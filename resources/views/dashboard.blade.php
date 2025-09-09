@@ -132,6 +132,100 @@
                                     </div>
                                 </div>
 
+                                <!-- Additional Statistics -->
+                                <div class="row mt-4">
+                                    <div class="col-lg-3 col-md-6">
+                                        <div class="stats-card total">
+                                            <div class="stats-icon">
+                                                <i class="flaticon-calendar"></i>
+                                            </div>
+                                            <div class="stats-content">
+                                                <h3>{{ $totalAppointments }}</h3>
+                                                <p>Total Appointments</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6">
+                                        <div class="stats-card spent">
+                                            <div class="stats-icon">
+                                                <i class="flaticon-money"></i>
+                                            </div>
+                                            <div class="stats-content">
+                                                <h3>₱{{ number_format($totalSpent, 2) }}</h3>
+                                                <p>Total Spent</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6">
+                                        <div class="stats-card upcoming">
+                                            <div class="stats-icon">
+                                                <i class="flaticon-next"></i>
+                                            </div>
+                                            <div class="stats-content">
+                                                <h3>{{ $upcomingAppointments }}</h3>
+                                                <p>Upcoming</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6">
+                                        <div class="stats-card month">
+                                            <div class="stats-icon">
+                                                <i class="flaticon-chart"></i>
+                                            </div>
+                                            <div class="stats-content">
+                                                <h3>{{ $thisMonthAppointments }}</h3>
+                                                <p>This Month</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Info Cards -->
+                                <div class="row mt-4">
+                                    <!-- Next Appointment Card -->
+                                    <div class="col-lg-6">
+                                        <div class="info-card">
+                                            <h5><i class="flaticon-clock mr-2"></i>Next Appointment</h5>
+                                            @if($nextAppointment)
+                                                <div class="appointment-preview">
+                                                    <h6>{{ $nextAppointment->service->service_name ?? 'N/A' }}</h6>
+                                                    <p><i class="flaticon-calendar mr-1"></i>{{ \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('M j, Y') }}</p>
+                                                    <p><i class="flaticon-clock mr-1"></i>{{ \Carbon\Carbon::parse($nextAppointment->appointment_time)->format('h:i A') }}</p>
+                                                    <p><i class="flaticon-user mr-1"></i>{{ $nextAppointment->staff->name ?? 'TBA' }}</p>
+                                                    <span class="badge badge-warning">{{ ucfirst($nextAppointment->status) }}</span>
+                                                </div>
+                                            @else
+                                                <div class="empty-state-small">
+                                                    <i class="flaticon-calendar text-muted"></i>
+                                                    <p class="text-muted">No upcoming appointments</p>
+                                                    <a href="{{ url('/services') }}" class="btn btn-primary btn-sm">Book Now</a>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <!-- Popular Service Card -->
+                                    <div class="col-lg-6">
+                                        <div class="info-card">
+                                            <h5><i class="flaticon-star mr-2"></i>Most Booked Service</h5>
+                                            @if($popularService)
+                                                <div class="service-preview">
+                                                    <h6>{{ $popularService['service']->service_name ?? 'N/A' }}</h6>
+                                                    <p><i class="flaticon-tag mr-1"></i>₱{{ number_format($popularService['service']->price ?? 0, 2) }}</p>
+                                                    <p><i class="flaticon-chart mr-1"></i>Booked {{ $popularService['count'] }} times</p>
+                                                    <span class="badge badge-success">Popular Choice</span>
+                                                </div>
+                                            @else
+                                                <div class="empty-state-small">
+                                                    <i class="flaticon-beauty text-muted"></i>
+                                                    <p class="text-muted">No completed services yet</p>
+                                                    <a href="{{ url('/services') }}" class="btn btn-primary btn-sm">Explore Services</a>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Recent Appointments -->
                                 <div class="row mt-5">
                                     <div class="col-lg-12">
@@ -304,19 +398,19 @@
                                                                             data-price="₱{{ number_format($appointment->service->price ?? 0, 2) }}"
                                                                             data-status="{{ $appointment->status }}"
                                                                             title="View Details">
-                                                                        <i class="flaticon-view"></i>
+                                                                        <i class=fas fa-signal"></i>
                                                                     </button>
                                                                     @if($appointment->status === 'pending')
                                                                         <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 title="Cancel">
-                                                                            <i class="flaticon-cancel"></i>
+                                                                            <i class="fas fa-signal"></i>
                                                                         </button>
                                                                     @elseif($appointment->status === 'scheduled')
                                                                         <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 title="Reschedule">
-                                                                            <i class="flaticon-calendar"></i>
+                                                                            <i class="fas fa-signal"></i>
                                                                         </button>
                                                                     @endif
                                                                 </div>
@@ -632,6 +726,22 @@
 
         .stats-card.cancelled .stats-icon {
             background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .stats-card.total .stats-icon {
+            background: linear-gradient(135deg, #6f42c1, #5a2d91);
+        }
+
+        .stats-card.spent .stats-icon {
+            background: linear-gradient(135deg, #fd7e14, #e55a00);
+        }
+
+        .stats-card.upcoming .stats-icon {
+            background: linear-gradient(135deg, #20c997, #17a085);
+        }
+
+        .stats-card.month .stats-icon {
+            background: linear-gradient(135deg, #e83e8c, #d81b70);
         }
 
         .stats-content h3 {
@@ -1083,6 +1193,58 @@
             background-color: #343a40;
             color: white;
         }
+
+        /* Info Cards */
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            height: 100%;
+        }
+
+        .info-card h5 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .appointment-preview, .service-preview {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .appointment-preview h6, .service-preview h6 {
+            color: #007bff;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .appointment-preview p, .service-preview p {
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .empty-state-small {
+            text-align: center;
+            padding: 30px 15px;
+            color: #999;
+        }
+
+        .empty-state-small i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+
+        .empty-state-small p {
+            margin-bottom: 15px;
+        }
     </style>
 @endpush
 
@@ -1178,7 +1340,7 @@
 
             // Function to load appointments for calendar
             function loadCalendarAppointments() {
-                fetch('{{ route("users.dashboard.appointments") }}')
+                fetch('{{ route("dashboard.appointments") }}')
                     .then(response => response.json())
                     .then(appointments => {
                         console.log('Dynamic appointments:', appointments);
