@@ -13,7 +13,7 @@
 
     <!-- Stylesheets -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome-all.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/menu.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/leaflet.css') }}">
@@ -122,19 +122,7 @@
                                                 <ul class="dropdown-menu dropdown-menu-right shadow">
                                                     <li class="dropdown-header bg-light">
                                                         <div class="d-flex align-items-center">
-                                                            <div class="mr-3">
-                                                                @if (auth()->user()->avatar_url)
-                                                                    <img src="{{ auth()->user()->avatar_url }}"
-                                                                        alt="{{ auth()->user()->name }}"
-                                                                        class="rounded-circle" width="40"
-                                                                        height="40">
-                                                                @else
-                                                                    <div
-                                                                        class="avatar-placeholder-small rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold">
-                                                                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-                                                                    </div>
-                                                                @endif
-                                                            </div>
+
                                                             <div>
                                                                 <h6 class="mb-0 font-weight-bold">
                                                                     {{ auth()->user()->name }}</h6>
@@ -145,10 +133,12 @@
                                                     </li>
                                                     <div class="dropdown-divider"></div>
                                                     <li><a class="dropdown-item" href="{{ url('/users/dashboard') }}"><i
-                                                                class="fa fa-tachometer-alt mr-2"></i>Dashboard</a></li>
+                                                                class="fas fa-dice-d6 mr-2"></i>Dashboard</a></li>
                                                     <li><a class="dropdown-item"
                                                             href="{{ route('users.profile.edit') }}"><i
-                                                                class="fa fa-user mr-2"></i>Edit Profile</a></li>
+                                                                class="fas fa-user mr-2"></i>Edit Profile</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('chat.index') }}"><i
+                                                                class="fas fa-comments mr-2"></i>Chat</a></li>
                                                     <div class="dropdown-divider"></div>
                                                     <li>
                                                         <form method="POST" action="{{ route('logout') }}"

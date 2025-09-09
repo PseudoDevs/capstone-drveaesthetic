@@ -119,31 +119,7 @@
                             <p class="text-sm text-green-600">● Online</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button
-                            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
-                                </path>
-                            </svg>
-                        </button>
-                        <button
-                            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                        </button>
-                        <button
-                            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </button>
-                    </div>
+                    
                 </div>
 
                 <!-- Messages Area -->
@@ -421,13 +397,13 @@
         function createConversationItem(conversation) {
             const user = conversation.user;
             const latestMessage = conversation.latest_message;
-            
+
             const conversationDiv = document.createElement('div');
             conversationDiv.className = 'user-item px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors';
             conversationDiv.dataset.userId = user.id;
             conversationDiv.dataset.userName = user.name;
             conversationDiv.dataset.chatId = conversation.chat_id || '';
-            
+
             // Format timestamp
             let timeDisplay = '';
             if (conversation.last_message_at) {
@@ -437,33 +413,33 @@
                 const diffMins = Math.floor(diffMs / 60000);
                 const diffHours = Math.floor(diffMs / 3600000);
                 const diffDays = Math.floor(diffMs / 86400000);
-                
+
                 if (diffMins < 1) timeDisplay = 'now';
                 else if (diffMins < 60) timeDisplay = `${diffMins}m`;
                 else if (diffHours < 24) timeDisplay = `${diffHours}h`;
                 else timeDisplay = `${diffDays}d`;
             }
-            
+
             // Format last message preview
             let messagePreview = '';
             let messageClass = 'text-gray-500';
-            
+
             if (latestMessage) {
                 const prefix = latestMessage.is_own_message ? 'You: ' : '';
                 let message = latestMessage.message;
-                
+
                 // Truncate long messages
                 if (message.length > 40) {
                     message = message.substring(0, 37) + '...';
                 }
-                
+
                 messagePreview = `${prefix}${message}`;
                 messageClass = latestMessage.is_own_message ? 'text-blue-600' : 'text-gray-700';
             } else {
                 messagePreview = 'Click to start conversation';
                 messageClass = 'text-gray-400 italic';
             }
-            
+
             conversationDiv.innerHTML = `
                 <div class="flex items-center space-x-3">
                     <div class="relative">
@@ -486,11 +462,11 @@
                     </div>
                 </div>
             `;
-            
+
             conversationDiv.addEventListener('click', function() {
                 selectUser(user.id, user.name);
             });
-            
+
             return conversationDiv;
         }
 
