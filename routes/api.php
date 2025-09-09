@@ -12,10 +12,24 @@ use App\Http\Controllers\Api\Client\MessageController;
 use App\Http\Controllers\Api\Client\MedicalCertificateController;
 use App\Http\Controllers\Api\Client\TimeLogsController;
 use App\Http\Controllers\Api\Client\TrainingController;
+use App\Http\Controllers\Api\Client\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+// Public Authentication Routes (no auth required)
+Route::prefix('client/auth')->name('client.auth.')->group(function () {
+    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('register', [AuthController::class, 'register'])->name('register');
+});
+
+// Protected Authentication Routes (auth required)
+Route::prefix('client/auth')->name('client.auth.')->middleware('auth:sanctum')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('profile', [AuthController::class, 'profile'])->name('profile');
+    Route::put('profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+});
 
 // Client API Routes with /api/client prefix
 Route::prefix('client')->name('client.')->group(function () {
