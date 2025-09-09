@@ -404,13 +404,13 @@
                                                                         <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 title="Cancel">
-                                                                            <i class="flaticon-cancel"></i>
+                                                                            <i class="fas fa-ban"></i>
                                                                         </button>
                                                                     @elseif($appointment->status === 'scheduled')
                                                                         <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 title="Reschedule">
-                                                                            <i class="flaticon-calendar"></i>
+                                                                            <i class="fas fa-calendar"></i>
                                                                         </button>
                                                                     @endif
                                                                 </div>
@@ -1296,20 +1296,69 @@
                             // Handle appointment cancellation
                             Swal.fire({
                                 title: 'Cancel Appointment',
-                                text: 'Are you sure you want to cancel this appointment?',
+                                text: 'Are you sure you want to cancel this appointment? This action cannot be undone.',
                                 icon: 'warning',
                                 showCancelButton: true,
                                 confirmButtonColor: '#dc3545',
                                 cancelButtonColor: '#6c757d',
-                                confirmButtonText: 'Yes, cancel it!'
+                                confirmButtonText: '<i class="flaticon-check mr-1"></i>Yes, cancel it!',
+                                cancelButtonText: '<i class="flaticon-cancel mr-1"></i>No, keep it'
                             }).then((cancelResult) => {
                                 if (cancelResult.isConfirmed) {
-                                    // TODO: Implement actual cancellation logic
-                                    Swal.fire(
-                                        'Cancelled!',
-                                        'Your appointment has been cancelled.',
-                                        'success'
-                                    );
+                                    // Show loading state
+                                    Swal.fire({
+                                        title: 'Cancelling...',
+                                        text: 'Please wait while we cancel your appointment.',
+                                        allowOutsideClick: false,
+                                        allowEscapeKey: false,
+                                        showConfirmButton: false,
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                        }
+                                    });
+
+                                    // Make the API call to cancel appointment
+                                    fetch(`/appointments/${event.id}/cancel`, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Accept': 'application/json'
+                                        }
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Cancelled!',
+                                                text: 'Your appointment has been cancelled successfully.',
+                                                confirmButtonColor: '#007bff',
+                                                confirmButtonText: 'OK'
+                                            }).then(() => {
+                                                // Remove the event from calendar
+                                                event.remove();
+                                                // Refresh the entire page to update statistics
+                                                location.reload();
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error!',
+                                                text: data.message || 'Failed to cancel the appointment. Please try again.',
+                                                confirmButtonColor: '#dc3545'
+                                            });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error!',
+                                            text: 'Network error occurred. Please check your connection and try again.',
+                                            confirmButtonColor: '#dc3545'
+                                        });
+                                    });
                                 }
                             });
                         }

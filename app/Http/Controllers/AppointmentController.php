@@ -46,6 +46,9 @@ class AppointmentController extends Controller
             return redirect()->back()->withErrors(['appointment_time' => 'This time slot is already booked.'])->withInput();
         }
 
+        // Get the service to retrieve staff_id
+        $service = \App\Models\ClinicService::findOrFail($validated['service_id']);
+        
         // Create appointment data
         $appointmentData = [
             'client_id' => auth()->id(),
@@ -57,6 +60,11 @@ class AppointmentController extends Controller
             'form_completed' => true,
             'medical_form_data' => $medicalFormData,
         ];
+
+        // Add staff_id if the service has one assigned
+        if ($service->staff_id) {
+            $appointmentData['staff_id'] = $service->staff_id;
+        }
 
         $appointment = Appointment::create($appointmentData);
 
@@ -72,12 +80,67 @@ class AppointmentController extends Controller
         return redirect()->back()->with('success', 'Appointment created successfully');
     }
 
-    public function cancel($id)
+    public function cancel(Request $request, $id)
     {
-        $appointment = Appointment::findOrFail($id);
-        $appointment->update(['status' => 'cancelled']);
+        try {
+            $appointment = Appointment::findOrFail($id);
+            
+            // Check if the appointment belongs to the authenticated user
+            if ($appointment->client_id !== auth()->id()) {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You are not authorized to cancel this appointment.'
+                    ], 403);
+                }
+                return redirect()->back()->withErrors(['error' => 'You are not authorized to cancel this appointment.']);
+            }
+            
+            // Check if appointment can be cancelled
+            if ($appointment->status === 'cancelled') {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This appointment is already cancelled.'
+                    ], 422);
+                }
+                return redirect()->back()->withErrors(['error' => 'This appointment is already cancelled.']);
+            }
+            
+            if ($appointment->status === 'completed') {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot cancel a completed appointment.'
+                    ], 422);
+                }
+                return redirect()->back()->withErrors(['error' => 'Cannot cancel a completed appointment.']);
+            }
+            
+            $appointment->update(['status' => 'cancelled']);
 
-        return redirect()->back()->with('success', 'Appointment cancelled successfully');
+            // Return JSON response for AJAX requests
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Appointment cancelled successfully!',
+                    'appointment' => $appointment->load(['service', 'client'])
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Appointment cancelled successfully!');
+            
+        } catch (\Exception $e) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while cancelling the appointment.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()->withErrors(['error' => 'An error occurred while cancelling the appointment.']);
+        }
     }
 
     public function getAvailableTimeSlots(Request $request)

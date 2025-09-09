@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Appointment;
+use Illuminate\Pagination\Paginator;
+use App\Observers\AppointmentObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+         Paginator::useBootstrapFive();
+
+        // Register observers
+        Appointment::observe(AppointmentObserver::class);
     }
 }

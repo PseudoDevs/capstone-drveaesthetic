@@ -322,7 +322,9 @@
                                 <button type="button" class="theme-btn" data-toggle="modal"
                                     data-target="#appointmentModal" data-service-id="{{ $service->id }}"
                                     data-service-name="{{ $service->service_name }}"
-                                    data-service-price="{{ $service->price }}">
+                                    data-service-price="{{ $service->price }}"
+                                    data-staff-id="{{ $service->staff_id }}"
+                                    data-staff-name="{{ $service->staff->name ?? 'TBA' }}">
                                     Set An Appointment
                                 </button>
                             </div>
@@ -374,7 +376,8 @@
                             <div class="col-md-12 mb-3">
                                 <div class="alert alert-info">
                                     <strong>Service:</strong> <span id="selectedServiceName"></span><br>
-                                    <strong>Price:</strong> $<span id="selectedServicePrice"></span>
+                                    <strong>Price:</strong> $<span id="selectedServicePrice"></span><br>
+                                    <strong>Staff:</strong> <span id="selectedStaffName"></span>
                                 </div>
                             </div>
                         </div>
@@ -540,6 +543,7 @@
                         </div>
 
                         <input type="hidden" id="service_id" name="service_id">
+                        <input type="hidden" id="staff_id" name="staff_id">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -583,6 +587,8 @@ $(document).ready(function() {
         var serviceId = button.data('service-id');
         var serviceName = button.data('service-name');
         var servicePrice = button.data('service-price');
+        var staffId = button.data('staff-id');
+        var staffName = button.data('staff-name');
 
         // Check if user is authenticated
         @guest
@@ -595,7 +601,9 @@ $(document).ready(function() {
         // Update modal with service information
         $('#selectedServiceName').text(serviceName);
         $('#selectedServicePrice').text(servicePrice);
+        $('#selectedStaffName').text(staffName);
         $('#service_id').val(serviceId);
+        $('#staff_id').val(staffId);
     });
 
     // Handle date change to update available time slots
