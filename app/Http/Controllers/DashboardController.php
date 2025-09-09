@@ -24,22 +24,55 @@ class DashboardController extends Controller
 
         // Group appointments by status
         $appointmentsByStatus = [
-            'pending' => $appointments->where('status', 'PENDING'),
-            'scheduled' => $appointments->where('status', 'SCHEDULED'),
-            'completed' => $appointments->where('status', 'COMPLETED'),
-            'cancelled' => $appointments->where('status', 'CANCELLED'),
+            'pending' => $appointments->where('status', 'pending'),
+            'scheduled' => $appointments->where('status', 'scheduled'),
+            'completed' => $appointments->where('status', 'completed'),
+            'cancelled' => $appointments->where('status', 'cancelled'),
         ];
 
+        // Calculate additional statistics
+        $totalAppointments = $appointments->count();
+        $totalSpent = $appointments->where('status', 'completed')
+            ->sum(function($appointment) {
+                return $appointment->service->price ?? 0;
+            });
+        
+        $upcomingAppointments = $appointments->whereIn('status', ['pending', 'scheduled'])
+            ->where('appointment_date', '>=', now()->format('Y-m-d'))
+            ->count();
+            
+        $thisMonthAppointments = $appointments->filter(function($appointment) {
+            return \Carbon\Carbon::parse($appointment->appointment_date)->isSameMonth(now());
+        })->count();
+
+        // Get next appointment
+        $nextAppointment = $appointments->whereIn('status', ['pending', 'scheduled'])
+            ->where('appointment_date', '>=', now()->format('Y-m-d'))
+            ->sortBy('appointment_date')
+            ->first();
+
+        // Get most popular service
+        $popularService = $appointments->where('status', 'completed')
+            ->groupBy('service_id')
+            ->map(function($group) {
+                return [
+                    'service' => $group->first()->service,
+                    'count' => $group->count()
+                ];
+            })
+            ->sortByDesc('count')
+            ->first();
+
         // Get appointments for calendar (scheduled and pending only)
-        $calendarAppointments = $appointments->whereIn('status', ['PENDING', 'SCHEDULED'])
+        $calendarAppointments = $appointments->whereIn('status', ['pending', 'scheduled'])
             ->map(function ($appointment) {
                 return [
                     'id' => $appointment->id,
                     'title' => $appointment->service->service_name ?? 'Appointment',
                     'start' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->appointment_time,
                     'end' => $appointment->appointment_date->format('Y-m-d') . 'T' . date('H:i:s', strtotime($appointment->appointment_time . ' +1 hour')),
-                    'backgroundColor' => $appointment->status === 'SCHEDULED' ? '#28a745' : '#ffc107',
-                    'borderColor' => $appointment->status === 'SCHEDULED' ? '#28a745' : '#ffc107',
+                    'backgroundColor' => $appointment->status === 'scheduled' ? '#28a745' : '#ffc107',
+                    'borderColor' => $appointment->status === 'scheduled' ? '#28a745' : '#ffc107',
                     'textColor' => '#fff',
                     'extendedProps' => [
                         'status' => $appointment->status,
@@ -52,7 +85,17 @@ class DashboardController extends Controller
                 ];
             });
 
-        return view('dashboard', compact('user', 'appointmentsByStatus', 'calendarAppointments'));
+        return view('dashboard', compact(
+            'user', 
+            'appointmentsByStatus', 
+            'calendarAppointments',
+            'totalAppointments',
+            'totalSpent',
+            'upcomingAppointments',
+            'thisMonthAppointments',
+            'nextAppointment',
+            'popularService'
+        ));
     }
 
     public function getAppointments(Request $request)
@@ -61,7 +104,7 @@ class DashboardController extends Controller
         
         $appointments = Appointment::where('client_id', $user->id)
             ->with(['service', 'staff'])
-            ->whereIn('status', ['PENDING', 'SCHEDULED'])
+            ->whereIn('status', ['pending', 'scheduled'])
             ->get()
             ->map(function ($appointment) {
                 return [
@@ -69,8 +112,8 @@ class DashboardController extends Controller
                     'title' => $appointment->service->service_name ?? 'Appointment',
                     'start' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->appointment_time,
                     'end' => $appointment->appointment_date->format('Y-m-d') . 'T' . date('H:i:s', strtotime($appointment->appointment_time . ' +1 hour')),
-                    'backgroundColor' => $appointment->status === 'SCHEDULED' ? '#28a745' : '#ffc107',
-                    'borderColor' => $appointment->status === 'SCHEDULED' ? '#28a745' : '#ffc107',
+                    'backgroundColor' => $appointment->status === 'scheduled' ? '#28a745' : '#ffc107',
+                    'borderColor' => $appointment->status === 'scheduled' ? '#28a745' : '#ffc107',
                     'textColor' => '#fff',
                     'extendedProps' => [
                         'status' => $appointment->status,

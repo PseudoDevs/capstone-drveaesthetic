@@ -72,9 +72,12 @@ Route::middleware('auth')->group(function () {
 
     // Appointment Routes
     Route::prefix('appointments')->name('appointments.')->group(function () {
-        Route::post('/', [AppointmentController::class, 'store'])->name('store');
-        Route::patch('/{id}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
+        Route::post('/', [AppointmentController::class, 'store'])->name('store')->middleware('auth');
+        Route::patch('/{id}/cancel', [AppointmentController::class, 'cancel'])->name('cancel')->middleware('auth');
     });
+    
+    // Public appointment routes (no auth required)
+    Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableTimeSlots'])->name('appointments.available-slots');
 
     // Chat Routes
     Route::prefix('chat')->name('chat.')->group(function () {

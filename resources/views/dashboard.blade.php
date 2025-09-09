@@ -160,11 +160,13 @@
                                                                             <br>
                                                                             @php
                                                                                 $badgeClass = match($appointment->status) {
-                                                                                    'PENDING' => 'badge-warning',
-                                                                                    'SCHEDULED' => 'badge-info',
-                                                                                    'ON-GOING' => 'badge-primary',
-                                                                                    'COMPLETED' => 'badge-success',
-                                                                                    'CANCELLED' => 'badge-danger',
+                                                                                    'pending' => 'badge-warning',
+                                                                                    'scheduled' => 'badge-info',
+                                                                                    'on-going' => 'badge-primary',
+                                                                                    'completed' => 'badge-success',
+                                                                                    'cancelled' => 'badge-danger',
+                                                                                    'declined' => 'badge-secondary',
+                                                                                    'rescheduled' => 'badge-dark',
                                                                                     default => 'badge-light'
                                                                                 };
                                                                             @endphp
@@ -189,13 +191,13 @@
                                                                                 title="View Details">
                                                                             <i class="flaticon-view"></i>
                                                                         </button>
-                                                                        @if($appointment->status === 'PENDING')
+                                                                        @if($appointment->status === 'pending')
                                                                             <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
                                                                                     data-appointment-id="{{ $appointment->id }}"
                                                                                     title="Cancel">
                                                                                 <i class="flaticon-cancel"></i>
                                                                             </button>
-                                                                        @elseif($appointment->status === 'SCHEDULED')
+                                                                        @elseif($appointment->status === 'scheduled')
                                                                             <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
                                                                                     data-appointment-id="{{ $appointment->id }}"
                                                                                     title="Reschedule">
@@ -273,13 +275,13 @@
                                                                         <br>
                                                                         @php
                                                                             $badgeClass = match($appointment->status) {
-                                                                                'PENDING' => 'badge-warning',
-                                                                                'SCHEDULED' => 'badge-info',
-                                                                                'ON-GOING' => 'badge-primary',
-                                                                                'COMPLETED' => 'badge-success',
-                                                                                'CANCELLED' => 'badge-danger',
-                                                                                'DECLINED' => 'badge-secondary',
-                                                                                'RESCHEDULE' => 'badge-dark',
+                                                                                'pending' => 'badge-warning',
+                                                                                'scheduled' => 'badge-info',
+                                                                                'on-going' => 'badge-primary',
+                                                                                'completed' => 'badge-success',
+                                                                                'cancelled' => 'badge-danger',
+                                                                                'declined' => 'badge-secondary',
+                                                                                'rescheduled' => 'badge-dark',
                                                                                 default => 'badge-light'
                                                                             };
                                                                         @endphp
@@ -304,13 +306,13 @@
                                                                             title="View Details">
                                                                         <i class="flaticon-view"></i>
                                                                     </button>
-                                                                    @if($appointment->status === 'PENDING')
+                                                                    @if($appointment->status === 'pending')
                                                                         <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 title="Cancel">
                                                                             <i class="flaticon-cancel"></i>
                                                                         </button>
-                                                                    @elseif($appointment->status === 'SCHEDULED')
+                                                                    @elseif($appointment->status === 'scheduled')
                                                                         <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 title="Reschedule">
@@ -1115,7 +1117,7 @@
                                 <p><strong>Staff:</strong> ${props.staff}</p>
                                 <p><strong>Price:</strong> ${props.price || 'N/A'}</p>
                                 <p><strong>Status:</strong>
-                                    <span class="badge badge-${props.status === 'PENDING' ? 'warning' : 'info'}">
+                                    <span class="badge badge-${props.status === 'pending' ? 'warning' : 'info'}">
                                         ${props.status}
                                     </span>
                                 </p>
@@ -1124,7 +1126,7 @@
                         icon: 'info',
                         confirmButtonColor: '#fbaaa9',
                         confirmButtonText: 'Close',
-                        showCancelButton: props.status === 'PENDING',
+                        showCancelButton: props.status === 'pending',
                         cancelButtonText: 'Cancel Appointment',
                         cancelButtonColor: '#dc3545'
                     }).then((result) => {
@@ -1452,20 +1454,20 @@
 
                 let statusBadge = '';
                 switch(status) {
-                    case 'PENDING':
+                    case 'pending':
                         statusBadge = '<span class="badge badge-warning">Pending</span>';
                         break;
-                    case 'SCHEDULED':
+                    case 'scheduled':
                         statusBadge = '<span class="badge badge-info">Scheduled</span>';
                         break;
-                    case 'COMPLETED':
+                    case 'completed':
                         statusBadge = '<span class="badge badge-success">Completed</span>';
                         break;
-                    case 'CANCELLED':
+                    case 'cancelled':
                         statusBadge = '<span class="badge badge-danger">Cancelled</span>';
                         break;
                     default:
-                        statusBadge = '<span class="badge badge-light">' + status + '</span>';
+                        statusBadge = '<span class="badge badge-light">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span>';
                 }
 
                 Swal.fire({
