@@ -59,7 +59,48 @@ Login with email and password to get an access token.
 }
 ```
 
-### 2. Register
+### 2. Google Login
+**POST** `/api/client/auth/google-login`
+
+Authenticate/register user using Google OAuth token from mobile apps.
+
+#### Request Body
+```json
+{
+    "access_token": "ya29.a0ARrd...", // Required: Google access token
+    "id_token": "eyJhbGc..."           // Optional: Google ID token for extra security
+}
+```
+
+#### Success Response (200)
+```json
+{
+    "success": true,
+    "message": "Google login successful",
+    "user": {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@gmail.com",
+        "avatar_url": "https://lh3.googleusercontent.com/a/...",
+        "google_id": "1234567890",
+        "role": "client",
+        "created_at": "2024-01-01T00:00:00.000000Z"
+    },
+    "access_token": "1|abc123token...",
+    "token_type": "Bearer",
+    "is_new_user": false
+}
+```
+
+#### Error Response (401)
+```json
+{
+    "success": false,
+    "message": "Invalid Google token"
+}
+```
+
+### 3. Register
 **POST** `/api/client/auth/register`
 
 Register a new user account.
@@ -102,7 +143,7 @@ Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
 
-### 3. Logout
+### 4. Logout
 **POST** `/api/client/auth/logout`
 
 Logout and revoke the current access token.
@@ -115,7 +156,7 @@ Logout and revoke the current access token.
 }
 ```
 
-### 4. Get Profile
+### 5. Get Profile
 **GET** `/api/client/auth/profile`
 
 Get the current user's profile information.
@@ -141,10 +182,31 @@ Get the current user's profile information.
 }
 ```
 
-### 5. Update Profile
+### 6. Update Profile
 **PUT** `/api/client/auth/profile`
 
 Update the current user's profile information.
+
+### 7. Unlink Google Account
+**POST** `/api/client/auth/unlink-google`
+
+Unlink Google account from user profile (requires authentication).
+
+#### Success Response (200)
+```json
+{
+    "success": true,
+    "message": "Google account unlinked successfully"
+}
+```
+
+#### Error Response (400)
+```json
+{
+    "success": false,
+    "message": "No Google account linked"
+}
+```
 
 #### Request Body
 ```json

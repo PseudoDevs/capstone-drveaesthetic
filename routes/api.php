@@ -22,6 +22,7 @@ Route::get('/user', function (Request $request) {
 Route::prefix('client/auth')->name('client.auth.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register'])->name('register');
+    Route::post('google-login', [AuthController::class, 'googleLogin'])->name('google-login');
 });
 
 // Protected Authentication Routes (auth required)
@@ -29,6 +30,7 @@ Route::prefix('client/auth')->name('client.auth.')->middleware('auth:sanctum')->
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('profile', [AuthController::class, 'profile'])->name('profile');
     Route::put('profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+    Route::post('unlink-google', [AuthController::class, 'unlinkGoogle'])->name('unlink-google');
 });
 
 // Client API Routes with /api/client prefix

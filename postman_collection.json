@@ -57,6 +57,53 @@
 					"response": []
 				},
 				{
+					"name": "Google Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.access_token) {",
+									"        pm.environment.set(\"access_token\", jsonData.access_token);",
+									"        pm.environment.set(\"user_id\", jsonData.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"access_token\": \"ya29.a0ARrd...\",\n    \"id_token\": \"eyJhbGc...\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/client/auth/google-login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"client",
+								"auth",
+								"google-login"
+							]
+						},
+						"description": "Login/register with Google OAuth token"
+					},
+					"response": []
+				},
+				{
 					"name": "Register",
 					"request": {
 						"method": "POST",
@@ -181,6 +228,36 @@
 							]
 						},
 						"description": "Update user password (requires current password)"
+					},
+					"response": []
+				},
+				{
+					"name": "Unlink Google Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/client/auth/unlink-google",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"client",
+								"auth",
+								"unlink-google"
+							]
+						},
+						"description": "Unlink Google account from user profile (requires authentication)"
 					},
 					"response": []
 				},
