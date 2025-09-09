@@ -398,7 +398,7 @@
                                                                             data-price="₱{{ number_format($appointment->service->price ?? 0, 2) }}"
                                                                             data-status="{{ $appointment->status }}"
                                                                             title="View Details">
-                                                                        <i class=fas fa-signal"></i>
+                                                                        <i class="flaticon-view"></i>
                                                                     </button>
                                                                     @if($appointment->status === 'pending')
                                                                         <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
@@ -1340,7 +1340,7 @@
 
             // Function to load appointments for calendar
             function loadCalendarAppointments() {
-                fetch('{{ route("dashboard.appointments") }}')
+                fetch('{{ route("users.dashboard.appointments") }}')
                     .then(response => response.json())
                     .then(appointments => {
                         console.log('Dynamic appointments:', appointments);
