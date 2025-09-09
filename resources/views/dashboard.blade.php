@@ -404,13 +404,13 @@
                                                                         <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 title="Cancel">
-                                                                            <i class="fas fa-signal"></i>
+                                                                            <i class="flaticon-cancel"></i>
                                                                         </button>
                                                                     @elseif($appointment->status === 'scheduled')
                                                                         <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 title="Reschedule">
-                                                                            <i class="fas fa-signal"></i>
+                                                                            <i class="flaticon-calendar"></i>
                                                                         </button>
                                                                     @endif
                                                                 </div>
