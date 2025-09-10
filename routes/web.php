@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\ClinicService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AppointmentController;
@@ -59,6 +61,67 @@ Route::post('/logout', [LoginController::class, 'logout'])
 */
 
 Route::middleware('auth')->group(function () {
+    
+    // Custom Broadcasting Authentication for debugging
+    Route::post('/broadcasting/auth', function (Request $request) {
+        \Log::info('Broadcasting auth request', [
+            'headers' => $request->headers->all(),
+            'body' => $request->all(),
+            'user' => auth()->id()
+        ]);
+
+        if (!auth()->check()) {
+            \Log::error('User not authenticated for broadcasting');
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $channelName = $request->input('channel_name');
+        $socketId = $request->input('socket_id');
+        
+        \Log::info('Broadcasting auth attempt', [
+            'channel' => $channelName,
+            'socket_id' => $socketId,
+            'user_id' => auth()->id()
+        ]);
+
+        // Extract chat ID from channel name
+        if (preg_match('/^private-chat\.(\d+)$/', $channelName, $matches)) {
+            $chatId = $matches[1];
+            $user = auth()->user();
+            
+            $chat = \App\Models\Chat::find($chatId);
+            if (!$chat) {
+                \Log::error('Chat not found', ['chat_id' => $chatId]);
+                return response()->json(['error' => 'Chat not found'], 403);
+            }
+            
+            if ($chat->staff_id != $user->id && $chat->client_id != $user->id) {
+                \Log::error('User not authorized for chat', [
+                    'user_id' => $user->id,
+                    'chat_id' => $chatId,
+                    'staff_id' => $chat->staff_id,
+                    'client_id' => $chat->client_id
+                ]);
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            // Generate Pusher auth signature
+            $pusher = app('pusher');
+            $authResponse = $pusher->authorizeChannel($channelName, $socketId);
+            
+            \Log::info('Broadcasting auth success', [
+                'channel' => $channelName,
+                'response' => $authResponse
+            ]);
+            
+            return response($authResponse, 200, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
+
+        \Log::error('Invalid channel format', ['channel' => $channelName]);
+        return response()->json(['error' => 'Invalid channel'], 400);
+    });
 
     // Dashboard Routes
     Route::prefix('users')->name('users.')->group(function () {

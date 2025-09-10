@@ -112,7 +112,7 @@ class ChatController extends Controller
     {
         $validated = $request->validate([
             'receiver_id' => 'required|exists:users,id',
-            'message' => 'required|string',
+            'message' => 'required|string|max:1000',
         ]);
 
         $user = auth()->user();
@@ -126,9 +126,23 @@ class ChatController extends Controller
 
         $chat->update(['last_message_at' => now()]);
 
+        // Broadcast the message
+        broadcast(new \App\Events\MessageSent($message));
+
         return response()->json([
             'status' => 'success',
-            'message' => $message->load('user')
+            'message' => [
+                'id' => $message->id,
+                'message' => $message->message,
+                'user_id' => $message->user_id,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'avatar' => $user->avatar,
+                ],
+                'created_at' => $message->created_at->toISOString(),
+                'chat_id' => $message->chat_id,
+            ]
         ]);
     }
 }
