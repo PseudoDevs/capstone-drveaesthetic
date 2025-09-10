@@ -57,6 +57,18 @@ Route::prefix('client')->name('client.')->group(function () {
     Route::get('chats/messages/{userId}', [ChatController::class, 'getMessages'])->name('chats.get-messages');
     Route::post('chats/send-message', [ChatController::class, 'sendMessage'])->name('chats.send-message');
     
+    // Mobile-specific Chat API endpoints
+    Route::prefix('mobile/chat')->name('mobile.chat.')->middleware('auth:sanctum')->group(function () {
+        Route::get('conversations', [ChatController::class, 'getConversations'])->name('conversations');
+        Route::get('conversations/{chatId}/messages', [ChatController::class, 'getConversationMessages'])->name('messages');
+        Route::post('send-message', [ChatController::class, 'sendMessageMobile'])->name('send-message');
+        Route::post('conversations/{chatId}/mark-read', [ChatController::class, 'markMessagesAsRead'])->name('mark-read');
+        Route::post('conversations/{chatId}/typing', [ChatController::class, 'updateTypingStatus'])->name('typing');
+        Route::delete('messages/{messageId}', [ChatController::class, 'deleteMessage'])->name('delete-message');
+        Route::get('unread-count', [ChatController::class, 'getUnreadCount'])->name('unread-count');
+        Route::get('search-users', [ChatController::class, 'searchUsers'])->name('search-users');
+    });
+    
     // Messages API
     Route::apiResource('messages', MessageController::class);
     
