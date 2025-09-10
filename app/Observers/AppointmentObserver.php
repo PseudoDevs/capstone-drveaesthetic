@@ -26,18 +26,18 @@ class AppointmentObserver
         if ($appointment->isDirty('status')) {
             $oldStatus = $appointment->getOriginal('status');
             $newStatus = $appointment->status;
-            
+
             // Only send email if status actually changed and it's not the initial creation
             if ($oldStatus !== $newStatus && $oldStatus !== null) {
                 try {
                     // Load necessary relationships if not already loaded
                     $appointment->load(['client', 'service', 'staff']);
-                    
+
                     // Send email notification to the client
                     if ($appointment->client && $appointment->client->email) {
                         Mail::to($appointment->client->email)
                             ->send(new AppointmentStatusNotification($appointment, $oldStatus));
-                        
+
                         // Show notification in Filament (if available)
                         if (class_exists(\Filament\Notifications\Notification::class)) {
                             \Filament\Notifications\Notification::make()
