@@ -109,4 +109,18 @@ class AppointmentController extends Controller
             'message' => 'Appointment deleted successfully'
         ]);
     }
+
+    public function getUserAppointments($userId): JsonResponse
+    {
+        $appointments = Appointment::with(['client', 'service', 'staff'])
+            ->forClient($userId)
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointments
+        ]);
+    }
 }
