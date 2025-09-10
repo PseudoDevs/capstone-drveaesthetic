@@ -86,8 +86,8 @@ Route::prefix('client')->name('client.')->group(function () {
     
 });
 
-// Special routes that support Bearer token authentication for mobile chat functionality
-Route::prefix('client')->name('client.')->middleware('auth:sanctum')->group(function () {
+// Special routes that support both web and Bearer token authentication for chat functionality
+Route::prefix('client')->name('client.')->middleware(['auth:sanctum,web'])->group(function () {
     Route::get('chats/search/staff', [ChatController::class, 'searchStaff'])->name('chats.search-staff');
 });
 

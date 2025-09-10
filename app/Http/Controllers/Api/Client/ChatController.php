@@ -128,8 +128,8 @@ class ChatController extends Controller
 
     public function searchStaff(Request $request): JsonResponse
     {
-        // Use Bearer token authentication for mobile requests
-        $user = auth('sanctum')->user();
+        // Support both Bearer token (mobile/API) and web session authentication
+        $user = auth('sanctum')->user() ?? auth('web')->user();
 
         if (!$user) {
             return response()->json([
