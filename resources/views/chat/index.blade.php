@@ -692,8 +692,17 @@
         function displayMessages(messages) {
             const container = document.getElementById('messagesContainer');
             container.innerHTML = '';
+            
+            console.log('Displaying messages:', messages);
+            console.log('Messages count:', messages.length);
 
-            messages.forEach(message => {
+            if (!messages || messages.length === 0) {
+                showEmptyConversation();
+                return;
+            }
+
+            messages.forEach((message, index) => {
+                console.log(`Adding message ${index}:`, message);
                 addMessageToUI(message);
             });
 

@@ -86,9 +86,25 @@ class ChatController extends Controller
         $chat = Chat::findOrCreateChat($user->id, $userId);
         $messages = $chat->messages()->with('user')->orderBy('created_at', 'asc')->get();
 
+        // Format messages for frontend
+        $formattedMessages = $messages->map(function($message) {
+            return [
+                'id' => $message->id,
+                'message' => $message->message,
+                'user_id' => $message->user_id,
+                'user' => [
+                    'id' => $message->user->id,
+                    'name' => $message->user->name,
+                    'avatar' => $message->user->avatar,
+                ],
+                'created_at' => $message->created_at->toISOString(),
+                'chat_id' => $message->chat_id,
+            ];
+        });
+
         return response()->json([
             'chat_id' => $chat->id,
-            'messages' => $messages
+            'messages' => $formattedMessages
         ]);
     }
 
