@@ -41,6 +41,7 @@ Route::prefix('client')->name('client.')->group(function () {
     
     // Appointments API
     Route::apiResource('appointments', AppointmentController::class);
+    Route::get('users/{userId}/appointments', [AppointmentController::class, 'getUserAppointments'])->name('appointments.user');
     
     // Clinic Services API
     Route::apiResource('services', ClinicServiceController::class);
