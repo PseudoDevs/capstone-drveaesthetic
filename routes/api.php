@@ -86,8 +86,8 @@ Route::prefix('client')->name('client.')->group(function () {
     
 });
 
-// Special routes that support web authentication for chat functionality
-Route::prefix('client')->name('client.')->middleware('web')->group(function () {
+// Special routes that support Bearer token authentication for mobile chat functionality
+Route::prefix('client')->name('client.')->middleware('auth:sanctum')->group(function () {
     Route::get('chats/search/staff', [ChatController::class, 'searchStaff'])->name('chats.search-staff');
 });
 

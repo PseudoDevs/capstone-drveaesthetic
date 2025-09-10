@@ -128,8 +128,8 @@ class ChatController extends Controller
 
     public function searchStaff(Request $request): JsonResponse
     {
-        // Support both API authentication and web authentication
-        $user = auth()->user() ?? auth('web')->user();
+        // Use Bearer token authentication for mobile requests
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
@@ -141,7 +141,7 @@ class ChatController extends Controller
         $query = $request->get('query', '');
 
         // Get all staff users (Staff, Doctor, Admin), with optional search filtering
-        $staffQuery = \App\Models\User::whereIn('role', ['Staff'])
+        $staffQuery = \App\Models\User::whereIn('role', ['Staff', 'Doctor', 'Admin'])
             ->where('id', '!=', $user->id); // Exclude current user
 
         // Apply search filter if query is provided (case-insensitive search)
