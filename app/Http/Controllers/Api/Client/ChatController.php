@@ -141,7 +141,7 @@ class ChatController extends Controller
         $query = $request->get('query', '');
 
         // Get all staff users (Staff, Doctor, Admin), with optional search filtering
-        $staffQuery = \App\Models\User::whereIn('role', ['Staff', 'Doctor', 'Admin'])
+        $staffQuery = \App\Models\User::whereIn('role', ['Staff'])
             ->where('id', '!=', $user->id); // Exclude current user
 
         // Apply search filter if query is provided (case-insensitive search)
