@@ -90,3 +90,5 @@ Route::prefix('client')->name('client.')->group(function () {
 Route::prefix('client')->name('client.')->middleware('web')->group(function () {
     Route::get('chats/search/staff', [ChatController::class, 'searchStaff'])->name('chats.search-staff');
 });
+
+

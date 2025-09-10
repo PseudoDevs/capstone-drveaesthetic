@@ -140,16 +140,23 @@ class ChatController extends Controller
 
         $query = $request->get('query', '');
 
-        $staff = \App\Models\User::whereIn('role', ['Staff'])
-            ->where('id', '!=', $user->id) // Exclude current user
-            ->where(function($q) use ($query) {
-                if ($query) {
-                    $q->where('name', 'LIKE', "%{$query}%")
-                      ->orWhere('email', 'LIKE', "%{$query}%");
-                }
-            })
+        // Get all staff users (Staff, Doctor, Admin), with optional search filtering
+        $staffQuery = \App\Models\User::whereIn('role', ['Staff', 'Doctor', 'Admin'])
+            ->where('id', '!=', $user->id); // Exclude current user
+
+        // Apply search filter if query is provided (case-insensitive search)
+        if (!empty(trim($query))) {
+            $searchTerm = trim($query);
+            $staffQuery->where(function($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(name) LIKE LOWER(?)', ["%{$searchTerm}%"])
+                  ->orWhereRaw('LOWER(email) LIKE LOWER(?)', ["%{$searchTerm}%"]);
+            });
+        }
+
+        $staff = $staffQuery
             ->select('id', 'name', 'email', 'role', 'avatar')
-            ->limit(20)
+            ->orderBy('name')
+            ->limit(50)
             ->get();
 
         return response()->json([
@@ -247,7 +254,7 @@ class ChatController extends Controller
         $formattedChats = $chats->getCollection()->map(function($chat) use ($user) {
             $otherUser = $chat->staff_id == $user->id ? $chat->client : $chat->staff;
             $latestMessage = $chat->latestMessage;
-            
+
             return [
                 'id' => $chat->id,
                 'other_user' => [
@@ -532,9 +539,9 @@ class ChatController extends Controller
         // Determine which roles the current user can chat with
         $searchRoles = [];
         if ($userRole === 'Client') {
-            $searchRoles = ['Staff', 'Admin'];
+            $searchRoles = ['Staff', 'Doctor', 'Admin'];
         } else {
-            $searchRoles = ['Client', 'Staff', 'Admin'];
+            $searchRoles = ['Client', 'Staff', 'Doctor', 'Admin'];
         }
 
         $users = \App\Models\User::whereIn('role', $searchRoles)
