@@ -270,21 +270,23 @@
         }
 
         function setupPusher() {
-            // Pusher is initialized in bootstrap.js as window.pusher
-            console.log('Pusher initialized:', window.pusher);
+            // Laravel Echo is initialized in bootstrap.js as window.Echo
+            console.log('Laravel Echo initialized:', window.Echo);
 
-            // Add connection state logging
-            window.pusher.connection.bind('connected', () => {
-                console.log('Pusher connected successfully');
-            });
+            if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
+                // Add connection state logging
+                window.Echo.connector.pusher.connection.bind('connected', () => {
+                    console.log('Pusher connected successfully via Echo');
+                });
 
-            window.pusher.connection.bind('disconnected', () => {
-                console.log('Pusher disconnected');
-            });
+                window.Echo.connector.pusher.connection.bind('disconnected', () => {
+                    console.log('Pusher disconnected');
+                });
 
-            window.pusher.connection.bind('error', (error) => {
-                console.error('Pusher connection error:', error);
-            });
+                window.Echo.connector.pusher.connection.bind('error', (error) => {
+                    console.error('Pusher connection error:', error);
+                });
+            }
         }
 
         function selectUser(userId, userName) {
@@ -652,36 +654,38 @@
         }
 
         function setupChatChannel() {
-            if (window.pusher && currentChatId) {
-                // Unsubscribe from previous channel if exists
+            if (window.Echo && currentChatId) {
+                // Leave previous channel if exists
                 if (pusherChannel) {
-                    pusherChannel.unbind_all();
-                    window.pusher.unsubscribe(pusherChannel.name);
+                    window.Echo.leave(`chat.${pusherChannel}`);
                 }
 
-                // Subscribe to new chat channel
-                pusherChannel = window.pusher.subscribe(`private-chat.${currentChatId}`);
+                // Subscribe to new chat channel using Laravel Echo
+                console.log(`Subscribing to private chat channel: chat.${currentChatId}`);
+                
+                pusherChannel = currentChatId;
+                window.Echo.private(`chat.${currentChatId}`)
+                    .listen('MessageSent', (e) => {
+                        console.log('Received message via Echo:', e);
+                        if (e.message.user_id !== currentUserId) {
+                            addMessageToUI(e.message);
 
-                pusherChannel.bind('message.sent', (data) => {
-                    console.log('Received message:', data);
-                    if (data.message.user_id !== currentUserId) {
-                        addMessageToUI(data.message);
-
-                        // Immediately refresh conversations list to update last message and order
-                        setTimeout(() => {
-                            loadUserConversations();
-                            updateSelectedUserInSidebar();
-                        }, 100); // Very fast refresh for real-time updates
-                    }
-                });
-
-                pusherChannel.bind('pusher:subscription_succeeded', () => {
-                    console.log('Successfully subscribed to chat channel:', currentChatId);
-                });
-
-                pusherChannel.bind('pusher:subscription_error', (error) => {
-                    console.error('Subscription error:', error);
-                });
+                            // Immediately refresh conversations list to update last message and order
+                            setTimeout(() => {
+                                if ({{ $currentUser->role === 'Client' ? 'false' : 'true' }}) {
+                                    loadUserConversations();
+                                    updateSelectedUserInSidebar();
+                                }
+                            }, 100); // Very fast refresh for real-time updates
+                        }
+                    })
+                    .error((error) => {
+                        console.error('Echo subscription error:', error);
+                    });
+            } else if (!window.Echo) {
+                console.error('Laravel Echo not initialized');
+            } else if (!currentChatId) {
+                console.error('No current chat ID for subscription');
             }
         }
 
