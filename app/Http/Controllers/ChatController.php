@@ -32,7 +32,13 @@ class ChatController extends Controller
         // Remove duplicates
         $users = $users->unique('id');
 
-        return view('chat.index', compact('chats', 'users', 'currentUser'));
+        // For clients, always provide the staff member data
+        $staffMember = null;
+        if ($currentUser->role === 'Client') {
+            $staffMember = \App\Models\User::where('role', 'Staff')->first();
+        }
+
+        return view('chat.index', compact('chats', 'users', 'currentUser', 'staffMember'));
     }
 
     public function getConversations()

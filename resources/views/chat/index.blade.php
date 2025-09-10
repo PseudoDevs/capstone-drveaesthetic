@@ -37,10 +37,11 @@
                 </div>
             </div>
 
-            <!-- Search -->
+            <!-- Search (only show for non-clients since clients only need to see the staff) -->
+            @if($currentUser->role !== 'Client')
             <div class="p-4">
                 <div class="relative">
-                    <input type="text" placeholder="Search staff members..." id="searchUsers"
+                    <input type="text" placeholder="Search users..." id="searchUsers"
                         class="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-full focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
                     <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -52,37 +53,72 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- User List -->
             <div class="flex-1 overflow-y-auto">
-                @foreach ($users as $user)
-                    <div class="user-item px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors"
-                        data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}">
-                        <div class="flex items-center space-x-3">
-                            <div class="relative">
-                                <div
-                                    class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                    {{ substr($user->name, 0, 2) }}
+                @if($currentUser->role === 'Client')
+                    <!-- For clients, directly show the staff member -->
+                    @if($staffMember)
+                        <div class="user-item px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors"
+                            data-user-id="{{ $staffMember->id }}" data-user-name="{{ $staffMember->name }}">
+                            <div class="flex items-center space-x-3">
+                                <div class="relative">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                        {{ substr($staffMember->name, 0, 2) }}
+                                    </div>
+                                    <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></div>
                                 </div>
-                                <div
-                                    class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full">
-                                </div>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between">
-                                    <h3 class="text-sm font-medium text-gray-900 truncate">{{ $user->name }}</h3>
-                                    <span class="text-xs text-gray-500">2m</span>
-                                </div>
-                                <p class="text-sm text-gray-500 truncate">{{ $user->email }}</p>
-                                <div class="flex items-center mt-1">
-                                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                                        {{ $user->role }}
-                                    </span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-sm font-medium text-gray-900 truncate">{{ $staffMember->name }}</h3>
+                                        <span class="text-xs text-green-600">● Online</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 truncate">{{ $staffMember->email }}</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                                            {{ $staffMember->role }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                    @else
+                        <div class="px-4 py-6 text-center text-gray-500">
+                            <p class="text-sm">No staff available</p>
+                        </div>
+                    @endif
+                @else
+                    <!-- For staff/admin, show the full user list -->
+                    @foreach ($users as $user)
+                        <div class="user-item px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors"
+                            data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}">
+                            <div class="flex items-center space-x-3">
+                                <div class="relative">
+                                    <div
+                                        class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                        {{ substr($user->name, 0, 2) }}
+                                    </div>
+                                    <div
+                                        class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full">
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-sm font-medium text-gray-900 truncate">{{ $user->name }}</h3>
+                                        <span class="text-xs text-gray-500">2m</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 truncate">{{ $user->email }}</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                                            {{ $user->role }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
             </div>
         </div>
 
@@ -165,6 +201,7 @@
             setupEventListeners();
             setupPusher();
             loadUserConversations();
+            
         });
 
         function initializeChat() {
@@ -175,6 +212,7 @@
                 this.style.height = Math.min(this.scrollHeight, 128) + 'px';
             });
         }
+
 
         function setupEventListeners() {
             // User selection
@@ -198,34 +236,37 @@
                 }
             });
 
-            // Search functionality with debouncing
-            document.getElementById('searchUsers').addEventListener('input', function(e) {
-                const query = e.target.value.trim();
+            // Search functionality with debouncing (only for non-clients)
+            const searchInput = document.getElementById('searchUsers');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.trim();
 
-                // Clear previous timeout
-                if (searchTimeout) {
-                    clearTimeout(searchTimeout);
-                }
+                    // Clear previous timeout
+                    if (searchTimeout) {
+                        clearTimeout(searchTimeout);
+                    }
 
-                // If query is empty, hide search results and show conversations
-                if (query === '') {
-                    hideSearchResults();
-                    showConversations();
-                    return;
-                }
+                    // If query is empty, hide search results and show conversations
+                    if (query === '') {
+                        hideSearchResults();
+                        showConversations();
+                        return;
+                    }
 
-                // Debounce search
-                searchTimeout = setTimeout(() => {
-                    searchStaff(query);
-                }, 300);
-            });
+                    // Debounce search
+                    searchTimeout = setTimeout(() => {
+                        searchStaff(query);
+                    }, 300);
+                });
 
-            // Click outside to hide search results
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('#searchUsers') && !e.target.closest('#searchResults')) {
-                    hideSearchResults();
-                }
-            });
+                // Click outside to hide search results
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('#searchUsers') && !e.target.closest('#searchResults')) {
+                        hideSearchResults();
+                    }
+                });
+            }
         }
 
         function setupPusher() {
@@ -291,6 +332,11 @@
         }
 
         async function loadUserConversations() {
+            // Skip loading conversations for clients since they auto-connect to staff
+            if ({{ $currentUser->role === 'Client' ? 'true' : 'false' }}) {
+                return;
+            }
+
             try {
                 console.log('Loading user conversations...');
 
@@ -328,7 +374,7 @@
                 userListContainer.innerHTML = `
                     <div class="p-4 text-center text-gray-500">
                         <p class="text-sm">No conversations yet</p>
-                        <p class="text-xs mt-1">Search for staff members to start chatting</p>
+                        <p class="text-xs mt-1">Search for clinic staff to start chatting</p>
                     </div>
                 `;
                 return;
@@ -506,7 +552,7 @@
             if (staff.length === 0) {
                 searchResults.innerHTML = `
                     <div class="p-3 text-center text-gray-500">
-                        <p class="text-sm">No staff members found</p>
+                        <p class="text-sm">No clinic staff found</p>
                     </div>
                 `;
             } else {
@@ -544,7 +590,10 @@
         }
 
         function hideSearchResults() {
-            document.getElementById('searchResults').classList.add('hidden');
+            const searchResults = document.getElementById('searchResults');
+            if (searchResults) {
+                searchResults.classList.add('hidden');
+            }
         }
 
         function showConversations() {
@@ -808,14 +857,17 @@
             }
         }
 
-        // Auto-refresh conversations periodically
-        setInterval(() => {
-            if (!isSearching && document.getElementById('searchUsers').value === '') {
-                loadUserConversations().then(() => {
-                    updateSelectedUserInSidebar();
-                });
-            }
-        }, 10000); // Refresh every 10 seconds for real-time feel
+        // Auto-refresh conversations periodically (skip for clients)
+        if ({{ $currentUser->role === 'Client' ? 'false' : 'true' }}) {
+            setInterval(() => {
+                const searchInput = document.getElementById('searchUsers');
+                if (!isSearching && (!searchInput || searchInput.value === '')) {
+                    loadUserConversations().then(() => {
+                        updateSelectedUserInSidebar();
+                    });
+                }
+            }, 10000); // Refresh every 10 seconds for real-time feel
+        }
     </script>
 </body>
 

@@ -31,15 +31,15 @@ class DatabaseSeeder extends Seeder
 
         // Create Doctors
         $this->command->info('👩‍⚕️ Creating doctors...');
-        $doctors = User::factory()->doctor()->count(5)->create();
+        $doctors = User::factory()->doctor()->count(1)->create();
 
         // Create Staff
         $this->command->info('👥 Creating staff members...');
-        $staff = User::factory()->staff()->count(8)->create();
+        $staff = User::factory()->staff()->count(1)->create();
 
         // Create Clients
         $this->command->info('🤝 Creating clients...');
-        $clients = User::factory()->client()->count(50)->create();
+        $clients = User::factory()->client()->count(10)->create();
 
         // Create Categories
         $this->command->info('📂 Creating service categories...');
@@ -166,8 +166,8 @@ class DatabaseSeeder extends Seeder
 
         // Create Chats and Messages
         $this->command->info('💬 Creating chats and messages...');
-        $chats = Chat::factory()->count(25)->create([
-            'staff_id' => fn() => $staff->merge($doctors)->random()->id,
+        $chats = Chat::factory()->count(10)->create([
+            'staff_id' => $staff->first()->id, // Use the single staff member for all chats
             'client_id' => fn() => $clients->random()->id,
         ]);
 

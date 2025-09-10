@@ -140,9 +140,15 @@ class ChatController extends Controller
 
         $query = $request->get('query', '');
 
-        // Get all staff users (Staff, Doctor, Admin), with optional search filtering
-        $staffQuery = \App\Models\User::whereIn('role', ['Staff', 'Doctor', 'Admin'])
-            ->where('id', '!=', $user->id); // Exclude current user
+        // For clients, only show the single staff member (and doctor if needed)
+        // For staff/doctors/admins, show all other roles
+        if ($user->role === 'Client') {
+            $staffQuery = \App\Models\User::whereIn('role', ['Staff'])
+                ->where('id', '!=', $user->id); // Exclude current user
+        } else {
+            $staffQuery = \App\Models\User::whereIn('role', ['Staff'])
+                ->where('id', '!=', $user->id); // Exclude current user
+        }
 
         // Apply search filter if query is provided (case-insensitive search)
         if (!empty(trim($query))) {
@@ -539,7 +545,7 @@ class ChatController extends Controller
         // Determine which roles the current user can chat with
         $searchRoles = [];
         if ($userRole === 'Client') {
-            $searchRoles = ['Staff', 'Doctor', 'Admin'];
+            $searchRoles = ['Staff', 'Doctor']; // Clients can only chat with Staff and Doctor
         } else {
             $searchRoles = ['Client', 'Staff', 'Doctor', 'Admin'];
         }

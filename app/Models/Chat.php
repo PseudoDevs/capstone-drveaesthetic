@@ -42,11 +42,57 @@ class Chat extends Model
         return $this->hasOne(Message::class)->latestOfMany();
     }
 
-    public static function findOrCreateChat(int $staffId, int $clientId): Chat
+    public static function findOrCreateChat(int $userId1, int $userId2): Chat
     {
-        return static::firstOrCreate([
+        // Get both users to determine who is staff and who is client
+        $user1 = User::find($userId1);
+        $user2 = User::find($userId2);
+        
+        // Determine staff and client IDs
+        if ($user1->role === 'Staff' || $user1->role === 'Doctor' || $user1->role === 'Admin') {
+            $staffId = $userId1;
+            $clientId = $userId2;
+        } else {
+            $staffId = $userId2;
+            $clientId = $userId1;
+        }
+        
+        // For single chat mode: Always get the single staff member
+        $staff = User::where('role', 'Staff')->first();
+        if (!$staff) {
+            throw new \Exception('No staff member found');
+        }
+        
+        // Always use the single staff member's ID
+        $staffId = $staff->id;
+        
+        // The client is whichever user is NOT the staff
+        $clientId = ($userId1 == $staffId) ? $userId2 : $userId1;
+        
+        // Simple find first, if not found then create
+        $chat = static::where([
             'staff_id' => $staffId,
             'client_id' => $clientId,
-        ]);
+        ])->first();
+        
+        if (!$chat) {
+            $chat = new static([
+                'staff_id' => $staffId,
+                'client_id' => $clientId,
+                'last_message_at' => now(),
+            ]);
+            
+            try {
+                $chat->save();
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                // If constraint violation, another request created it, so fetch it
+                $chat = static::where([
+                    'staff_id' => $staffId,
+                    'client_id' => $clientId,
+                ])->first();
+            }
+        }
+        
+        return $chat;
     }
 }
