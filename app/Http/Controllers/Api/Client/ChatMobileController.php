@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Events\MessageSent;
+use App\Services\AutoIntroMessageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -673,5 +674,65 @@ class ChatMobileController extends Controller
             'Connection' => 'keep-alive',
             'X-Accel-Buffering' => 'no'
         ]);
+    }
+
+    public function sendIntroMessage(Request $request, $chatId): JsonResponse
+    {
+        $user = auth('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
+        $chat = Chat::find($chatId);
+
+        if (!$chat) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Chat not found'
+            ], 404);
+        }
+
+        // Verify user has access to this chat and is staff
+        if ($chat->staff_id != $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only staff can send intro messages'
+            ], 403);
+        }
+
+        // Send intro message
+        $introService = new AutoIntroMessageService();
+        $message = $introService->sendIntroMessage($chat);
+
+        if (!$message) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Intro message already sent or could not be created'
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'message' => [
+                    'id' => $message->id,
+                    'message' => $message->message,
+                    'sender_id' => $message->user_id,
+                    'sender' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'avatar' => $user->avatar,
+                    ],
+                    'is_mine' => true,
+                    'is_read' => false,
+                    'created_at' => $message->created_at->toISOString(),
+                    'time_ago' => $message->created_at->diffForHumans(),
+                ]
+            ]
+        ], 201);
     }
 }

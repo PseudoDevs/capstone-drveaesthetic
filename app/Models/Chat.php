@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Services\AutoIntroMessageService;
 
 class Chat extends Model
 {
@@ -75,6 +76,7 @@ class Chat extends Model
             'client_id' => $clientId,
         ])->first();
         
+        $isNewChat = false;
         if (!$chat) {
             $chat = new static([
                 'staff_id' => $staffId,
@@ -84,6 +86,7 @@ class Chat extends Model
             
             try {
                 $chat->save();
+                $isNewChat = true;
             } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
                 // If constraint violation, another request created it, so fetch it
                 $chat = static::where([
@@ -91,6 +94,12 @@ class Chat extends Model
                     'client_id' => $clientId,
                 ])->first();
             }
+        }
+        
+        // Send automated intro message if this is a new chat
+        if ($isNewChat) {
+            $introService = new AutoIntroMessageService();
+            $introService->sendIntroMessage($chat);
         }
         
         return $chat;

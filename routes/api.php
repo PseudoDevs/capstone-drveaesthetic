@@ -68,6 +68,7 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::delete('messages/{messageId}', [ChatMobileController::class, 'deleteMessage'])->name('delete-message');
         Route::get('unread-count', [ChatMobileController::class, 'getUnreadCount'])->name('unread-count');
         Route::get('search-users', [ChatMobileController::class, 'searchUsers'])->name('search-users');
+        Route::post('conversations/{chatId}/intro-message', [ChatMobileController::class, 'sendIntroMessage'])->name('intro-message');
         
         // SSE (Server-Sent Events) endpoints for real-time chat synchronization
         // Note: These endpoints handle Sanctum authentication manually to support bearer tokens in SSE streams
