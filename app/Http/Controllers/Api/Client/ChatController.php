@@ -168,6 +168,10 @@ class ChatController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
+        // Get both sender and receiver users
+        $sender = \App\Models\User::find($validated['sender_id']);
+        $receiver = \App\Models\User::find($validated['receiver_id']);
+        
         // Get the staff member
         $staff = \App\Models\User::where('role', 'Staff')->first();
         
@@ -178,11 +182,36 @@ class ChatController extends Controller
             ], 404);
         }
 
-        // Ensure one of the participants is the staff member
-        if ($validated['sender_id'] != $staff->id && $validated['receiver_id'] != $staff->id) {
+        // Debug logging
+        \Log::info('ChatController sendMessage debug', [
+            'staff_id' => $staff->id,
+            'staff_name' => $staff->name,
+            'sender_id' => $validated['sender_id'],
+            'sender_name' => $sender->name,
+            'sender_role' => $sender->role,
+            'receiver_id' => $validated['receiver_id'],
+            'receiver_name' => $receiver->name,
+            'receiver_role' => $receiver->role,
+            'sender_is_staff' => $validated['sender_id'] == $staff->id,
+            'receiver_is_staff' => $validated['receiver_id'] == $staff->id
+        ]);
+
+        // Modified validation: Allow messages between staff and clients, or between staff members
+        $senderIsStaffOrDoctor = in_array($sender->role, ['Staff', 'Doctor', 'Admin']);
+        $receiverIsStaffOrDoctor = in_array($receiver->role, ['Staff', 'Doctor', 'Admin']);
+        $involvesSingleStaffMember = ($validated['sender_id'] == $staff->id || $validated['receiver_id'] == $staff->id);
+        
+        if (!$involvesSingleStaffMember && !($senderIsStaffOrDoctor || $receiverIsStaffOrDoctor)) {
             return response()->json([
                 'success' => false,
-                'message' => 'All messages must involve the staff member'
+                'message' => 'Messages must involve the staff member or authorized personnel',
+                'debug' => [
+                    'staff_id' => $staff->id,
+                    'sender_id' => $validated['sender_id'],
+                    'receiver_id' => $validated['receiver_id'],
+                    'sender_role' => $sender->role,
+                    'receiver_role' => $receiver->role
+                ]
             ], 400);
         }
 

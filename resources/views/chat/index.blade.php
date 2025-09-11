@@ -7,6 +7,49 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Chat - {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        /* Chat specific CSS fixes */
+        #activeChat {
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100vh !important;
+        }
+        
+        #activeChat.hidden {
+            display: none !important;
+        }
+        
+        #messagesContainer {
+            flex: 1 1 auto !important;
+            overflow-y: auto !important;
+            min-height: 0 !important;
+        }
+        
+        #messageForm {
+            position: relative !important;
+            z-index: 1000 !important;
+        }
+        
+        #messageInput {
+            position: relative !important;
+            z-index: 1001 !important;
+            background: #f3f4f6 !important;
+        }
+        
+        #sendButton {
+            position: relative !important;
+            z-index: 1002 !important;
+            flex-shrink: 0 !important;
+        }
+        
+        /* Ensure message input area is always visible */
+        .message-input-container {
+            position: sticky !important;
+            bottom: 0 !important;
+            z-index: 999 !important;
+            background: white !important;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50">
@@ -66,7 +109,7 @@
             </div>
 
             <!-- Active Chat -->
-            <div id="activeChat" class="hidden flex-1 flex flex-col">
+            <div id="activeChat" class="hidden flex-1 flex flex-col relative z-0" style="min-height: 100vh;">
 
                 <!-- Chat Header -->
                 <div id="chatHeader"
@@ -94,15 +137,15 @@
                 </div>
 
                 <!-- Message Input -->
-                <div class="bg-white px-4 py-4 border-t border-gray-200">
-                    <form id="messageForm" class="flex items-end space-x-3">
-                        <div class="flex-1">
+                <div class="message-input-container bg-white px-4 py-4 border-t border-gray-200 relative z-10" style="min-height: 80px;">
+                    <form id="messageForm" class="flex items-end space-x-3 relative z-20">
+                        <div class="flex-1 relative z-30">
                             <textarea id="messageInput" placeholder="Type a message..." rows="1"
-                                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-full resize-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors max-h-32"
+                                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-full resize-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors max-h-32 relative z-40"
                                 maxlength="1000"></textarea>
                         </div>
                         <button type="submit" id="sendButton"
-                            class="p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative z-50 flex-shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>

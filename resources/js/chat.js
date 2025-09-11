@@ -42,7 +42,40 @@ class ChatManager {
         this.setupEventSource();
         await this.loadConversations();
         
+        // Debug: Test direct API call for clients
+        if (this.isClient) {
+            console.log('🔍 Testing direct API call for client...');
+            await this.testClientMessageAPI();
+        }
+        
         console.log('✅ Chat Manager initialized');
+    }
+
+    async testClientMessageAPI() {
+        try {
+            console.log('🧪 Testing client message API with client ID:', this.currentUser.id);
+            const response = await fetch(`/api/client/chats/messages/${this.currentUser.id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': window.ChatData?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            });
+            
+            console.log('🧪 Direct API test - Status:', response.status);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('🧪 Direct API test - Success:', data.success);
+                console.log('🧪 Direct API test - Messages count:', data?.data?.messages?.length || 0);
+                console.log('🧪 Direct API test - Chat ID:', data?.data?.chat_id);
+            } else {
+                const errorText = await response.text();
+                console.log('🧪 Direct API test - Error:', errorText);
+            }
+        } catch (error) {
+            console.error('🧪 Direct API test - Exception:', error);
+        }
     }
 
     setupEventListeners() {
@@ -228,6 +261,14 @@ class ChatManager {
         
         // If current user is a client, show only the staff member
         if (this.isClient) {
+            console.log('🔍 Client rendering conversation:', {
+                hasStaff: !!data.staff,
+                staffName: data.staff?.name,
+                staffId: data.staff?.id,
+                hasChats: !!data.chats,
+                chatsCount: data.chats?.length || 0
+            });
+            
             if (data.staff) {
                 // Find existing chat with staff if any
                 let existingChat = null;
@@ -267,6 +308,8 @@ class ChatManager {
                         // For clients, we want to load messages between client and staff
                         // The API getMessages($userId) finds chat between staff and $userId
                         // So for client to see staff messages, we pass the client's own ID
+                        // But store staff info for sending messages
+                        window.ChatData.staff = data.staff;
                         this.selectConversation(this.currentUser.id, data.staff.name, true);
                     }, 100);
                 }
@@ -443,22 +486,79 @@ class ChatManager {
 
     showChatArea() {
         console.log('🔍 Showing chat area for:', this.selectedUserName);
-        document.getElementById('noChatSelected').classList.add('hidden');
-        document.getElementById('activeChat').classList.remove('hidden');
-
-        // Update header
-        document.getElementById('selectedUserName').textContent = this.selectedUserName;
-        document.getElementById('selectedUserAvatar').textContent = this.selectedUserName.substring(0, 2);
         
-        console.log('🔍 Chat area shown, activeChat classes:', document.getElementById('activeChat').className);
+        const noChatSelected = document.getElementById('noChatSelected');
+        const activeChat = document.getElementById('activeChat');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        console.log('🔍 Elements found:', {
+            noChatSelected: !!noChatSelected,
+            activeChat: !!activeChat, 
+            messageInput: !!messageInput,
+            sendButton: !!sendButton
+        });
+        
+        if (noChatSelected) {
+            noChatSelected.classList.add('hidden');
+            console.log('🔍 Hidden noChatSelected');
+        }
+        
+        if (activeChat) {
+            activeChat.classList.remove('hidden');
+            activeChat.style.display = 'flex'; // Force display
+            activeChat.style.zIndex = '1';     // Ensure z-index
+            console.log('🔍 Shown activeChat, classes:', activeChat.className);
+            console.log('🔍 ActiveChat style:', {
+                display: activeChat.style.display,
+                zIndex: activeChat.style.zIndex,
+                visibility: activeChat.style.visibility
+            });
+        }
+        
+        // Update header
+        const selectedUserName = document.getElementById('selectedUserName');
+        const selectedUserAvatar = document.getElementById('selectedUserAvatar');
+        
+        if (selectedUserName) {
+            selectedUserName.textContent = this.selectedUserName;
+        }
+        if (selectedUserAvatar) {
+            selectedUserAvatar.textContent = this.selectedUserName.substring(0, 2);
+        }
+        
+        // Ensure input and button are visible
+        if (messageInput) {
+            messageInput.style.zIndex = '100';
+            messageInput.style.position = 'relative';
+            console.log('🔍 MessageInput styled');
+        }
+        if (sendButton) {
+            sendButton.style.zIndex = '101';
+            sendButton.style.position = 'relative';
+            console.log('🔍 SendButton styled');
+        }
+        
+        console.log('✅ Chat area setup complete');
     }
 
     async loadMessages() {
         try {
             console.log(`📨 Loading messages for user ${this.selectedUserId}...`);
+            console.log('🔍 Client debug info:', {
+                selectedUserId: this.selectedUserId,
+                currentUser: this.currentUser,
+                isClient: this.isClient,
+                selectedUserName: this.selectedUserName
+            });
             
             // Show loading state
             const container = document.getElementById('messagesContainer');
+            if (!container) {
+                console.error('❌ messagesContainer not found!');
+                return;
+            }
+            
             container.innerHTML = `
                 <div class="flex justify-center items-center h-32">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -468,24 +568,51 @@ class ChatManager {
 
             const response = await fetch(`/api/client/chats/messages/${this.selectedUserId}`, {
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': window.ChatData?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                 }
             });
 
+            console.log('📨 API Response status:', response.status);
+            
             if (response.ok) {
                 const data = await response.json();
                 console.log('📨 Messages API response:', data);
-                if (data.success && data.data) {
+                console.log('🔍 API response details:', {
+                    success: data?.success,
+                    chatId: data?.data?.chat_id,
+                    messagesCount: data?.data?.messages?.length || 0,
+                    staff: data?.data?.staff?.name,
+                    otherUser: data?.data?.other_user?.name,
+                    firstMessage: data?.data?.messages?.[0]?.message?.substring(0, 30) + '...' || 'None'
+                });
+                
+                if (data.success && data.data && data.data.messages) {
                     this.currentChatId = data.data.chat_id;
-                    console.log(`🔄 About to display ${data.data.messages?.length || 0} messages`);
-                    this.displayMessages(data.data.messages || []);
-                    console.log(`✅ Loaded ${data.data.messages?.length || 0} messages for chat ${this.currentChatId}`);
+                    const messageCount = data.data.messages.length;
+                    console.log(`🔄 About to display ${messageCount} messages for chat ${this.currentChatId}`);
+                    
+                    // Force clear any existing content
+                    container.innerHTML = '';
+                    
+                    // Add a delay to ensure DOM is ready
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    this.displayMessages(data.data.messages);
+                    console.log(`✅ Loaded ${messageCount} messages for chat ${this.currentChatId}`);
                 } else {
-                    console.log('❌ API response indicates no data:', data);
+                    console.log('❌ API response indicates no data or empty messages:', data);
+                    console.log('   - Success:', data?.success);
+                    console.log('   - Data exists:', !!data?.data);
+                    console.log('   - Messages exists:', !!data?.data?.messages);
+                    console.log('   - Messages count:', data?.data?.messages?.length || 0);
+                    console.log('   - Full data structure:', JSON.stringify(data, null, 2));
                     this.showEmptyMessages();
                 }
             } else {
-                console.error('❌ Failed to load messages:', response.status);
+                const errorText = await response.text();
+                console.error('❌ Failed to load messages:', response.status, errorText);
                 this.showEmptyMessages();
             }
         } catch (error) {
@@ -503,29 +630,85 @@ class ChatManager {
         }
         
         console.log('🔍 displayMessages called with:', messages);
-        console.log('🔍 Container element:', container);
+        console.log('🔍 Container element exists:', !!container);
+        console.log('🔍 Messages array:', Array.isArray(messages), 'Length:', messages?.length || 0);
         
+        // Force clear container and reset state
         container.innerHTML = '';
         this.displayedMessageIds.clear();
 
-        if (!messages || messages.length === 0) {
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
             console.log('📭 No messages to display, showing empty state');
             this.showEmptyMessages();
             return;
         }
 
-        console.log(`✅ Displaying ${messages.length} messages`);
+        console.log(`✅ Processing ${messages.length} messages for display`);
+        
+        // Create a document fragment for better performance
+        const fragment = document.createDocumentFragment();
         
         messages.forEach((message, index) => {
-            console.log(`🔄 Processing message ${index + 1}:`, message);
+            console.log(`🔄 Processing message ${index + 1}:`, {
+                id: message.id,
+                message: message.message?.substring(0, 50) + '...',
+                user_id: message.user_id,
+                created_at: message.created_at
+            });
+            
+            if (!message.id || !message.message) {
+                console.warn('⚠️ Skipping invalid message:', message);
+                return;
+            }
+            
             this.displayedMessageIds.add(message.id);
-            this.addMessageToUI(message, false); // Don't scroll for initial load
+            
+            // Create message element
+            const messageElement = this.createMessageElement(message);
+            if (messageElement) {
+                fragment.appendChild(messageElement);
+            }
         });
         
-        console.log('🔍 Container after adding messages:', container.innerHTML.length > 0 ? 'Has content' : 'Empty');
+        // Add all messages to container at once
+        container.appendChild(fragment);
+        
+        console.log('🔍 Container after adding messages - HTML length:', container.innerHTML.length);
+        console.log('🔍 Container children count:', container.children.length);
 
         // Force scroll after all messages are added
-        setTimeout(() => this.scrollToBottom(), 100);
+        setTimeout(() => {
+            this.scrollToBottom();
+            console.log('✅ Messages display complete');
+        }, 100);
+    }
+
+    createMessageElement(message) {
+        try {
+            const isOwn = message.user_id === this.currentUser.id;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isOwn ? 'justify-end' : 'justify-start'} mb-4 animate-fade-in`;
+
+            const time = new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            messageDiv.innerHTML = `
+                <div class="max-w-xs lg:max-w-md">
+                    <div class="px-4 py-3 rounded-2xl shadow ${isOwn 
+                        ? 'bg-blue-500 text-white ml-auto' 
+                        : 'bg-white text-gray-900 border border-gray-200'
+                    }">
+                        <p class="text-sm break-words">${this.escapeHtml(message.message)}</p>
+                        <p class="text-xs mt-1 opacity-75">${time}</p>
+                    </div>
+                    ${!isOwn ? `<p class="text-xs text-gray-500 mt-1">${this.escapeHtml(message.user?.name || 'Unknown User')}</p>` : ''}
+                </div>
+            `;
+
+            return messageDiv;
+        } catch (error) {
+            console.error('❌ Error creating message element:', error, message);
+            return null;
+        }
     }
 
     showEmptyMessages() {
@@ -554,7 +737,7 @@ class ChatManager {
         }
 
         console.log('✅ Adding new message to UI:', message.id);
-        this.addMessageToUI(message, true); // Scroll for new messages
+        this.addIncomingMessageToUI(message);
         
         // Refresh conversations list (for staff)
         if (!this.isClient) {
@@ -562,11 +745,8 @@ class ChatManager {
         }
     }
 
-    addMessageToUI(message, shouldScroll = true) {
-        console.log('🔄 addMessageToUI called for message:', message.id, message.message);
-        
+    addIncomingMessageToUI(message) {
         if (this.displayedMessageIds.has(message.id)) {
-            console.log('⚠️ Duplicate message ignored:', message.id);
             return; // Prevent duplicates
         }
 
@@ -578,39 +758,19 @@ class ChatManager {
             return;
         }
         
-        console.log('✅ Adding message to UI:', message.id);
-        
         // Remove empty state if present
         const emptyState = container.querySelector('.flex.justify-center.items-center.h-full');
         if (emptyState) {
             container.innerHTML = '';
         }
 
-        const isOwn = message.user_id === this.currentUser.id;
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `flex ${isOwn ? 'justify-end' : 'justify-start'} mb-4`;
-
-        const time = new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        messageDiv.innerHTML = `
-            <div class="max-w-xs lg:max-w-md">
-                <div class="px-4 py-3 rounded-2xl shadow ${isOwn 
-                    ? 'bg-blue-500 text-white ml-auto' 
-                    : 'bg-white text-gray-900 border border-gray-200'
-                }">
-                    <p class="text-sm break-words">${this.escapeHtml(message.message)}</p>
-                    <p class="text-xs mt-1 opacity-75">${time}</p>
-                </div>
-                ${!isOwn ? `<p class="text-xs text-gray-500 mt-1">${message.user.name}</p>` : ''}
-            </div>
-        `;
-
-        container.appendChild(messageDiv);
-
-        if (shouldScroll) {
+        const messageElement = this.createMessageElement(message);
+        if (messageElement) {
+            container.appendChild(messageElement);
             this.scrollToBottom();
         }
     }
+
 
     async sendMessage() {
         const input = document.getElementById('messageInput');
@@ -624,17 +784,45 @@ class ChatManager {
         sendButton.disabled = true;
 
         try {
-            console.log('📤 Sending message...', { to: this.selectedUserId, message: message.substring(0, 50) + '...' });
+            console.log('📤 Sending message...', { 
+                to: this.selectedUserId, 
+                message: message.substring(0, 50) + '...',
+                currentUser: this.currentUser,
+                isClient: this.isClient
+            });
 
+            // Determine correct receiver_id based on user role
+            let receiverId;
+            if (this.isClient) {
+                // Client always sends TO the staff member
+                // We need to get the staff ID from the backend or stored data
+                const staffData = window.ChatData?.staff || (await this.getStaffInfo());
+                receiverId = staffData ? staffData.id : this.selectedUserId;
+            } else {
+                // Staff sends to the selected user (client)
+                receiverId = this.selectedUserId;
+            }
+            
             const formData = new FormData();
             formData.append('sender_id', this.currentUser.id);
-            formData.append('receiver_id', this.selectedUserId);
+            formData.append('receiver_id', receiverId);
             formData.append('message', message);
+            
+            console.log('📤 FormData being sent:', {
+                sender_id: this.currentUser.id,
+                receiver_id: receiverId,
+                sender_name: this.currentUser.name,
+                receiver_name: this.selectedUserName,
+                isClient: this.isClient,
+                selectedUserId: this.selectedUserId
+            });
 
             const response = await fetch('/api/client/chats/send-message', {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': window.ChatData?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                 },
                 body: formData
             });
@@ -657,11 +845,32 @@ class ChatManager {
                     // The message will appear via SSE stream
                     
                 } else {
+                    console.error('❌ Send message failed:', data);
                     throw new Error(data.message || 'Send failed');
                 }
             } else {
-                const errorText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
+                let errorData = null;
+                try {
+                    const responseClone = response.clone();
+                    errorData = await responseClone.json();
+                } catch (e) {
+                    // If JSON parsing fails, get text
+                    try {
+                        const errorText = await response.text();
+                        console.error('❌ HTTP error (text):', response.status, errorText);
+                        throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    } catch (e2) {
+                        console.error('❌ HTTP error (unknown):', response.status);
+                        throw new Error(`HTTP ${response.status}: Unknown error`);
+                    }
+                }
+                
+                console.error('❌ HTTP error (JSON):', response.status, errorData);
+                if (errorData && errorData.debug) {
+                    console.error('🔍 Debug info:', errorData.debug);
+                }
+                
+                throw new Error(`HTTP ${response.status}: ${errorData?.message || 'Unknown error'}`);
             }
         } catch (error) {
             console.error('❌ Error sending message:', error);
@@ -695,6 +904,24 @@ class ChatManager {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    async getStaffInfo() {
+        try {
+            const response = await fetch('/api/client/chats', {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                return data.success && data.data ? data.data.staff : null;
+            }
+        } catch (error) {
+            console.error('❌ Error getting staff info:', error);
+        }
+        return null;
     }
 }
 
