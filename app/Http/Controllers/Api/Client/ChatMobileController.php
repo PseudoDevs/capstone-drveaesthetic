@@ -14,7 +14,7 @@ class ChatMobileController extends Controller
 {
     public function getConversations(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
@@ -85,7 +85,7 @@ class ChatMobileController extends Controller
 
     public function getConversationMessages(Request $request, $chatId): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
@@ -174,7 +174,7 @@ class ChatMobileController extends Controller
 
     public function sendMessageMobile(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
@@ -238,7 +238,7 @@ class ChatMobileController extends Controller
 
     public function markMessagesAsRead(Request $request, $chatId): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
@@ -280,7 +280,7 @@ class ChatMobileController extends Controller
 
     public function getUnreadCount(): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
@@ -309,7 +309,7 @@ class ChatMobileController extends Controller
 
     public function searchUsers(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
@@ -358,7 +358,7 @@ class ChatMobileController extends Controller
 
     public function updateTypingStatus(Request $request, $chatId): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
@@ -406,7 +406,7 @@ class ChatMobileController extends Controller
 
     public function deleteMessage(Request $request, $messageId): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         if (!$user) {
             return response()->json([
