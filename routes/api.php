@@ -70,8 +70,9 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::get('search-users', [ChatMobileController::class, 'searchUsers'])->name('search-users');
         
         // SSE (Server-Sent Events) endpoints for real-time chat synchronization
-        Route::get('stream/messages', [ChatMobileController::class, 'streamMessages'])->name('stream-messages');
-        Route::get('stream/conversations', [ChatMobileController::class, 'streamConversations'])->name('stream-conversations');
+        // Note: These endpoints handle Sanctum authentication manually to support bearer tokens in SSE streams
+        Route::get('stream/messages', [ChatMobileController::class, 'streamMessages'])->name('stream-messages')->withoutMiddleware('auth:sanctum');
+        Route::get('stream/conversations', [ChatMobileController::class, 'streamConversations'])->name('stream-conversations')->withoutMiddleware('auth:sanctum');
     });
     
     // Messages API

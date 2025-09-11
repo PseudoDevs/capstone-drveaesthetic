@@ -6,6 +6,9 @@ use App\Models\Appointment;
 use Illuminate\Pagination\Paginator;
 use App\Observers\AppointmentObserver;
 use Illuminate\Support\ServiceProvider;
+use Dedoc\Scramble\Scramble;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,5 +29,12 @@ class AppServiceProvider extends ServiceProvider
 
         // Register observers
         Appointment::observe(AppointmentObserver::class);
+
+        Scramble::configure()
+        ->withDocumentTransformers(function (OpenApi $openApi) {
+            $openApi->secure(
+                SecurityScheme::http('bearer')
+            );
+        });
     }
 }

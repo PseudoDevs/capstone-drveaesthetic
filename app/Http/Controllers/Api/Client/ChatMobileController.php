@@ -463,10 +463,11 @@ class ChatMobileController extends Controller
 
     public function streamMessages(Request $request): Response
     {
-        $user = auth()->user();
+        // Handle Sanctum bearer token authentication for mobile apps
+        $user = auth('sanctum')->user();
 
         if (!$user) {
-            return response('Unauthenticated', 401);
+            return response('Unauthenticated - Bearer token required', 401);
         }
 
         $chatId = $request->get('chat_id');
@@ -569,10 +570,11 @@ class ChatMobileController extends Controller
 
     public function streamConversations(Request $request): Response
     {
-        $user = auth()->user();
+        // Handle Sanctum bearer token authentication for mobile apps
+        $user = auth('sanctum')->user();
 
         if (!$user) {
-            return response('Unauthenticated', 401);
+            return response('Unauthenticated - Bearer token required', 401);
         }
 
         $lastMessageId = $request->get('last_message_id', 0);
