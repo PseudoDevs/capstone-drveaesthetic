@@ -113,7 +113,28 @@ class ChatManager {
             if (conversationItem) {
                 const userId = conversationItem.dataset.userId;
                 const userName = conversationItem.dataset.userName;
-                this.selectConversation(userId, userName);
+                
+                // For clients clicking on staff conversation, use client's own ID for message loading
+                // but keep the staff name for display
+                let messageLoadUserId = userId;
+                if (this.isClient && conversationItem.dataset.isStaff === 'true') {
+                    messageLoadUserId = this.currentUser.id;
+                    // Store staff info for sending messages
+                    window.ChatData.staff = {
+                        id: parseInt(userId),
+                        name: userName
+                    };
+                }
+                
+                console.log('🖱️ Manual conversation click:', {
+                    clickedUserId: userId,
+                    messageLoadUserId: messageLoadUserId,
+                    userName: userName,
+                    isClient: this.isClient,
+                    isStaffConversation: conversationItem.dataset.isStaff === 'true'
+                });
+                
+                this.selectConversation(messageLoadUserId, userName);
             }
         });
     }
@@ -294,7 +315,8 @@ class ChatManager {
                         user_id: existingChat.latest_message.user_id,
                         is_own_message: existingChat.latest_message.user_id === this.currentUser.id
                     } : null,
-                    has_messages: existingChat && existingChat.latest_message ? true : false
+                    has_messages: existingChat && existingChat.latest_message ? true : false,
+                    is_staff_conversation: true // Mark this as a staff conversation for clients
                 };
                 
                 const element = this.createConversationElement(conversation);
@@ -379,6 +401,11 @@ class ChatManager {
         div.dataset.userId = user.id;
         div.dataset.userName = user.name;
         div.dataset.chatId = conversation.chat_id || '';
+        
+        // Mark staff conversations for special handling
+        if (conversation.is_staff_conversation) {
+            div.dataset.isStaff = 'true';
+        }
 
         // Format time
         let timeDisplay = '';
