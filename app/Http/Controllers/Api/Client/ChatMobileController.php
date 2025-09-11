@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
+use App\Models\Message;
 use App\Events\MessageSent;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class ChatMobileController extends Controller
 {
@@ -456,6 +458,218 @@ class ChatMobileController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Message deleted successfully'
+        ]);
+    }
+
+    public function streamMessages(Request $request): Response
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response('Unauthenticated', 401);
+        }
+
+        $chatId = $request->get('chat_id');
+        $lastMessageId = $request->get('last_message_id', 0);
+
+        if (!$chatId) {
+            return response('Chat ID required', 400);
+        }
+
+        $chat = Chat::find($chatId);
+
+        if (!$chat) {
+            return response('Chat not found', 404);
+        }
+
+        // Verify user has access to this chat
+        if ($chat->staff_id != $user->id && $chat->client_id != $user->id) {
+            return response('Access denied', 403);
+        }
+
+        return response()->stream(function() use ($chat, $lastMessageId, $user) {
+            // Keep track of the last message ID we've sent
+            $currentLastId = $lastMessageId;
+            
+            // Send initial connection message
+            echo "data: " . json_encode([
+                'type' => 'connected',
+                'chat_id' => $chat->id,
+                'user_id' => $user->id,
+                'timestamp' => now()->toISOString()
+            ]) . "\n\n";
+            
+            if (ob_get_level()) {
+                ob_flush();
+            }
+            flush();
+            
+            // Loop to check for new messages
+            while (true) {
+                // Check for new messages
+                $newMessages = Message::where('chat_id', $chat->id)
+                    ->where('id', '>', $currentLastId)
+                    ->with('user')
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+                
+                foreach ($newMessages as $message) {
+                    echo "data: " . json_encode([
+                        'type' => 'message',
+                        'message' => [
+                            'id' => $message->id,
+                            'message' => $message->message,
+                            'sender_id' => $message->user_id,
+                            'sender' => [
+                                'id' => $message->user->id,
+                                'name' => $message->user->name,
+                                'avatar' => $message->user->avatar,
+                            ],
+                            'is_mine' => $message->user_id == $user->id,
+                            'is_read' => $message->is_read,
+                            'created_at' => $message->created_at->toISOString(),
+                            'time_ago' => $message->created_at->diffForHumans(),
+                        ]
+                    ]) . "\n\n";
+                    
+                    $currentLastId = $message->id;
+                    
+                    if (ob_get_level()) {
+                        ob_flush();
+                    }
+                    flush();
+                }
+                
+                // Send heartbeat every 30 seconds to keep connection alive
+                echo "data: " . json_encode([
+                    'type' => 'heartbeat',
+                    'timestamp' => now()->toISOString()
+                ]) . "\n\n";
+                
+                if (ob_get_level()) {
+                    ob_flush();
+                }
+                flush();
+                
+                // Check if client disconnected
+                if (connection_aborted()) {
+                    break;
+                }
+                
+                // Wait 2 seconds before checking again
+                sleep(2);
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no'
+        ]);
+    }
+
+    public function streamConversations(Request $request): Response
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response('Unauthenticated', 401);
+        }
+
+        $lastMessageId = $request->get('last_message_id', 0);
+
+        return response()->stream(function() use ($user, $lastMessageId) {
+            // Keep track of the last message ID we've sent
+            $currentLastId = $lastMessageId;
+            
+            // Send initial connection message
+            echo "data: " . json_encode([
+                'type' => 'connected',
+                'user_id' => $user->id,
+                'timestamp' => now()->toISOString()
+            ]) . "\n\n";
+            
+            if (ob_get_level()) {
+                ob_flush();
+            }
+            flush();
+            
+            // Loop to check for new messages in all user's chats
+            while (true) {
+                // Get all chats where user is participant
+                $chatIds = Chat::where(function($query) use ($user) {
+                    $query->where('staff_id', $user->id)
+                          ->orWhere('client_id', $user->id);
+                })->pluck('id');
+
+                // Check for new messages in any of user's chats
+                $newMessages = Message::whereIn('chat_id', $chatIds)
+                    ->where('id', '>', $currentLastId)
+                    ->with(['user', 'chat', 'chat.staff', 'chat.client'])
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+                
+                foreach ($newMessages as $message) {
+                    $chat = $message->chat;
+                    $otherUser = $chat->staff_id == $user->id ? $chat->client : $chat->staff;
+                    
+                    echo "data: " . json_encode([
+                        'type' => 'conversation_update',
+                        'chat_id' => $chat->id,
+                        'message' => [
+                            'id' => $message->id,
+                            'message' => $message->message,
+                            'sender_id' => $message->user_id,
+                            'sender_name' => $message->user->name,
+                            'is_mine' => $message->user_id == $user->id,
+                            'is_read' => $message->is_read,
+                            'created_at' => $message->created_at->toISOString(),
+                            'time_ago' => $message->created_at->diffForHumans(),
+                        ],
+                        'other_user' => [
+                            'id' => $otherUser->id,
+                            'name' => $otherUser->name,
+                            'email' => $otherUser->email,
+                            'avatar' => $otherUser->avatar,
+                            'role' => $otherUser->role,
+                        ],
+                        'unread_count' => $chat->messages()
+                            ->where('user_id', '!=', $user->id)
+                            ->where('is_read', false)
+                            ->count()
+                    ]) . "\n\n";
+                    
+                    $currentLastId = $message->id;
+                    
+                    if (ob_get_level()) {
+                        ob_flush();
+                    }
+                    flush();
+                }
+                
+                // Send heartbeat every 30 seconds
+                echo "data: " . json_encode([
+                    'type' => 'heartbeat',
+                    'timestamp' => now()->toISOString()
+                ]) . "\n\n";
+                
+                if (ob_get_level()) {
+                    ob_flush();
+                }
+                flush();
+                
+                // Check if client disconnected
+                if (connection_aborted()) {
+                    break;
+                }
+                
+                // Wait 2 seconds before checking again
+                sleep(2);
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no'
         ]);
     }
 }

@@ -68,6 +68,10 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::delete('messages/{messageId}', [ChatMobileController::class, 'deleteMessage'])->name('delete-message');
         Route::get('unread-count', [ChatMobileController::class, 'getUnreadCount'])->name('unread-count');
         Route::get('search-users', [ChatMobileController::class, 'searchUsers'])->name('search-users');
+        
+        // SSE (Server-Sent Events) endpoints for real-time chat synchronization
+        Route::get('stream/messages', [ChatMobileController::class, 'streamMessages'])->name('stream-messages');
+        Route::get('stream/conversations', [ChatMobileController::class, 'streamConversations'])->name('stream-conversations');
     });
     
     // Messages API
