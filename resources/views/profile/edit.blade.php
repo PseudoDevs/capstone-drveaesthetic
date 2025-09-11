@@ -36,10 +36,10 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('users.profile.update') }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        
+
                         <div class="row">
                             <!-- Profile Picture Section -->
                             <div class="col-md-4">
@@ -69,7 +69,7 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="name">Full Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                        <input type="text" class="form-control @error('name') is-invalid @enderror border border-1"
                                                id="name" name="name" value="{{ old('name', auth()->user()->name) }}" required>
                                         @error('name')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -77,7 +77,7 @@
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="email">Email Address <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror border border-1"
                                                id="email" name="email" value="{{ old('email', auth()->user()->email) }}" required>
                                         @error('email')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -88,7 +88,7 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="phone">Phone Number</label>
-                                        <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                                        <input type="tel" class="form-control @error('phone') is-invalid @enderror border border-1"
                                                id="phone" name="phone" value="{{ old('phone', auth()->user()->phone) }}">
                                         @error('phone')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -96,7 +96,7 @@
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="date_of_birth">Date of Birth</label>
-                                        <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" 
+                                        <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror border border-1"
                                                id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', auth()->user()->date_of_birth) }}">
                                         @error('date_of_birth')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -106,7 +106,7 @@
 
                                 <div class="form-group">
                                     <label for="address">Address</label>
-                                    <textarea class="form-control @error('address') is-invalid @enderror" 
+                                    <textarea class="form-control @error('address') is-invalid @enderror border border-1"
                                               id="address" name="address" rows="3">{{ old('address', auth()->user()->address) }}</textarea>
                                     @error('address')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -118,11 +118,11 @@
                         <!-- Password Change Section -->
                         <hr class="my-4">
                         <h4 class="mb-3"><i class="fa fa-lock mr-2"></i> Change Password (Optional)</h4>
-                        
+
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label for="current_password">Current Password</label>
-                                <input type="password" class="form-control @error('current_password') is-invalid @enderror" 
+                                <input type="password" class="form-control @error('current_password') is-invalid @enderror border border-1"
                                        id="current_password" name="current_password">
                                 @error('current_password')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -130,7 +130,7 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="new_password">New Password</label>
-                                <input type="password" class="form-control @error('new_password') is-invalid @enderror" 
+                                <input type="password" class="form-control @error('new_password') is-invalid @enderror border border-1"
                                        id="new_password" name="new_password">
                                 @error('new_password')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -138,13 +138,13 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="new_password_confirmation">Confirm New Password</label>
-                                <input type="password" class="form-control" 
+                                <input type="password" class="form-control border border-1"
                                        id="new_password_confirmation" name="new_password_confirmation">
                             </div>
                         </div>
 
                         <div class="form-group text-center mt-4">
-                            <a href="{{ url('/users/dashboard') }}" class="btn btn-secondary mr-3">
+                            <a href="{{ url('/users/dashboard') }}" class="btn btn-danger text-white mr-3">
                                 <i class="fa fa-arrow-left mr-1"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-primary">
@@ -166,24 +166,24 @@
         height: 150px;
         font-size: 3rem;
     }
-    
+
     .contact-form-wrap {
         background: #fff;
         border-radius: 15px;
         padding: 40px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
-    
+
     .section-title h2 {
         color: #333;
         font-weight: 700;
     }
-    
+
     .form-control:focus {
         border-color: #007bff;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
-    
+
     label {
         font-weight: 600;
         color: #333;

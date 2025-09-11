@@ -138,7 +138,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        $request->validate([
+        $validationRules = [
             'name' => 'required|string|max:255',
             'email' => [
                 'required',
@@ -150,9 +150,15 @@ class DashboardController extends Controller
             'date_of_birth' => 'nullable|date|before:today',
             'address' => 'nullable|string|max:1000',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'current_password' => 'nullable|required_with:new_password|current_password',
-            'new_password' => 'nullable|min:8|confirmed',
-        ]);
+        ];
+
+        // Only add password validation if user wants to change password
+        if ($request->filled('new_password')) {
+            $validationRules['current_password'] = 'required|current_password';
+            $validationRules['new_password'] = 'required|min:8|confirmed';
+        }
+
+        $request->validate($validationRules);
 
         $updateData = [
             'name' => $request->name,
@@ -191,19 +197,27 @@ class DashboardController extends Controller
             }
             
             // Regular form submission
-            return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
+            return redirect()->route('users.profile.edit')->with('success', 'Profile updated successfully!');
         } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Profile update error: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'request_data' => $request->except(['avatar', 'current_password', 'new_password', 'new_password_confirmation'])
+            ]);
+            
             // Check if this is an AJAX request
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'An error occurred while updating your profile.',
+                    'message' => 'An error occurred while updating your profile: ' . $e->getMessage(),
                     'errors' => ['general' => ['Please try again.']]
                 ], 422);
             }
             
             // Regular form submission
-            return redirect()->back()->withErrors(['general' => 'An error occurred while updating your profile. Please try again.']);
+            return redirect()->back()
+                ->withErrors(['general' => 'An error occurred while updating your profile. Please try again.'])
+                ->withInput($request->except(['current_password', 'new_password', 'new_password_confirmation']));
         }
     }
 }
