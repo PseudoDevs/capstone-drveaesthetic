@@ -8,9 +8,22 @@ use Illuminate\Http\Request;
 
 class ChatController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $currentUser = auth()->user();
+        // For testing purposes, allow user_id parameter
+        $userId = $request->get('user_id');
+        
+        if ($userId) {
+            $currentUser = \App\Models\User::find($userId);
+        } else {
+            $currentUser = auth()->user();
+        }
+        
+        if (!$currentUser) {
+            // Default to a test user for demo
+            $currentUser = \App\Models\User::where('role', 'Client')->first();
+        }
+        
         $chats = Chat::with(['staff', 'client', 'latestMessage'])
             ->where(function($query) use ($currentUser) {
                 $query->where('staff_id', $currentUser->id)

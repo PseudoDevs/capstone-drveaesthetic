@@ -1,5 +1,5 @@
 /**
- * Real-time Chat Module for Laravel 12 + Pusher
+ * Real-time Chat Module for Laravel 12 + Server-Sent Events
  * Clean implementation with proper real-time messaging
  */
 
@@ -18,9 +18,11 @@ class ChatManager {
         this.selectedUserId = null;
         this.selectedUserName = null;
         this.currentChatId = null;
-        this.pusherChannel = null;
+        this.eventSource = null;
         this.displayedMessageIds = new Set();
         this.searchTimeout = null;
+        this.lastMessageId = 0;
+        this.hasManualSelection = false; // Track if staff manually selected a conversation
         
         console.log('🔧 ChatManager properties set:', {
             currentUser: this.currentUser,
@@ -37,7 +39,7 @@ class ChatManager {
         });
 
         this.setupEventListeners();
-        this.setupPusher();
+        this.setupEventSource();
         await this.loadConversations();
         
         console.log('✅ Chat Manager initialized');
@@ -64,20 +66,7 @@ class ChatManager {
             e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
         });
 
-        // Search functionality (staff only)
-        if (!this.isClient) {
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
-                
-                // Click outside to hide search results
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('#searchInput') && !e.target.closest('#searchResults')) {
-                        this.hideSearchResults();
-                    }
-                });
-            }
-        }
+        // No search functionality needed - only one staff member
 
         // Conversation clicks
         document.addEventListener('click', (e) => {
@@ -90,42 +79,133 @@ class ChatManager {
         });
     }
 
-    setupPusher() {
-        if (!window.pusher) {
-            console.error('❌ Pusher not initialized');
-            return;
-        }
-
-        console.log('🔄 Setting up Pusher connection...');
+    setupEventSource(forSpecificUser = null) {
+        console.log('🔄 Setting up Server-Sent Events connection...');
         
-        window.pusher.connection.bind('connected', () => {
-            console.log('✅ Pusher connected');
-        });
+        // Close existing connection if any
+        if (this.eventSource) {
+            this.eventSource.close();
+        }
+        
+        // Determine which user ID to use for SSE connection
+        let sseUserId;
+        if (forSpecificUser) {
+            // Staff connecting to specific client chat
+            sseUserId = forSpecificUser;
+            console.log(`🔄 Staff connecting to client ${forSpecificUser} chat`);
+        } else if (this.isClient) {
+            // Client connecting to staff chat
+            sseUserId = this.currentUser.id;
+            console.log(`🔄 Client ${this.currentUser.id} connecting to staff chat`);
+        } else {
+            // Staff initial connection - will be updated when they select a conversation
+            sseUserId = this.currentUser.id;
+            console.log(`🔄 Staff initial connection`);
+        }
+        
+        // Set up EventSource connection
+        const url = `/chat/stream?user_id=${sseUserId}&last_message_id=${this.lastMessageId || 0}`;
+        console.log(`🔗 SSE URL: ${url}`);
+        this.eventSource = new EventSource(url);
+        
+        this.eventSource.onopen = () => {
+            console.log('✅ SSE connected');
+        };
+        
+        this.eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log('📨 SSE message received:', data);
+            
+            switch (data.type) {
+                case 'connected':
+                    console.log('✅ SSE connection established for chat:', data.chat_id);
+                    break;
+                case 'message':
+                    this.handleIncomingMessage(data.message);
+                    this.lastMessageId = Math.max(this.lastMessageId, data.message.id);
+                    break;
+                case 'heartbeat':
+                    console.log('💓 SSE heartbeat');
+                    break;
+            }
+        };
+        
+        this.eventSource.onerror = (error) => {
+            console.error('❌ SSE connection error:', error);
+            // Attempt to reconnect after 5 seconds
+            setTimeout(() => {
+                if (this.eventSource.readyState === EventSource.CLOSED) {
+                    console.log('🔄 Attempting to reconnect SSE...');
+                    this.setupEventSource(forSpecificUser);
+                }
+            }, 5000);
+        };
+    }
 
-        window.pusher.connection.bind('error', (error) => {
-            console.error('❌ Pusher connection error:', error);
-        });
+    reconnectSSEForUser(userId) {
+        console.log(`🔄 Safely reconnecting SSE for user ${userId}...`);
+        
+        // Close existing connection
+        if (this.eventSource) {
+            this.eventSource.close();
+        }
+        
+        // Set up new connection for the specific user
+        const url = `/chat/stream?user_id=${userId}&last_message_id=${this.lastMessageId || 0}`;
+        console.log(`🔗 SSE URL: ${url}`);
+        this.eventSource = new EventSource(url);
+        
+        this.eventSource.onopen = () => {
+            console.log(`✅ SSE reconnected for user ${userId}`);
+        };
+        
+        this.eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log('📨 SSE message received:', data);
+            
+            switch (data.type) {
+                case 'connected':
+                    console.log('✅ SSE connection established for chat:', data.chat_id);
+                    break;
+                case 'message':
+                    this.handleIncomingMessage(data.message);
+                    this.lastMessageId = Math.max(this.lastMessageId, data.message.id);
+                    break;
+                case 'heartbeat':
+                    console.log('💓 SSE heartbeat');
+                    break;
+            }
+        };
+        
+        this.eventSource.onerror = (error) => {
+            console.error(`❌ SSE connection error for user ${userId}:`, error);
+            // Attempt to reconnect after 5 seconds
+            setTimeout(() => {
+                if (this.eventSource.readyState === EventSource.CLOSED) {
+                    console.log(`🔄 Attempting to reconnect SSE for user ${userId}...`);
+                    this.reconnectSSEForUser(userId);
+                }
+            }, 5000);
+        };
     }
 
     async loadConversations() {
-        if (this.isClient) {
-            // Clients don't need to load conversations - they see staff directly
-            return;
-        }
-
         try {
             console.log('📨 Loading conversations...');
             
-            const response = await fetch('/chat/conversations', {
+            const response = await fetch('/api/client/chats', {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': window.ChatData.csrfToken
+                    'Accept': 'application/json'
                 }
             });
 
             if (response.ok) {
                 const data = await response.json();
-                this.renderConversations(data.conversations);
+                if (data.success && data.data) {
+                    this.renderConversations(data.data);
+                } else {
+                    this.showEmptyConversations();
+                }
             } else {
                 console.error('❌ Failed to load conversations:', response.status);
                 this.showEmptyConversations();
@@ -136,22 +216,109 @@ class ChatManager {
         }
     }
 
-    renderConversations(conversations) {
+    renderConversations(data) {
         const container = document.getElementById('conversationsList');
         
-        if (!conversations || conversations.length === 0) {
+        if (!data || (!data.chats && !data.chat_users)) {
             this.showEmptyConversations();
             return;
         }
 
         container.innerHTML = '';
         
-        conversations.forEach(conversation => {
-            const element = this.createConversationElement(conversation);
-            container.appendChild(element);
-        });
-
-        console.log(`✅ Rendered ${conversations.length} conversations`);
+        // If current user is a client, show only the staff member
+        if (this.isClient) {
+            if (data.staff) {
+                // Find existing chat with staff if any
+                let existingChat = null;
+                if (data.chats) {
+                    existingChat = data.chats.find(chat => 
+                        chat.staff_id === data.staff.id && chat.client_id === this.currentUser.id
+                    );
+                }
+                
+                const conversation = {
+                    user: data.staff,
+                    chat_id: existingChat ? existingChat.id : null,
+                    last_message_at: existingChat ? existingChat.last_message_at : null,
+                    latest_message: existingChat && existingChat.latest_message ? {
+                        id: existingChat.latest_message.id,
+                        message: existingChat.latest_message.message,
+                        user_id: existingChat.latest_message.user_id,
+                        is_own_message: existingChat.latest_message.user_id === this.currentUser.id
+                    } : null,
+                    has_messages: existingChat && existingChat.latest_message ? true : false
+                };
+                
+                const element = this.createConversationElement(conversation);
+                container.appendChild(element);
+                
+                console.log('✅ Rendered staff member for client view');
+                
+                // Auto-select the staff conversation for clients (only if no manual selection)
+                if (!this.hasManualSelection) {
+                    setTimeout(() => {
+                        console.log('🔄 Auto-selecting staff conversation for client:', {
+                            staffId: data.staff.id,
+                            staffName: data.staff.name,
+                            currentUserId: this.currentUser.id,
+                            isClient: this.isClient
+                        });
+                        // For clients, we want to load messages between client and staff
+                        // The API getMessages($userId) finds chat between staff and $userId
+                        // So for client to see staff messages, we pass the client's own ID
+                        this.selectConversation(this.currentUser.id, data.staff.name, true);
+                    }, 100);
+                }
+            }
+        } else {
+            // If current user is staff, show all clients (original behavior)
+            if (data.chat_users) {
+                data.chat_users.forEach(chatUser => {
+                    const user = chatUser.user;
+                    const chat = chatUser.chat;
+                    
+                    const conversation = {
+                        user: user,
+                        chat_id: chat ? chat.id : null,
+                        last_message_at: chat ? chat.last_message_at : null,
+                        latest_message: chat && chat.latest_message ? {
+                            id: chat.latest_message.id,
+                            message: chat.latest_message.message,
+                            user_id: chat.latest_message.user_id,
+                            is_own_message: chat.latest_message.user_id === this.currentUser.id
+                        } : null,
+                        has_messages: chatUser.has_messages
+                    };
+                    
+                    const element = this.createConversationElement(conversation);
+                    container.appendChild(element);
+                });
+                
+                console.log(`✅ Rendered ${data.chat_users.length} chat users`);
+                
+                // Auto-select the client with the most recent message for staff (only if no manual selection)
+                if (!this.hasManualSelection) {
+                    const clientWithRecentMessage = data.chat_users.find(chatUser => 
+                        chatUser.has_messages && chatUser.chat && chatUser.chat.latest_message
+                    );
+                    
+                    if (clientWithRecentMessage) {
+                        setTimeout(() => {
+                            console.log('🔄 Auto-selecting client with recent message for staff:', {
+                                clientId: clientWithRecentMessage.user.id,
+                                clientName: clientWithRecentMessage.user.name,
+                                currentUserId: this.currentUser.id,
+                                isClient: this.isClient
+                            });
+                            this.selectConversation(clientWithRecentMessage.user.id, clientWithRecentMessage.user.name, true);
+                        }, 100);
+                    }
+                } else {
+                    console.log('🚫 Skipping auto-selection - staff has manual selection');
+                }
+            }
+        }
     }
 
     createConversationElement(conversation) {
@@ -233,11 +400,17 @@ class ChatManager {
         `;
     }
 
-    async selectConversation(userId, userName) {
-        console.log(`💬 Selecting conversation with ${userName} (${userId})`);
+    async selectConversation(userId, userName, isAutoSelect = false) {
+        console.log(`💬 Selecting conversation with ${userName} (${userId}) - ${isAutoSelect ? 'auto' : 'manual'}`);
         
         this.selectedUserId = parseInt(userId);
         this.selectedUserName = userName;
+        
+        // Track manual selections to prevent auto-selection override
+        if (!isAutoSelect) {
+            this.hasManualSelection = true;
+            console.log('🎯 Manual selection detected, preventing auto-selection override');
+        }
 
         // Update UI selection
         this.updateConversationSelection();
@@ -247,6 +420,12 @@ class ChatManager {
         
         // Load messages
         await this.loadMessages();
+        
+        // Reconnect SSE for the selected conversation (important for staff)
+        if (!this.isClient) {
+            console.log(`🔄 Staff selected client ${userId}, reconnecting SSE...`);
+            this.reconnectSSEForUser(parseInt(userId));
+        }
     }
 
     updateConversationSelection() {
@@ -287,19 +466,24 @@ class ChatManager {
                 </div>
             `;
 
-            const response = await fetch(`/chat/messages/${this.selectedUserId}`, {
+            const response = await fetch(`/api/client/chats/messages/${this.selectedUserId}`, {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': window.ChatData.csrfToken
+                    'Accept': 'application/json'
                 }
             });
 
             if (response.ok) {
                 const data = await response.json();
-                this.currentChatId = data.chat_id;
-                this.displayMessages(data.messages || []);
-                this.setupChatChannel();
-                console.log(`✅ Loaded ${data.messages?.length || 0} messages for chat ${this.currentChatId}`);
+                console.log('📨 Messages API response:', data);
+                if (data.success && data.data) {
+                    this.currentChatId = data.data.chat_id;
+                    console.log(`🔄 About to display ${data.data.messages?.length || 0} messages`);
+                    this.displayMessages(data.data.messages || []);
+                    console.log(`✅ Loaded ${data.data.messages?.length || 0} messages for chat ${this.currentChatId}`);
+                } else {
+                    console.log('❌ API response indicates no data:', data);
+                    this.showEmptyMessages();
+                }
             } else {
                 console.error('❌ Failed to load messages:', response.status);
                 this.showEmptyMessages();
@@ -318,20 +502,27 @@ class ChatManager {
             return;
         }
         
+        console.log('🔍 displayMessages called with:', messages);
+        console.log('🔍 Container element:', container);
+        
         container.innerHTML = '';
         this.displayedMessageIds.clear();
 
         if (!messages || messages.length === 0) {
+            console.log('📭 No messages to display, showing empty state');
             this.showEmptyMessages();
             return;
         }
 
         console.log(`✅ Displaying ${messages.length} messages`);
         
-        messages.forEach(message => {
+        messages.forEach((message, index) => {
+            console.log(`🔄 Processing message ${index + 1}:`, message);
             this.displayedMessageIds.add(message.id);
             this.addMessageToUI(message, false); // Don't scroll for initial load
         });
+        
+        console.log('🔍 Container after adding messages:', container.innerHTML.length > 0 ? 'Has content' : 'Empty');
 
         // Force scroll after all messages are added
         setTimeout(() => this.scrollToBottom(), 100);
@@ -354,37 +545,6 @@ class ChatManager {
         `;
     }
 
-    setupChatChannel() {
-        if (!window.pusher || !this.currentChatId) {
-            console.error('❌ Cannot setup chat channel:', { pusher: !!window.pusher, chatId: this.currentChatId });
-            return;
-        }
-
-        // Unsubscribe from previous channel
-        if (this.pusherChannel) {
-            this.pusherChannel.unbind_all();
-            window.pusher.unsubscribe(this.pusherChannel.name);
-        }
-
-        // Subscribe to chat channel
-        const channelName = `private-chat.${this.currentChatId}`;
-        console.log(`🔄 Subscribing to ${channelName}...`);
-        
-        this.pusherChannel = window.pusher.subscribe(channelName);
-
-        this.pusherChannel.bind('message.sent', (data) => {
-            console.log('📨 Received message via Pusher:', data);
-            this.handleIncomingMessage(data.message);
-        });
-
-        this.pusherChannel.bind('pusher:subscription_succeeded', () => {
-            console.log(`✅ Successfully subscribed to ${channelName}`);
-        });
-
-        this.pusherChannel.bind('pusher:subscription_error', (error) => {
-            console.error('❌ Pusher subscription error:', error);
-        });
-    }
 
     handleIncomingMessage(message) {
         // Prevent duplicate messages
@@ -403,7 +563,10 @@ class ChatManager {
     }
 
     addMessageToUI(message, shouldScroll = true) {
+        console.log('🔄 addMessageToUI called for message:', message.id, message.message);
+        
         if (this.displayedMessageIds.has(message.id)) {
+            console.log('⚠️ Duplicate message ignored:', message.id);
             return; // Prevent duplicates
         }
 
@@ -414,6 +577,8 @@ class ChatManager {
             console.error('❌ Messages container not found!');
             return;
         }
+        
+        console.log('✅ Adding message to UI:', message.id);
         
         // Remove empty state if present
         const emptyState = container.querySelector('.flex.justify-center.items-center.h-full');
@@ -461,23 +626,23 @@ class ChatManager {
         try {
             console.log('📤 Sending message...', { to: this.selectedUserId, message: message.substring(0, 50) + '...' });
 
-            const response = await fetch('/chat/send', {
+            const formData = new FormData();
+            formData.append('sender_id', this.currentUser.id);
+            formData.append('receiver_id', this.selectedUserId);
+            formData.append('message', message);
+
+            const response = await fetch('/api/client/chats/send-message', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': window.ChatData.csrfToken
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    receiver_id: this.selectedUserId,
-                    message: message
-                })
+                body: formData
             });
 
             if (response.ok) {
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if (data.success && data.data) {
                     console.log('✅ Message sent successfully');
                     
                     // Clear input
@@ -485,12 +650,11 @@ class ChatManager {
                     input.style.height = 'auto';
                     
                     // Set chat ID if this was the first message
-                    if (!this.currentChatId && data.message.chat_id) {
-                        this.currentChatId = data.message.chat_id;
-                        this.setupChatChannel();
+                    if (!this.currentChatId && data.data.chat_id) {
+                        this.currentChatId = data.data.chat_id;
                     }
                     
-                    // The message will appear via Pusher broadcast
+                    // The message will appear via SSE stream
                     
                 } else {
                     throw new Error(data.message || 'Send failed');
@@ -507,91 +671,6 @@ class ChatManager {
         }
     }
 
-    handleSearch(query) {
-        if (this.searchTimeout) {
-            clearTimeout(this.searchTimeout);
-        }
-
-        if (!query.trim()) {
-            this.hideSearchResults();
-            return;
-        }
-
-        this.searchTimeout = setTimeout(() => {
-            this.performSearch(query);
-        }, 300);
-    }
-
-    async performSearch(query) {
-        try {
-            console.log('🔍 Searching for:', query);
-
-            const response = await fetch(`/api/client/chats/search/staff?query=${encodeURIComponent(query)}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': window.ChatData.csrfToken
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                this.showSearchResults(data.data || []);
-            } else {
-                console.error('❌ Search failed:', response.status);
-                this.showSearchResults([]);
-            }
-        } catch (error) {
-            console.error('❌ Search error:', error);
-            this.showSearchResults([]);
-        }
-    }
-
-    showSearchResults(users) {
-        const resultsContainer = document.getElementById('searchResults');
-        resultsContainer.innerHTML = '';
-
-        if (users.length === 0) {
-            resultsContainer.innerHTML = `
-                <div class="p-3 text-center text-gray-500">
-                    <p class="text-sm">No staff found</p>
-                </div>
-            `;
-        } else {
-            users.forEach(user => {
-                const item = document.createElement('div');
-                item.className = 'p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0';
-                item.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                            ${user.name.substring(0, 2)}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-medium text-gray-900 truncate">${user.name}</h3>
-                            <p class="text-xs text-gray-500 truncate">${user.email}</p>
-                            <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">${user.role}</span>
-                        </div>
-                    </div>
-                `;
-                
-                item.addEventListener('click', () => {
-                    this.selectConversation(user.id, user.name);
-                    this.hideSearchResults();
-                    document.getElementById('searchInput').value = '';
-                });
-
-                resultsContainer.appendChild(item);
-            });
-        }
-
-        resultsContainer.classList.remove('hidden');
-    }
-
-    hideSearchResults() {
-        const resultsContainer = document.getElementById('searchResults');
-        if (resultsContainer) {
-            resultsContainer.classList.add('hidden');
-        }
-    }
 
     scrollToBottom() {
         const container = document.getElementById('messagesContainer');

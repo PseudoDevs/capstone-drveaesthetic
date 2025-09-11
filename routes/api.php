@@ -53,7 +53,7 @@ Route::prefix('client')->name('client.')->group(function () {
     // Feedback API
     Route::apiResource('feedback', FeedbackController::class);
     
-    // Chat API
+    // Public Chat API (no authentication required for 1-on-1 client-staff chat)
     Route::apiResource('chats', ChatController::class);
     Route::get('chats/messages/{userId}', [ChatController::class, 'getMessages'])->name('chats.get-messages');
     Route::post('chats/send-message', [ChatController::class, 'sendMessage'])->name('chats.send-message');
@@ -87,9 +87,5 @@ Route::prefix('client')->name('client.')->group(function () {
     
 });
 
-// Special routes that support both web and Bearer token authentication for chat functionality
-Route::prefix('client')->name('client.')->middleware(['auth:sanctum,web'])->group(function () {
-    Route::get('chats/search/staff', [ChatController::class, 'searchStaff'])->name('chats.search-staff');
-});
 
 

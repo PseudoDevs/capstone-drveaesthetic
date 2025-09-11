@@ -37,60 +37,13 @@
                 </div>
             </div>
 
-            <!-- Search (only for non-clients) -->
-            @if ($currentUser->role !== 'Client')
-                <div class="p-4">
-                    <div class="relative">
-                        <input type="text" placeholder="Search staff..." id="searchInput"
-                            class="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-full focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-                        <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        <div id="searchResults"
-                            class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto z-50 hidden">
-                        </div>
-                    </div>
-                </div>
-            @endif
 
             <!-- Conversations List -->
             <div class="flex-1 overflow-y-auto" id="conversationsList">
-                @if ($currentUser->role === 'Client' && $staffMember)
-                    <!-- Client sees only staff -->
-                    <div class="conversation-item px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors"
-                        data-user-id="{{ $staffMember->id }}" data-user-name="{{ $staffMember->name }}">
-                        <div class="flex items-center space-x-3">
-                            <div class="relative">
-                                <div
-                                    class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                    {{ substr($staffMember->name, 0, 2) }}
-                                </div>
-                                <div
-                                    class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full">
-                                </div>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between">
-                                    <h3 class="text-sm font-medium text-gray-900 truncate">{{ $staffMember->name }}</h3>
-                                    <span class="text-xs text-green-600">● Online</span>
-                                </div>
-                                <p class="text-sm text-gray-500 truncate">{{ $staffMember->email }}</p>
-                                <div class="flex items-center mt-1">
-                                    <span
-                                        class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">{{ $staffMember->role }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <!-- Staff/Admin see conversations -->
-                    <div class="p-4 text-center text-gray-500">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                        <p class="text-sm">Loading conversations...</p>
-                    </div>
-                @endif
+                <div class="p-4 text-center text-gray-500">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                    <p class="text-sm">Loading conversations...</p>
+                </div>
             </div>
         </div>
 
@@ -166,8 +119,6 @@
         window.ChatData = {
             currentUser: @json($currentUser),
             isClient: @json($currentUser->role === 'Client'),
-            pusherKey: "{{ config('broadcasting.connections.pusher.key') }}",
-            pusherCluster: "{{ config('broadcasting.connections.pusher.options.cluster') }}",
             csrfToken: "{{ csrf_token() }}"
         };
         console.log('🔧 ChatData initialized:', window.ChatData);

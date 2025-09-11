@@ -142,11 +142,13 @@ Route::middleware('auth')->group(function () {
     // Public appointment routes (no auth required)
     Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableTimeSlots'])->name('appointments.available-slots');
 
-    // Chat Routes
-    Route::prefix('chat')->name('chat.')->group(function () {
-        Route::get('/', [ChatController::class, 'index'])->name('index');
-        Route::get('/conversations', [ChatController::class, 'getConversations'])->name('conversations');
-        Route::get('/messages/{userId}', [ChatController::class, 'getMessages'])->name('messages');
-        Route::post('/send', [ChatController::class, 'sendMessage'])->name('send');
-    });
+});
+
+// Public Chat Routes (no authentication required)
+Route::prefix('chat')->name('chat.')->group(function () {
+    Route::get('/', [ChatController::class, 'index'])->name('index');
+    Route::get('/conversations', [ChatController::class, 'getConversations'])->name('conversations');
+    Route::get('/messages/{userId}', [ChatController::class, 'getMessages'])->name('messages');
+    Route::post('/send', [ChatController::class, 'sendMessage'])->name('send');
+    Route::get('/stream', [\App\Http\Controllers\ChatStreamController::class, 'stream'])->name('stream');
 });

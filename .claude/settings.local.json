@@ -10,7 +10,9 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(composer:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "WebFetch(domain:drveaestheticclinic.online)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []

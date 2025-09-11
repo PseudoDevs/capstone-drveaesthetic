@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
-use App\Events\MessageSent;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -12,42 +11,49 @@ class ChatController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        // Get the single staff member and all clients
+        $staff = \App\Models\User::where('role', 'Staff')->first();
+        $clients = \App\Models\User::where('role', 'Client')->get();
 
-        if (!$user) {
+        if (!$staff) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthenticated'
-            ], 401);
+                'message' => 'No staff member found'
+            ], 404);
         }
 
+        // Get all chats involving the staff member
         $chats = Chat::with(['staff', 'client', 'latestMessage'])
-            ->where(function($query) use ($user) {
-                $query->where('staff_id', $user->id)
-                      ->orWhere('client_id', $user->id);
-            })
+            ->where('staff_id', $staff->id)
             ->orderBy('last_message_at', 'desc')
             ->get();
 
-        // Extract users from chats that have conversations with current user
-        $users = collect();
-        foreach ($chats as $chat) {
-            if ($chat->staff_id == $user->id) {
-                $users->push($chat->client);
+        // For each client, ensure they have a potential chat entry (even if no messages yet)
+        $chatUsers = collect();
+        foreach ($clients as $client) {
+            $existingChat = $chats->where('client_id', $client->id)->first();
+            if ($existingChat) {
+                $chatUsers->push([
+                    'user' => $client,
+                    'chat' => $existingChat,
+                    'has_messages' => $existingChat->latestMessage !== null
+                ]);
             } else {
-                $users->push($chat->staff);
+                $chatUsers->push([
+                    'user' => $client,
+                    'chat' => null,
+                    'has_messages' => false
+                ]);
             }
         }
-
-        // Remove duplicates
-        $users = $users->unique('id')->values();
 
         return response()->json([
             'success' => true,
             'data' => [
                 'chats' => $chats,
-                'users_with_conversations' => $users,
-                'current_user' => $user
+                'staff' => $staff,
+                'clients' => $clients,
+                'chat_users' => $chatUsers
             ]
         ]);
     }
@@ -126,102 +132,71 @@ class ChatController extends Controller
         ]);
     }
 
-    public function searchStaff(Request $request): JsonResponse
-    {
-        // Support both Bearer token (mobile/API) and web session authentication
-        $user = auth('sanctum')->user() ?? auth('web')->user();
-
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthenticated'
-            ], 401);
-        }
-
-        $query = $request->get('query', '');
-
-        // For clients, only show the single staff member (and doctor if needed)
-        // For staff/doctors/admins, show all other roles
-        if ($user->role === 'Client') {
-            $staffQuery = \App\Models\User::whereIn('role', ['Staff'])
-                ->where('id', '!=', $user->id); // Exclude current user
-        } else {
-            $staffQuery = \App\Models\User::whereIn('role', ['Staff'])
-                ->where('id', '!=', $user->id); // Exclude current user
-        }
-
-        // Apply search filter if query is provided (case-insensitive search)
-        if (!empty(trim($query))) {
-            $searchTerm = trim($query);
-            $staffQuery->where(function($q) use ($searchTerm) {
-                $q->whereRaw('LOWER(name) LIKE LOWER(?)', ["%{$searchTerm}%"])
-                  ->orWhereRaw('LOWER(email) LIKE LOWER(?)', ["%{$searchTerm}%"]);
-            });
-        }
-
-        $staff = $staffQuery
-            ->select('id', 'name', 'email', 'role', 'avatar')
-            ->orderBy('name')
-            ->limit(50)
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $staff
-        ]);
-    }
 
     public function getMessages($userId): JsonResponse
     {
-        $user = auth()->user();
-
-        if (!$user) {
+        // Get the single staff member
+        $staff = \App\Models\User::where('role', 'Staff')->first();
+        
+        if (!$staff) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthenticated'
-            ], 401);
+                'message' => 'No staff member found'
+            ], 404);
         }
 
-        $chat = Chat::findOrCreateChat($user->id, $userId);
+        // Find or create chat between staff and the specified user
+        $chat = Chat::findOrCreateChat($staff->id, $userId);
         $messages = $chat->messages()->with('user')->orderBy('created_at', 'asc')->get();
 
         return response()->json([
             'success' => true,
             'data' => [
                 'chat_id' => $chat->id,
-                'messages' => $messages
+                'messages' => $messages,
+                'staff' => $staff,
+                'other_user' => \App\Models\User::find($userId)
             ]
         ]);
     }
 
     public function sendMessage(Request $request): JsonResponse
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthenticated'
-            ], 401);
-        }
-
         $validated = $request->validate([
+            'sender_id' => 'required|exists:users,id',
             'receiver_id' => 'required|exists:users,id',
             'message' => 'required|string|max:1000',
         ]);
 
-        $chat = Chat::findOrCreateChat($user->id, $validated['receiver_id']);
+        // Get the staff member
+        $staff = \App\Models\User::where('role', 'Staff')->first();
+        
+        if (!$staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No staff member found'
+            ], 404);
+        }
+
+        // Ensure one of the participants is the staff member
+        if ($validated['sender_id'] != $staff->id && $validated['receiver_id'] != $staff->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'All messages must involve the staff member'
+            ], 400);
+        }
+
+        $chat = Chat::findOrCreateChat($validated['sender_id'], $validated['receiver_id']);
 
         $message = \App\Models\Message::create([
             'chat_id' => $chat->id,
-            'user_id' => $user->id,
+            'user_id' => $validated['sender_id'],
             'message' => $validated['message'],
         ]);
 
         $chat->update(['last_message_at' => now()]);
 
-        // Broadcast the message for real-time updates
-        broadcast(new MessageSent($message));
+        // Note: Real-time updates now handled by Server-Sent Events
 
         return response()->json([
             'success' => true,
