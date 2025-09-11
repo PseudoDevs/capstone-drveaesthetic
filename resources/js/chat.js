@@ -6,6 +6,12 @@
 class ChatManager {
     constructor() {
         console.log('🔧 ChatManager constructor called');
+        console.log('🔧 Environment info:', {
+            hostname: window.location.hostname,
+            protocol: window.location.protocol,
+            origin: window.location.origin,
+            userAgent: navigator.userAgent.substring(0, 50) + '...'
+        });
         console.log('🔧 window.ChatData:', window.ChatData);
         
         if (!window.ChatData) {
