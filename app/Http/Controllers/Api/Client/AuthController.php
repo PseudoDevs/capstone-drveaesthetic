@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Http;
@@ -257,6 +258,7 @@ class AuthController extends Controller
                 'phone' => 'nullable|string|max:20',
                 'date_of_birth' => 'nullable|date|before:today',
                 'address' => 'nullable|string|max:1000',
+                'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // 2MB max
                 'current_password' => 'sometimes|required_with:new_password|string',
                 'new_password' => 'sometimes|string|min:8|confirmed',
             ]);
@@ -270,6 +272,17 @@ class AuthController extends Controller
             }
 
             $updateData = $request->only(['name', 'email', 'phone', 'date_of_birth', 'address']);
+
+            // Handle avatar upload
+            if ($request->hasFile('avatar')) {
+                // Delete old avatar if exists and is not a Google avatar URL
+                if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+                
+                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+                $updateData['avatar'] = $avatarPath;
+            }
 
             // Handle password update
             if ($request->filled('new_password')) {

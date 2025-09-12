@@ -170,8 +170,8 @@ class DashboardController extends Controller
 
         // Handle avatar upload
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if it exists
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            // Delete old avatar if exists and is not a Google avatar URL
+            if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
                 Storage::disk('public')->delete($user->avatar);
             }
 
