@@ -39,6 +39,8 @@ Route::prefix('client')->name('client.')->group(function () {
     
     // Users API
     Route::apiResource('users', UserController::class);
+    Route::post('users/{id}/upload-avatar', [UserController::class, 'uploadAvatar'])->name('users.upload-avatar');
+    Route::delete('users/{id}/remove-avatar', [UserController::class, 'removeAvatar'])->name('users.remove-avatar');
     
     // Appointments API
     Route::apiResource('appointments', AppointmentController::class);
