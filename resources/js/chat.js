@@ -1,6 +1,6 @@
 /**
- * Real-time Chat Module for Laravel 12 + Server-Sent Events
- * Clean implementation with proper real-time messaging
+ * Real-time Chat Module for Laravel 12 + Ajax Polling
+ * Clean implementation with proper real-time messaging using Ajax instead of SSE
  */
 
 class ChatManager {
@@ -24,11 +24,16 @@ class ChatManager {
         this.selectedUserId = null;
         this.selectedUserName = null;
         this.currentChatId = null;
-        this.eventSource = null;
         this.displayedMessageIds = new Set();
         this.searchTimeout = null;
         this.lastMessageId = 0;
         this.hasManualSelection = false; // Track if staff manually selected a conversation
+        
+        // Ajax polling configuration
+        this.messagePollingInterval = null;
+        this.conversationPollingInterval = null;
+        this.messagePollingFrequency = 2000; // Poll messages every 2 seconds when in active chat
+        this.conversationPollingFrequency = 5000; // Poll conversation updates every 5 seconds
         
         console.log('🔧 ChatManager properties set:', {
             currentUser: this.currentUser,
@@ -45,8 +50,8 @@ class ChatManager {
         });
 
         this.setupEventListeners();
-        this.setupEventSource();
         await this.loadConversations();
+        this.startConversationPolling();
         
         // Debug: Test direct API call for clients
         if (this.isClient) {
@@ -105,8 +110,6 @@ class ChatManager {
             e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
         });
 
-        // No search functionality needed - only one staff member
-
         // Conversation clicks
         document.addEventListener('click', (e) => {
             const conversationItem = e.target.closest('.conversation-item');
@@ -137,116 +140,120 @@ class ChatManager {
                 this.selectConversation(messageLoadUserId, userName);
             }
         });
+
+        // Handle page visibility for efficient polling
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Page hidden, reduce polling frequency
+                this.pauseActivePolling();
+            } else {
+                // Page visible, resume normal polling
+                this.resumeActivePolling();
+            }
+        });
     }
 
-    setupEventSource(forSpecificUser = null) {
-        console.log('🔄 Setting up Server-Sent Events connection...');
-        
-        // Close existing connection if any
-        if (this.eventSource) {
-            this.eventSource.close();
-        }
-        
-        // Determine which user ID to use for SSE connection
-        let sseUserId;
-        if (forSpecificUser) {
-            // Staff connecting to specific client chat
-            sseUserId = forSpecificUser;
-            console.log(`🔄 Staff connecting to client ${forSpecificUser} chat`);
-        } else if (this.isClient) {
-            // Client connecting to staff chat
-            sseUserId = this.currentUser.id;
-            console.log(`🔄 Client ${this.currentUser.id} connecting to staff chat`);
-        } else {
-            // Staff initial connection - will be updated when they select a conversation
-            sseUserId = this.currentUser.id;
-            console.log(`🔄 Staff initial connection`);
-        }
-        
-        // Set up EventSource connection
-        const url = `/chat/stream?user_id=${sseUserId}&last_message_id=${this.lastMessageId || 0}`;
-        console.log(`🔗 SSE URL: ${url}`);
-        this.eventSource = new EventSource(url);
-        
-        this.eventSource.onopen = () => {
-            console.log('✅ SSE connected');
-        };
-        
-        this.eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log('📨 SSE message received:', data);
-            
-            switch (data.type) {
-                case 'connected':
-                    console.log('✅ SSE connection established for chat:', data.chat_id);
-                    break;
-                case 'message':
-                    this.handleIncomingMessage(data.message);
-                    this.lastMessageId = Math.max(this.lastMessageId, data.message.id);
-                    break;
-                case 'heartbeat':
-                    console.log('💓 SSE heartbeat');
-                    break;
-            }
-        };
-        
-        this.eventSource.onerror = (error) => {
-            console.error('❌ SSE connection error:', error);
-            // Attempt to reconnect after 5 seconds
-            setTimeout(() => {
-                if (this.eventSource.readyState === EventSource.CLOSED) {
-                    console.log('🔄 Attempting to reconnect SSE...');
-                    this.setupEventSource(forSpecificUser);
-                }
-            }, 5000);
-        };
+    startConversationPolling() {
+        console.log('📊 Starting conversation polling...');
+        this.conversationPollingInterval = setInterval(() => {
+            this.pollConversationUpdates();
+        }, this.conversationPollingFrequency);
     }
 
-    reconnectSSEForUser(userId) {
-        console.log(`🔄 Safely reconnecting SSE for user ${userId}...`);
-        
-        // Close existing connection
-        if (this.eventSource) {
-            this.eventSource.close();
+    startMessagePolling() {
+        if (this.messagePollingInterval) {
+            clearInterval(this.messagePollingInterval);
         }
         
-        // Set up new connection for the specific user
-        const url = `/chat/stream?user_id=${userId}&last_message_id=${this.lastMessageId || 0}`;
-        console.log(`🔗 SSE URL: ${url}`);
-        this.eventSource = new EventSource(url);
-        
-        this.eventSource.onopen = () => {
-            console.log(`✅ SSE reconnected for user ${userId}`);
-        };
-        
-        this.eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log('📨 SSE message received:', data);
-            
-            switch (data.type) {
-                case 'connected':
-                    console.log('✅ SSE connection established for chat:', data.chat_id);
-                    break;
-                case 'message':
-                    this.handleIncomingMessage(data.message);
-                    this.lastMessageId = Math.max(this.lastMessageId, data.message.id);
-                    break;
-                case 'heartbeat':
-                    console.log('💓 SSE heartbeat');
-                    break;
-            }
-        };
-        
-        this.eventSource.onerror = (error) => {
-            console.error(`❌ SSE connection error for user ${userId}:`, error);
-            // Attempt to reconnect after 5 seconds
-            setTimeout(() => {
-                if (this.eventSource.readyState === EventSource.CLOSED) {
-                    console.log(`🔄 Attempting to reconnect SSE for user ${userId}...`);
-                    this.reconnectSSEForUser(userId);
+        console.log('📨 Starting message polling for chat:', this.currentChatId);
+        this.messagePollingInterval = setInterval(() => {
+            this.pollNewMessages();
+        }, this.messagePollingFrequency);
+    }
+
+    stopMessagePolling() {
+        if (this.messagePollingInterval) {
+            console.log('⏹️ Stopping message polling');
+            clearInterval(this.messagePollingInterval);
+            this.messagePollingInterval = null;
+        }
+    }
+
+    pauseActivePolling() {
+        console.log('⏸️ Pausing active polling (page hidden)');
+        this.stopMessagePolling();
+    }
+
+    resumeActivePolling() {
+        console.log('▶️ Resuming active polling (page visible)');
+        if (this.currentChatId) {
+            this.startMessagePolling();
+        }
+    }
+
+    async pollNewMessages() {
+        if (!this.currentChatId) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/chat/poll-messages/${this.currentChatId}?last_message_id=${this.lastMessageId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': window.ChatData?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                 }
-            }, 5000);
-        };
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.success && data.has_new_messages && data.messages) {
+                    console.log('📨 New messages received:', data.messages.length);
+                    
+                    data.messages.forEach(message => {
+                        this.handleIncomingMessage(message);
+                    });
+                    
+                    this.lastMessageId = data.last_message_id;
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error polling new messages:', error);
+        }
+    }
+
+    async pollConversationUpdates() {
+        try {
+            const response = await fetch(`/chat/poll-conversation-updates?last_message_id=${this.lastMessageId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': window.ChatData?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.success && data.has_updates && data.conversation_updates) {
+                    console.log('📊 Conversation updates received:', data.conversation_updates.length);
+                    
+                    // Update conversations list
+                    this.handleConversationUpdates(data.conversation_updates);
+                    
+                    this.lastMessageId = Math.max(this.lastMessageId, data.last_message_id);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error polling conversation updates:', error);
+        }
+    }
+
+    handleConversationUpdates(updates) {
+        // For now, just reload conversations to keep it simple
+        // In a more sophisticated implementation, you would update individual conversation items
+        this.loadConversations();
     }
 
     async loadConversations() {
@@ -334,9 +341,6 @@ class ChatManager {
                             isClient: this.isClient
                         });
                         // For clients, we want to load messages between client and staff
-                        // The API getMessages($userId) finds chat between staff and $userId
-                        // So for client to see staff messages, we pass the client's own ID
-                        // But store staff info for sending messages
                         window.ChatData.staff = data.staff;
                         this.selectConversation(this.currentUser.id, data.staff.name, true);
                     }, 100);
@@ -497,11 +501,8 @@ class ChatManager {
         // Load messages
         await this.loadMessages();
         
-        // Reconnect SSE for the selected conversation (important for staff)
-        if (!this.isClient) {
-            console.log(`🔄 Staff selected client ${userId}, reconnecting SSE...`);
-            this.reconnectSSEForUser(parseInt(userId));
-        }
+        // Start polling for new messages in this chat
+        this.startMessagePolling();
     }
 
     updateConversationSelection() {
@@ -633,14 +634,16 @@ class ChatManager {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     
                     this.displayMessages(data.data.messages);
+                    
+                    // Set last message ID for polling
+                    if (data.data.messages.length > 0) {
+                        const lastMessage = data.data.messages[data.data.messages.length - 1];
+                        this.lastMessageId = Math.max(this.lastMessageId, lastMessage.id);
+                    }
+                    
                     console.log(`✅ Loaded ${messageCount} messages for chat ${this.currentChatId}`);
                 } else {
                     console.log('❌ API response indicates no data or empty messages:', data);
-                    console.log('   - Success:', data?.success);
-                    console.log('   - Data exists:', !!data?.data);
-                    console.log('   - Messages exists:', !!data?.data?.messages);
-                    console.log('   - Messages count:', data?.data?.messages?.length || 0);
-                    console.log('   - Full data structure:', JSON.stringify(data, null, 2));
                     this.showEmptyMessages();
                 }
             } else {
@@ -761,7 +764,6 @@ class ChatManager {
         `;
     }
 
-
     handleIncomingMessage(message) {
         // Prevent duplicate messages
         if (this.displayedMessageIds.has(message.id)) {
@@ -772,10 +774,8 @@ class ChatManager {
         console.log('✅ Adding new message to UI:', message.id);
         this.addIncomingMessageToUI(message);
         
-        // Refresh conversations list (for staff)
-        if (!this.isClient) {
-            setTimeout(() => this.loadConversations(), 100);
-        }
+        // Update last message ID
+        this.lastMessageId = Math.max(this.lastMessageId, message.id);
     }
 
     addIncomingMessageToUI(message) {
@@ -804,7 +804,6 @@ class ChatManager {
         }
     }
 
-
     async sendMessage() {
         const input = document.getElementById('messageInput');
         const message = input.value.trim();
@@ -828,42 +827,31 @@ class ChatManager {
             let receiverId;
             if (this.isClient) {
                 // Client always sends TO the staff member
-                // We need to get the staff ID from the backend or stored data
                 const staffData = window.ChatData?.staff || (await this.getStaffInfo());
                 receiverId = staffData ? staffData.id : this.selectedUserId;
             } else {
                 // Staff sends to the selected user (client)
                 receiverId = this.selectedUserId;
             }
-            
-            const formData = new FormData();
-            formData.append('sender_id', this.currentUser.id);
-            formData.append('receiver_id', receiverId);
-            formData.append('message', message);
-            
-            console.log('📤 FormData being sent:', {
-                sender_id: this.currentUser.id,
-                receiver_id: receiverId,
-                sender_name: this.currentUser.name,
-                receiver_name: this.selectedUserName,
-                isClient: this.isClient,
-                selectedUserId: this.selectedUserId
-            });
 
-            const response = await fetch('/api/client/chats/send-message', {
+            const response = await fetch('/chat/send-message', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
+                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': window.ChatData?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                 },
-                body: formData
+                body: JSON.stringify({
+                    receiver_id: receiverId,
+                    message: message
+                })
             });
 
             if (response.ok) {
                 const data = await response.json();
                 
-                if (data.success && data.data) {
+                if (data.status === 'success' && data.message) {
                     console.log('✅ Message sent successfully');
                     
                     // Clear input
@@ -871,11 +859,14 @@ class ChatManager {
                     input.style.height = 'auto';
                     
                     // Set chat ID if this was the first message
-                    if (!this.currentChatId && data.data.chat_id) {
-                        this.currentChatId = data.data.chat_id;
+                    if (!this.currentChatId && data.message.chat_id) {
+                        this.currentChatId = data.message.chat_id;
+                        // Start message polling now that we have a chat
+                        this.startMessagePolling();
                     }
                     
-                    // The message will appear via SSE stream
+                    // Add message to UI immediately for better UX
+                    this.addIncomingMessageToUI(data.message);
                     
                 } else {
                     console.error('❌ Send message failed:', data);
@@ -884,25 +875,13 @@ class ChatManager {
             } else {
                 let errorData = null;
                 try {
-                    const responseClone = response.clone();
-                    errorData = await responseClone.json();
+                    errorData = await response.json();
                 } catch (e) {
-                    // If JSON parsing fails, get text
-                    try {
-                        const errorText = await response.text();
-                        console.error('❌ HTTP error (text):', response.status, errorText);
-                        throw new Error(`HTTP ${response.status}: ${errorText}`);
-                    } catch (e2) {
-                        console.error('❌ HTTP error (unknown):', response.status);
-                        throw new Error(`HTTP ${response.status}: Unknown error`);
-                    }
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
                 
-                console.error('❌ HTTP error (JSON):', response.status, errorData);
-                if (errorData && errorData.debug) {
-                    console.error('🔍 Debug info:', errorData.debug);
-                }
-                
+                console.error('❌ HTTP error:', response.status, errorData);
                 throw new Error(`HTTP ${response.status}: ${errorData?.message || 'Unknown error'}`);
             }
         } catch (error) {
@@ -912,7 +891,6 @@ class ChatManager {
             sendButton.disabled = false;
         }
     }
-
 
     scrollToBottom() {
         const container = document.getElementById('messagesContainer');
@@ -956,6 +934,18 @@ class ChatManager {
         }
         return null;
     }
+
+    // Cleanup method for when component is destroyed
+    destroy() {
+        this.stopMessagePolling();
+        
+        if (this.conversationPollingInterval) {
+            clearInterval(this.conversationPollingInterval);
+            this.conversationPollingInterval = null;
+        }
+        
+        console.log('🗑️ ChatManager destroyed');
+    }
 }
 
 // Initialize chat when DOM is ready
@@ -974,5 +964,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
 
     // Initialize chat manager
-    new ChatManager();
+    window.chatManager = new ChatManager();
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (window.chatManager) {
+        window.chatManager.destroy();
+    }
 });

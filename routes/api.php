@@ -70,10 +70,9 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::get('search-users', [ChatMobileController::class, 'searchUsers'])->name('search-users');
         Route::post('conversations/{chatId}/intro-message', [ChatMobileController::class, 'sendIntroMessage'])->name('intro-message');
         
-        // SSE (Server-Sent Events) endpoints for real-time chat synchronization
-        // Note: These endpoints handle Sanctum authentication manually to support bearer tokens in SSE streams
-        Route::get('stream/messages', [ChatMobileController::class, 'streamMessages'])->name('stream-messages')->withoutMiddleware('auth:sanctum');
-        Route::get('stream/conversations', [ChatMobileController::class, 'streamConversations'])->name('stream-conversations')->withoutMiddleware('auth:sanctum');
+        // Ajax polling endpoints for real-time chat updates
+        Route::get('conversations/{chatId}/poll-messages', [ChatMobileController::class, 'pollNewMessages'])->name('poll-messages');
+        Route::get('poll-conversation-updates', [ChatMobileController::class, 'pollConversationUpdates'])->name('poll-conversation-updates');
     });
     
     // Messages API

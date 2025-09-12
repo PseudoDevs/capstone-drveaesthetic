@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Models\User;
-use App\Events\MessageSent;
 
 class AutoIntroMessageService
 {
@@ -39,9 +38,6 @@ class AutoIntroMessageService
 
         // Update chat's last message timestamp
         $chat->update(['last_message_at' => now()]);
-
-        // Broadcast the message for real-time updates
-        broadcast(new MessageSent($message));
 
         return $message;
     }

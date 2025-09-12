@@ -225,8 +225,6 @@ class ChatController extends Controller
 
         $chat->update(['last_message_at' => now()]);
 
-        // Note: Real-time updates now handled by Server-Sent Events
-
         return response()->json([
             'success' => true,
             'data' => [
