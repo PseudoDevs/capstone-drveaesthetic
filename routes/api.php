@@ -14,7 +14,8 @@ use App\Http\Controllers\Api\Client\MedicalCertificateController;
 use App\Http\Controllers\Api\Client\TimeLogsController;
 use App\Http\Controllers\Api\Client\TrainingController;
 use App\Http\Controllers\Api\Client\AuthController;
-use App\Http\Controllers\Api\Mobile\GoogleAuthController;
+use App\Http\Controllers\Api\Mobile\GoogleAuthController as MobileGoogleAuthController;
+use App\Http\Controllers\Api\Web\GoogleAuthController as WebGoogleAuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,11 +28,21 @@ Route::prefix('client/auth')->name('client.auth.')->group(function () {
     Route::post('google-login', [AuthController::class, 'googleLogin'])->name('google-login');
 });
 
+// Web Google Authentication Routes (no auth required)
+Route::prefix('web/auth/google')->name('web.auth.google.')->group(function () {
+    Route::get('redirect', [WebGoogleAuthController::class, 'redirectToGoogle'])->name('redirect');
+    Route::get('callback', [WebGoogleAuthController::class, 'handleGoogleCallback'])->name('callback');
+});
+
 // Mobile Google Authentication Routes (no auth required)
 Route::prefix('mobile/auth/google')->name('mobile.auth.google.')->group(function () {
-    Route::get('auth-url', [GoogleAuthController::class, 'getAuthUrl'])->name('auth-url');
-    Route::get('callback', [GoogleAuthController::class, 'handleCallback'])->name('callback');
-    Route::post('mobile-auth', [GoogleAuthController::class, 'handleMobileAuth'])->name('mobile-auth');
+    Route::post('token', [MobileGoogleAuthController::class, 'authenticateWithToken'])->name('token');
+    Route::post('id-token', [MobileGoogleAuthController::class, 'authenticateWithIdToken'])->name('id-token');
+});
+
+// Mobile Google Authentication Routes (auth required)
+Route::prefix('mobile/auth/google')->name('mobile.auth.google.')->middleware('auth:sanctum')->group(function () {
+    Route::post('logout', [MobileGoogleAuthController::class, 'logout'])->name('logout');
 });
 
 // Protected Authentication Routes (auth required)
