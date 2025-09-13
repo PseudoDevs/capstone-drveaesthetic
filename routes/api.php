@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Client\MedicalCertificateController;
 use App\Http\Controllers\Api\Client\TimeLogsController;
 use App\Http\Controllers\Api\Client\TrainingController;
 use App\Http\Controllers\Api\Client\AuthController;
+use App\Http\Controllers\Api\Mobile\GoogleAuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -24,6 +25,13 @@ Route::prefix('client/auth')->name('client.auth.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register'])->name('register');
     Route::post('google-login', [AuthController::class, 'googleLogin'])->name('google-login');
+});
+
+// Mobile Google Authentication Routes (no auth required)
+Route::prefix('mobile/auth/google')->name('mobile.auth.google.')->group(function () {
+    Route::get('auth-url', [GoogleAuthController::class, 'getAuthUrl'])->name('auth-url');
+    Route::get('callback', [GoogleAuthController::class, 'handleCallback'])->name('callback');
+    Route::post('mobile-auth', [GoogleAuthController::class, 'handleMobileAuth'])->name('mobile-auth');
 });
 
 // Protected Authentication Routes (auth required)
