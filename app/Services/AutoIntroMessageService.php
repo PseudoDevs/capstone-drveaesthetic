@@ -48,9 +48,9 @@ class AutoIntroMessageService
     private function generateIntroMessage(User $staff, User $client): string
     {
         $greetings = [
-            "Hello {$client->name}! 👋 Welcome to Dr. V Aesthetic Clinic. I'm {$staff->name} and I'm here to help you with any questions about our services.",
-            "Hi {$client->name}! 😊 Thank you for choosing Dr. V Aesthetic Clinic. I'm {$staff->name}, your personal assistant. How can I help you today?",
-            "Welcome {$client->name}! ✨ I'm {$staff->name} from Dr. V Aesthetic Clinic. I'm excited to help you on your aesthetic journey. What can I assist you with?",
+            "Hello {$client->name}! 👋 Welcome to Dr. Ve Aesthetic Clinic. I'm {$staff->name} and I'm here to help you with any questions about our services.",
+            "Hi {$client->name}! 😊 Thank you for choosing Dr. Ve Aesthetic Clinic. I'm {$staff->name}, your personal assistant. How can I help you today?",
+            "Welcome {$client->name}! ✨ I'm {$staff->name} from Dr. Ve Aesthetic Clinic. I'm excited to help you on your aesthetic journey. What can I assist you with?",
             "Hello {$client->name}! 🌟 My name is {$staff->name} and I'll be your guide at Dr. V Aesthetic Clinic. Feel free to ask me anything about our treatments and services!"
         ];
 

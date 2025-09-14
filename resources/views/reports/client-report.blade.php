@@ -394,7 +394,7 @@
             <div class="footer-info">
                 <strong>{{ setting('general.site_name', 'Capstone Aesthetic') }}</strong><br>
                 {{ setting('footer.contact_address_line_1', 'Zone 1, San Jose, Iriga City') }}<br>
-                Phone: {{ setting('contact.phone_1', '+00 569 846 358') }} | Email: {{ setting('contact.email_1', 'support@gmail.com') }}
+                Phone: {{ setting('contact.phone_1', '09123123') }} | Email: {{ setting('contact.email_1', 'support@gmail.com') }}
             </div>
             <div style="border-top: 1px solid #000; padding-top: 10px; margin-top: 10px;">
                 CONFIDENTIAL DOCUMENT - For Authorized Personnel Only<br>

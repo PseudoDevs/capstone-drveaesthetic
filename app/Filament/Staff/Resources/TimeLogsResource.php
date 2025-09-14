@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 class TimeLogsResource extends Resource
 {
     protected static ?string $model = TimeLogs::class;
-
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $navigationIcon = 'heroicon-o-clock';
 
     protected static ?string $label = 'Time Log';

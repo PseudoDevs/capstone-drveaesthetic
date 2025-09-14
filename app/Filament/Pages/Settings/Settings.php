@@ -25,7 +25,7 @@ class Settings extends BaseSettings
                                     TextInput::make('general.site_name')
                                         ->label('Site Name')
                                         ->default(env('APP_NAME', 'Capstone Aesthetic'))
-                                        ->required(),
+                                        ,
 
                                     TextInput::make('general.site_tagline')
                                         ->label('Site Tagline')
@@ -42,7 +42,7 @@ class Settings extends BaseSettings
                                     TextInput::make('general.about_banner_title')
                                         ->label('Banner Title')
                                         ->default('About Us.')
-                                        ->required(),
+                                        ,
 
                                     Textarea::make('general.about_banner_description')
                                         ->label('Banner Description')
@@ -66,7 +66,7 @@ class Settings extends BaseSettings
                                     TextInput::make('general.about_title')
                                         ->label('About Section Title')
                                         ->default('We Have 25+ Years Experience.')
-                                        ->required(),
+                                        ,
 
                                     Textarea::make('general.about_description')
                                         ->label('About Description')
@@ -108,7 +108,7 @@ class Settings extends BaseSettings
                                     TextInput::make('general.mission_title')
                                         ->label('Mission Title')
                                         ->default('Our Mission.')
-                                        ->required(),
+                                        ,
 
                                     Textarea::make('general.mission_subtitle')
                                         ->label('Mission Subtitle')
@@ -123,7 +123,7 @@ class Settings extends BaseSettings
                                     TextInput::make('general.vision_title')
                                         ->label('Vision Title')
                                         ->default('Our Vision.')
-                                        ->required(),
+                                        ,
 
                                     Textarea::make('general.vision_description_1')
                                         ->label('Vision Description (Paragraph 1)')
@@ -144,7 +144,7 @@ class Settings extends BaseSettings
                                     TextInput::make('contact.banner_title')
                                         ->label('Banner Title')
                                         ->default('Contact Us.')
-                                        ->required(),
+                                        ,
 
                                     Textarea::make('contact.banner_description')
                                         ->label('Banner Description')
@@ -157,7 +157,7 @@ class Settings extends BaseSettings
                                     TextInput::make('contact.phone_1')
                                         ->label('Primary Phone')
                                         ->default('+00 569 846 358')
-                                        ->required(),
+                                        ,
 
                                     TextInput::make('contact.phone_2')
                                         ->label('Secondary Phone')
@@ -166,7 +166,7 @@ class Settings extends BaseSettings
                                     TextInput::make('contact.address_line_1')
                                         ->label('Address Line 1')
                                         ->default('1569  Davis Place,')
-                                        ->required(),
+                                        ,
 
                                     TextInput::make('contact.address_line_2')
                                         ->label('Address Line 2')
@@ -176,7 +176,7 @@ class Settings extends BaseSettings
                                         ->label('Primary Email')
                                         ->email()
                                         ->default('support@gmail.com')
-                                        ->required(),
+                                        ,
 
                                     TextInput::make('contact.email_2')
                                         ->label('Secondary Email')
@@ -192,7 +192,7 @@ class Settings extends BaseSettings
                                     TextInput::make('team.section_title')
                                         ->label('Section Title')
                                         ->default('Our Expert And Dedicated Team')
-                                        ->required(),
+                                        ,
 
                                     Textarea::make('team.section_description')
                                         ->label('Section Description')
@@ -204,11 +204,11 @@ class Settings extends BaseSettings
                                         ->schema([
                                             TextInput::make('name')
                                                 ->label('Full Name')
-                                                ->required(),
+                                                ,
                                             
                                             TextInput::make('position')
                                                 ->label('Position/Title')
-                                                ->required(),
+                                                ,
                                             
                                             FileUpload::make('image')
                                                 ->label('Profile Image')
@@ -221,7 +221,7 @@ class Settings extends BaseSettings
                                                 ->maxSize(2048)
                                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                                 ->helperText('Upload image with 270x320 pixels or it will be resized automatically')
-                                                ->required(),
+                                                ,
                                             
                                             Textarea::make('bio')
                                                 ->label('Short Bio')
@@ -261,18 +261,18 @@ class Settings extends BaseSettings
                                     TextInput::make('footer.about_title')
                                         ->label('About Title')
                                         ->default('About Us.')
-                                        ->required(),
+                                        ,
 
                                     Textarea::make('footer.about_description')
                                         ->label('About Description')
                                         ->default('The pleasant temperature, similar body temperature, extending beneath client\'s body, frees the body negative tension caused by everyday stress.')
                                         ->rows(4)
-                                        ->required(),
+                                        ,
 
                                     TextInput::make('footer.contact_address_line_1')
                                         ->label('Contact Address Line 1')
                                         ->default('176 W street name,')
-                                        ->required(),
+                                        ,
 
                                     TextInput::make('footer.contact_address_line_2')
                                         ->label('Contact Address Line 2')
@@ -281,7 +281,7 @@ class Settings extends BaseSettings
                                     TextInput::make('footer.contact_phone')
                                         ->label('Contact Phone')
                                         ->default('+00 568 468 349')
-                                        ->required(),
+                                        ,
                                 ]),
 
 
@@ -290,7 +290,7 @@ class Settings extends BaseSettings
                                     TextInput::make('footer.copyright_text')
                                         ->label('Copyright Text')
                                         ->default('Copyright@2025 {{ env(\'APP_NAME\') }}. All rights reserved')
-                                        ->required(),
+                                        ,
                                 ]),
                         ]),
 

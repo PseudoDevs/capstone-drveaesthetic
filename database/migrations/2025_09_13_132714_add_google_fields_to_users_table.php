@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('google_id')->nullable()->after('password');
-            $table->string('avatar')->nullable()->after('google_id');
-            $table->string('phone')->nullable()->after('avatar');
-            $table->date('date_of_birth')->nullable()->after('phone');
-            $table->text('address')->nullable()->after('date_of_birth');
+
+            // $table->string('avatar')->nullable()->after('google_id');
+            // $table->string('phone')->nullable()->after('avatar');
+            // $table->date('date_of_birth')->nullable()->after('phone');
+            // $table->text('address')->nullable()->after('date_of_birth');
         });
     }
 

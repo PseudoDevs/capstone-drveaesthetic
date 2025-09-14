@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class TimeClock extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-clock';
-    
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $title = 'Time Clock';
     
     protected static ?string $slug = 'time-clock';
