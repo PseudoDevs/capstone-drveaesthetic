@@ -5,9 +5,11 @@ namespace App\Filament\Staff\Resources;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
+use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Appointment;
+use App\Enums\AppointmentType;
 use App\Models\ClinicService;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\SelectFilter;
@@ -35,16 +37,46 @@ class AppointmentResource extends Resource
                     ->relationship('client', 'name', fn (Builder $query) => $query->where('role', 'Client'))
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Full Name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->required()
+                            ->unique(User::class, 'email')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('phone')
+                            ->label('Phone Number')
+                            ->tel()
+                            ->maxLength(20),
+                        Forms\Components\DatePicker::make('date_of_birth')
+                            ->label('Date of Birth')
+                            ->native(false),
+                        Forms\Components\Textarea::make('address')
+                            ->label('Address')
+                            ->rows(3)
+                            ->maxLength(500),
+                    ])
+                    ->createOptionUsing(function (array $data): int {
+                        $client = User::create([
+                            'name' => $data['name'],
+                            'email' => $data['email'],
+                            'phone' => $data['phone'] ?? null,
+                            'date_of_birth' => $data['date_of_birth'] ?? null,
+                            'address' => $data['address'] ?? null,
+                            'role' => 'Client',
+                            'password' => Hash::make('password123'), // Default password
+                        ]);
+
+                        return $client->id;
+                    }),
                 Forms\Components\Select::make('service_id')
                     ->label('Service')
                     ->relationship('service', 'service_name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\Select::make('staff_id')
-                    ->label('Assigned Staff')
-                    ->relationship('staff', 'name', fn (Builder $query) => $query->whereIn('role', ['Staff', 'Doctor']))
                     ->searchable()
                     ->preload()
                     ->required(),
@@ -56,6 +88,21 @@ class AppointmentResource extends Resource
                     ->label('Appointment Time')
                     ->required()
                     ->native(false),
+                Forms\Components\Select::make('appointment_type')
+                    ->label('Appointment Type')
+                    ->options([
+                        AppointmentType::ONLINE->value => AppointmentType::ONLINE->label(),
+                        AppointmentType::WALK_IN->value => AppointmentType::WALK_IN->label(),
+                    ])
+                    ->default(AppointmentType::ONLINE->value)
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        if ($state === AppointmentType::WALK_IN->value) {
+                            $set('appointment_date', now()->format('Y-m-d'));
+                            $set('appointment_time', now()->format('H:i'));
+                        }
+                    }),
                 Forms\Components\Select::make('status')
                     ->label('Status')
                     ->options([
@@ -101,6 +148,15 @@ class AppointmentResource extends Resource
                 Tables\Columns\TextColumn::make('staff.name')
                     ->label('Assigned Staff')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('appointment_type')
+                    ->label('Type')
+                    ->badge()
+                    ->color(fn (AppointmentType $state): string => match ($state) {
+                        AppointmentType::ONLINE => 'info',
+                        AppointmentType::WALK_IN => 'warning',
+                    })
+                    ->formatStateUsing(fn (AppointmentType $state): string => $state->label())
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -142,6 +198,12 @@ class AppointmentResource extends Resource
                     ->label('Assigned Staff')
                     ->relationship('staff', 'name')
                     ->preload(),
+                SelectFilter::make('appointment_type')
+                    ->label('Appointment Type')
+                    ->options([
+                        AppointmentType::ONLINE->value => AppointmentType::ONLINE->label(),
+                        AppointmentType::WALK_IN->value => AppointmentType::WALK_IN->label(),
+                    ]),
                 Tables\Filters\Filter::make('is_paid')
                     ->label('Payment Status')
                     ->query(fn (Builder $query): Builder => $query->where('is_paid', true))
@@ -169,6 +231,13 @@ class AppointmentResource extends Resource
                         Forms\Components\TimePicker::make('appointment_time')
                             ->label('New Time')
                             ->required(),
+                        Forms\Components\Select::make('appointment_type')
+                            ->label('Appointment Type')
+                            ->options([
+                                AppointmentType::ONLINE->value => AppointmentType::ONLINE->label(),
+                                AppointmentType::WALK_IN->value => AppointmentType::WALK_IN->label(),
+                            ])
+                            ->required(),
                         Forms\Components\Select::make('status')
                             ->label('Status')
                             ->options([
@@ -187,6 +256,7 @@ class AppointmentResource extends Resource
                     ->fillForm(fn ($record) => [
                         'appointment_date' => $record->appointment_date,
                         'appointment_time' => $record->appointment_time,
+                        'appointment_type' => $record->appointment_type,
                         'status' => $record->status,
                         'is_paid' => $record->is_paid,
                     ])
@@ -194,6 +264,7 @@ class AppointmentResource extends Resource
                         $record->update([
                             'appointment_date' => $data['appointment_date'],
                             'appointment_time' => $data['appointment_time'],
+                            'appointment_type' => $data['appointment_type'],
                             'status' => $data['status'],
                             'is_paid' => $data['is_paid'],
                             'is_rescheduled' => $record->appointment_date != $data['appointment_date'] || $record->appointment_time != $data['appointment_time'],
@@ -262,8 +333,8 @@ class AppointmentResource extends Resource
     {
         return [
             'index' => Pages\ListAppointments::route('/'),
-            'create' => Pages\CreateAppointment::route('/create'),
-            'edit' => Pages\EditAppointment::route('/{record}/edit'),
+            // 'create' => Pages\CreateAppointment::route('/create'),
+            // 'edit' => Pages\EditAppointment::route('/{record}/edit'),
         ];
     }
 }

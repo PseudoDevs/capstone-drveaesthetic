@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AppointmentType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,7 @@ class Appointment extends Model
         'is_rescheduled',
         'is_paid',
         'status',
+        'appointment_type',
         'form_type',
         'form_completed',
         'medical_form_data',
@@ -31,6 +33,7 @@ class Appointment extends Model
         'is_rescheduled' => 'boolean',
         'is_paid' => 'boolean',
         'form_completed' => 'boolean',
+        'appointment_type' => AppointmentType::class,
         'medical_form_data' => 'array',
         'consent_waiver_form_data' => 'array',
     ];
@@ -86,6 +89,16 @@ class Appointment extends Model
         return $query->where('client_id', $clientId);
     }
 
+    public function scopeOnline($query)
+    {
+        return $query->where('appointment_type', AppointmentType::ONLINE);
+    }
+
+    public function scopeWalkIn($query)
+    {
+        return $query->where('appointment_type', AppointmentType::WALK_IN);
+    }
+
     // Helper methods
     public function isPending()
     {
@@ -115,8 +128,18 @@ class Appointment extends Model
 
     public function canBeRescheduled()
     {
-        return in_array($this->status, ['pending', 'confirmed']) && 
+        return in_array($this->status, ['pending', 'confirmed']) &&
                $this->appointment_date >= now()->format('Y-m-d');
+    }
+
+    public function isOnline()
+    {
+        return $this->appointment_type === AppointmentType::ONLINE;
+    }
+
+    public function isWalkIn()
+    {
+        return $this->appointment_type === AppointmentType::WALK_IN;
     }
 
     // Check for conflicts with same time slot
