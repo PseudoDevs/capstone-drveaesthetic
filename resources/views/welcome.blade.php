@@ -13,9 +13,9 @@
     <section class="hero-section">
         <div class="container">
             <div class="hero-content">
-                <h1 class="text-white">We Are <span>Ready</span> For Your <span>Skin</span> Care <span>Help.</span></h1>
-                <h5 class="text-white">Saunas are used all over the world to improve health, to enjoy and relax.</h5>
-                <a href="{{ url('/contact') }}" class="theme-btn">Contact now</a>
+                <h1 class="text-white">Extra <span>Care, </span>Extraordinary  <span>Result.</span></h1>
+                <h5 class="text-white">Expert cosmetic treatments to rejuvenate your look and boost your confidence. Look as vibrant as you feel.</h5>
+                <a href="{{ url('/services') }}" class="theme-btn">Book now</a>
             </div>
         </div>
         <div class="hero-angle">
@@ -35,29 +35,26 @@
             <div class="row align-items-center">
                 <div class="col-lg-7">
                     <div class="about-images rmb-50">
-                        <img src="{{ asset('assets/images/about/about1.png') }}" alt="about image">
-                        <img src="{{ asset('assets/images/about/about2.png') }}" alt="about image">
-                        <img src="{{ asset('assets/images/about/about3.png') }}" alt="about image">
+                        <img src="{{ Storage::url(setting('general.about_image_1')) }}" alt="about image">
+                        <img src="{{ Storage::url(setting('general.about_image_2')) }}" alt="about image">
+                        <img src="{{ Storage::url(setting('general.about_image_3')) }}" alt="about image">
                     </div>
                 </div>
                 <div class="col-lg-5">
                     <div class="about-content">
                         <div class="section-title">
-                            <h2>We Have 25+ Years Experience.</h2>
+                            <h2>{{ setting('general.about_title', 'We Have 25+ Years Experience.') }}</h2>
                         </div>
-                        <h6>Saunas are used all over the world to improve health enjoy relax. During the clients
-                            stay in sauna, body is sweating and from harmful substances and toxins.</h6>
-                        <p>It has different attractions – tropical rain, fog, dew, wall jets and it is combined with
-                            sound, caribbian storm, aroma and various lighting effects, what makes you have an
-                            unforgettable filling.</p>
+                        <h6>{{ setting('general.about_description', 'Saunas are used all over the world to improve health enjoy relax. During the clients stay in sauna, body is sweating and from harmful substances and toxins.') }}</h6>
+                        <p>{{ setting('general.about_content', 'It has different attractions – tropical rain, fog, dew, wall jets and it is combined with sound, caribbian storm, aroma and various lighting effects, what makes you have an unforgettable filling.') }}</p>
                         <div class="vision-mision">
                             <div class="vm-image">
                                 <img src="{{ asset('assets/images/about/icon.png') }}" alt="Icon">
                             </div>
                             <div class="vm-content">
-                                <h4>Our Mission & Vission</h4>
-                                <p>The pleasant temperature, similar to body temperature, extending beneath client’s
-                                    body, frees the body negative tension caused by everyday stress.</p>
+                                <h4>Where Art Meets Science</h4>
+                                <p>We believe aesthetic medicine is a delicate balance between precise medical science and intuitive artistry. 
+                                        Our philosophy is to enhance your natural features, not alter them, achieving results that are both transformative and authentically you.</p>
                             </div>
                         </div>
                         <a href="#" class="theme-btn style-two">Expert Team</a>
@@ -85,28 +82,28 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="service-item style-one">
                         <i class="flaticon-eyepatch"></i>
-                        <h4><a href="services.html">Facial Implants</a></h4>
+                        <h4><a href={{ url('/services') }}>Facial Implants</a></h4>
                         <p>It has different attractions combined with sound, caribbian storm, aroma and various.</p>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="service-item style-two">
                         <i class="flaticon-aesthetic"></i>
-                        <h4><a href="services.html">Lip Augmentation</a></h4>
+                        <h4><a href={{ url('/services') }}>Lip Augmentation</a></h4>
                         <p>It has different attractions combined with sound, caribbian storm, aroma and various.</p>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="service-item style-three">
                         <i class="flaticon-beauty"></i>
-                        <h4><a href="services.html">Blepharoplasty</a></h4>
+                        <h4><a href={{ url('/services') }}>Blepharoplasty</a></h4>
                         <p>It has different attractions combined with sound, caribbian storm, aroma and various.</p>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="service-item style-four">
                         <i class="flaticon-ear"></i>
-                        <h4><a href="services.html">Ear Surgery</a></h4>
+                        <h4><a href={{ url('/services') }}>Ear Surgery</a></h4>
                         <p>It has different attractions combined with sound, caribbian storm, aroma and various.</p>
                     </div>
                 </div>

@@ -15,7 +15,8 @@
                 <div class="banner-inner">
                     <div class="banner-content">
                         <h2 class="page-title">{{ setting('general.about_banner_title', 'About Us.') }}</h2>
-                        <p>{{ setting('general.about_banner_description', 'Saunas are used all over the world to improve health, to enjoy and relax.') }}</p>
+                        <h4 class="text-black">The <span>Art of </span>Natural  <span>Enhancement.</span></h4>
+                        <!--<p>{{ setting('general.about_banner_description', 'Saunas are used all over the world to improve health, to enjoy and relax.') }}</p>-->
                     </div>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
@@ -73,9 +74,9 @@
                                     <img src="{{ asset('assets/images/about/icon.png') }}" alt="Icon">
                                 </div>
                                 <div class="vm-content">
-                                    <h4>Our Mission & Vission</h4>
-                                    <p>The pleasant temperature, similar to body temperature, extending beneath client’s
-                                        body, frees the body negative tension caused by everyday stress.</p>
+                                    <h4>Where Art Meets Science</h4>
+                                    <p>We believe aesthetic medicine is a delicate balance between precise medical science and intuitive artistry. 
+                                        Our philosophy is to enhance your natural features, not alter them, achieving results that are both transformative and authentically you.</p>
                                 </div>
                             </div>
                             <a href="#" class="theme-btn style-two">Expert Team</a>
@@ -153,7 +154,7 @@
                             <p>{{ $member['position'] ?? 'Team Member' }}</p>
                             @if(isset($member['bio']) && $member['bio'])
                                 <div class="team-bio mt-2">
-                                    <small>{{ Str::limit($member['bio'], 100) }}</small>
+                                    <small>{{ Str::limit($member['bio'], 500) }}</small>
                                 </div>
                             @endif
                         </div>
