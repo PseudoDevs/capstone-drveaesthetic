@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\PushNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -558,6 +559,144 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while unlinking Google account',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Register or update FCM token for push notifications
+     */
+    public function updateFcmToken(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'fcm_token' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Validate FCM token with Firebase
+            $pushService = new PushNotificationService();
+            if (!$pushService->validateToken($request->fcm_token)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid FCM token'
+                ], 400);
+            }
+
+            $user->update([
+                'fcm_token' => $request->fcm_token
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'FCM token updated successfully'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating FCM token',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove FCM token (for logout or token invalidation)
+     */
+    public function removeFcmToken(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+
+            $user->update([
+                'fcm_token' => null
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'FCM token removed successfully'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while removing FCM token',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Test push notification (for debugging)
+     */
+    public function testPushNotification(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+
+            if (!$user->fcm_token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No FCM token registered for this user'
+                ], 400);
+            }
+
+            $pushService = new PushNotificationService();
+            $success = $pushService->sendAppointmentNotification(
+                $user,
+                'Test Notification',
+                'This is a test notification from Dr. V Aesthetic Clinic',
+                ['test' => true]
+            );
+
+            if ($success) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Test notification sent successfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send test notification'
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while sending test notification',
                 'error' => $e->getMessage()
             ], 500);
         }

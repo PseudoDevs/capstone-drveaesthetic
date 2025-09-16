@@ -41,4 +41,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL', env('APP_URL', 'http://localhost') . '/auth/google/callback'),
     ],
 
+    'firebase' => [
+        'credentials_path' => env('FIREBASE_CREDENTIALS_PATH'),
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+    ],
+
 ];
