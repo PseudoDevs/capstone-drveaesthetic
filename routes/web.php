@@ -94,3 +94,16 @@ Route::prefix('chat')->name('chat.')->group(function () {
     Route::get('/poll-messages/{chatId}', [ChatController::class, 'pollNewMessages'])->name('poll-messages');
     Route::get('/poll-conversation-updates', [ChatController::class, 'pollConversationUpdates'])->name('poll-conversation-updates');
 });
+
+// Medical Certificate Download Route (protected)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/medical-certificate/{id}/download', function ($id) {
+        $certificate = \App\Models\MedicalCertificate::with(['client', 'staff'])->findOrFail($id);
+
+        return response()->streamDownload(function () use ($certificate) {
+            echo \App\Filament\Resources\MedicalCertificateResource::generateCertificatePDF($certificate);
+        }, "medical-certificate-{$certificate->client->name}-" . now()->format('Y-m-d') . ".pdf", [
+            'Content-Type' => 'application/pdf',
+        ]);
+    })->name('medical-certificate.download');
+});

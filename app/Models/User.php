@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable 
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
@@ -31,6 +31,7 @@ class User extends Authenticatable implements FilamentUser
         'phone',
         'date_of_birth',
         'address',
+        'email_verified_at',
     ];
 
     /**
@@ -85,12 +86,12 @@ class User extends Authenticatable implements FilamentUser
     }
 
     // Filament panel access control
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return match ($panel->getId()) {
-            'admin' => $this->role === 'Admin',
-            'staff' => in_array($this->role, ['Staff', 'Doctor']),
-            default => false,
-        };
-    }
+    // public function canAccessPanel(Panel $panel): bool
+    // {
+    //     return match ($panel->getId()) {
+    //         'admin' => $this->role === 'Admin',
+    //         'staff' => in_array($this->role, ['Staff', 'Doctor']),
+    //         default => false,
+    //     };
+    // }
 }

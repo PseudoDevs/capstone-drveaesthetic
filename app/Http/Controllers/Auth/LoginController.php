@@ -35,22 +35,42 @@ class LoginController extends Controller
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/',
                 'confirmed'
             ],
+        ], [
+            'name.required' => 'Full name is required.',
+            'name.max' => 'Name cannot exceed 255 characters.',
+            'email.required' => 'Email address is required.',
+            'email.email' => 'Please provide a valid email address.',
+            'email.unique' => 'This email address is already registered. Please use a different email or try logging in.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters long.',
+            'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).',
+            'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            return back()->withErrors($validator)->withInput($request->except('password', 'password_confirmation'));
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'Client',
-        ]);
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'Client',
+                'email_verified_at' => now(), // Auto-verify for now
+            ]);
 
-        Auth::login($user);
+            Auth::login($user);
 
-        return redirect('/users/dashboard');
+            return redirect('/users/dashboard')->with('success', 'Registration successful! Welcome to Dr. V Aesthetic Clinic.');
+
+        } catch (\Exception $e) {
+            \Log::error('Registration error: ' . $e->getMessage());
+
+            return back()->withErrors([
+                'registration' => 'An error occurred during registration. Please try again.'
+            ])->withInput($request->except('password', 'password_confirmation'));
+        }
     }
 
     public function login(Request $request)

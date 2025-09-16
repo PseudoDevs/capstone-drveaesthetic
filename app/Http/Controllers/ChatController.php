@@ -138,8 +138,6 @@ class ChatController extends Controller
             'message' => $validated['message'],
         ]);
 
-        $chat->update(['last_message_at' => now()]);
-
         return response()->json([
             'status' => 'success',
             'message' => [

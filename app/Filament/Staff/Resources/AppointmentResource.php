@@ -5,9 +5,11 @@ namespace App\Filament\Staff\Resources;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
+use Filament\Infolists;
 use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
 use App\Models\Appointment;
 use App\Enums\AppointmentType;
 use App\Models\ClinicService;
@@ -128,6 +130,7 @@ class AppointmentResource extends Resource
     {
         return $table
             ->recordUrl(null)
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['client', 'service.category', 'staff']))
             ->columns([
                 Tables\Columns\TextColumn::make('client.name')
                     ->label('Client')
@@ -145,9 +148,6 @@ class AppointmentResource extends Resource
                     ->label('Time')
                     ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->format('g:i A'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('staff.name')
-                    ->label('Assigned Staff')
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('appointment_type')
                     ->label('Type')
                     ->badge()
@@ -161,25 +161,16 @@ class AppointmentResource extends Resource
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'PENDING' => 'warning',
-                        'SCHEDULED' => 'info',
-                        'ON-GOING' => 'primary',
-                        'COMPLETED' => 'success',
-                        'CANCELLED' => 'danger',
-                        'DECLINED' => 'danger',
-                        'RESCHEDULE' => 'secondary',
+                        'pending' => 'warning',
+                        'scheduled' => 'info',
+                        'on-going' => 'primary',
+                        'completed' => 'success',
+                        'cancelled' => 'danger',
+                        'declined' => 'danger',
+                        'reschedule' => 'secondary',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'PENDING' => 'Pending',
-                        'SCHEDULED' => 'Scheduled',
-                        'ON-GOING' => 'On-Going',
-                        'COMPLETED' => 'Completed',
-                        'CANCELLED' => 'Cancelled',
-                        'DECLINED' => 'Declined',
-                        'RESCHEDULE' => 'Reschedule',
-                        default => $state,
-                    })
+                    ->formatStateUsing(fn (string $state): string => strtoupper($state))
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_paid')
                     ->label('Paid')
@@ -210,20 +201,52 @@ class AppointmentResource extends Resource
                     ->toggle(),
             ])
             ->actions([
+                // Quick Status Actions - shown first based on current status
+                Tables\Actions\Action::make('confirm')
+                    ->label('Confirm')
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->status === 'pending')
+                    ->requiresConfirmation()
+                    ->modalHeading('Confirm Appointment')
+                    ->modalDescription('Are you sure you want to confirm this appointment?')
+                    ->action(fn ($record) => $record->update(['status' => 'scheduled'])),
+
+                Tables\Actions\Action::make('start_appointment')
+                    ->label('Start')
+                    ->icon('heroicon-o-play')
+                    ->color('primary')
+                    ->visible(fn ($record) => $record->status === 'scheduled')
+                    ->requiresConfirmation()
+                    ->modalHeading('Start Appointment')
+                    ->modalDescription('Mark this appointment as ongoing?')
+                    ->action(fn ($record) => $record->update(['status' => 'on-going'])),
+
+                Tables\Actions\Action::make('complete')
+                    ->label('Complete')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->status === 'on-going')
+                    ->requiresConfirmation()
+                    ->modalHeading('Complete Appointment')
+                    ->modalDescription('Mark this appointment as completed?')
+                    ->action(fn ($record) => $record->update(['status' => 'completed'])),
+
                 Tables\Actions\Action::make('mark_paid')
                     ->label('Mark as Paid')
                     ->icon('heroicon-o-currency-dollar')
-                    ->color('success')
+                    ->color('warning')
                     ->visible(fn ($record) => !$record->is_paid)
                     ->requiresConfirmation()
-                    ->modalHeading('Mark Appointment as Paid')
-                    ->modalDescription('Are you sure you want to mark this appointment as paid?')
+                    ->modalHeading('Mark as Paid')
+                    ->modalDescription('Mark this appointment as paid?')
                     ->action(fn ($record) => $record->update(['is_paid' => true])),
+
                 Tables\Actions\Action::make('reschedule')
                     ->label('Reschedule')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
-                    ->visible(fn ($record) => !$record->is_rescheduled)
+                    ->visible(fn ($record) => in_array($record->status, ['pending', 'scheduled']))
                     ->form([
                         Forms\Components\DatePicker::make('appointment_date')
                             ->label('New Date')
@@ -238,81 +261,170 @@ class AppointmentResource extends Resource
                                 AppointmentType::WALK_IN->value => AppointmentType::WALK_IN->label(),
                             ])
                             ->required(),
-                        Forms\Components\Select::make('status')
-                            ->label('Status')
-                            ->options([
-                                'PENDING' => 'Pending',
-                                'SCHEDULED' => 'Scheduled',
-                                'ON-GOING' => 'On-Going',
-                                'COMPLETED' => 'Completed',
-                                'CANCELLED' => 'Cancelled',
-                                'DECLINED' => 'Declined',
-                                'RESCHEDULE' => 'Reschedule',
-                            ])
-                            ->required(),
-                        Forms\Components\Toggle::make('is_paid')
-                            ->label('Mark as Paid'),
                     ])
                     ->fillForm(fn ($record) => [
                         'appointment_date' => $record->appointment_date,
                         'appointment_time' => $record->appointment_time,
                         'appointment_type' => $record->appointment_type,
-                        'status' => $record->status,
-                        'is_paid' => $record->is_paid,
                     ])
                     ->action(function ($record, array $data) {
                         $record->update([
                             'appointment_date' => $data['appointment_date'],
                             'appointment_time' => $data['appointment_time'],
                             'appointment_type' => $data['appointment_type'],
-                            'status' => $data['status'],
-                            'is_paid' => $data['is_paid'],
+                            'status' => 'scheduled',
                             'is_rescheduled' => $record->appointment_date != $data['appointment_date'] || $record->appointment_time != $data['appointment_time'],
                         ]);
                     })
                     ->modalHeading('Reschedule Appointment')
                     ->modalWidth('md'),
+
+                // More Actions Dropdown
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('update_status_scheduled')
-                        ->label('Set to Scheduled')
-                        ->icon('heroicon-o-calendar')
-                        ->color('info')
-                        ->visible(fn ($record) => in_array($record->status, ['PENDING']))
-                        ->requiresConfirmation()
-                        ->action(fn ($record) => $record->update(['status' => 'SCHEDULED'])),
-                    Tables\Actions\Action::make('update_status_ongoing')
-                        ->label('Set to On-Going')
-                        ->icon('heroicon-o-play')
-                        ->color('primary')
-                        ->visible(fn ($record) => in_array($record->status, ['PENDING', 'SCHEDULED']))
-                        ->requiresConfirmation()
-                        ->action(fn ($record) => $record->update(['status' => 'ON-GOING'])),
-                    Tables\Actions\Action::make('update_status_completed')
-                        ->label('Set to Completed')
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->visible(fn ($record) => in_array($record->status, ['PENDING', 'SCHEDULED', 'ON-GOING']))
-                        ->requiresConfirmation()
-                        ->action(fn ($record) => $record->update(['status' => 'COMPLETED'])),
-                    Tables\Actions\Action::make('update_status_cancelled')
-                        ->label('Set to Cancelled')
+                    Tables\Actions\ViewAction::make()
+                        ->label('View Details')
+                        ->icon('heroicon-o-eye')
+                        ->slideOver()
+                        ->modalWidth('xl')
+                        ->infolist([
+                            Infolists\Components\Section::make('Appointment Information')
+                                ->schema([
+                                    Infolists\Components\Grid::make(2)
+                                        ->schema([
+                                            Infolists\Components\TextEntry::make('client.name')
+                                                ->label('Client Name')
+                                                ->weight('bold'),
+                                            Infolists\Components\TextEntry::make('client.email')
+                                                ->label('Client Email')
+                                                ->icon('heroicon-m-envelope'),
+                                            Infolists\Components\TextEntry::make('service.service_name')
+                                                ->label('Service')
+                                                ->badge()
+                                                ->color('primary'),
+                                            Infolists\Components\TextEntry::make('service.price')
+                                                ->label('Service Price')
+                                                ->money('PHP')
+                                                ->icon('heroicon-m-currency-dollar'),
+                                            Infolists\Components\TextEntry::make('appointment_date')
+                                                ->label('Appointment Date')
+                                                ->date()
+                                                ->icon('heroicon-m-calendar-days'),
+                                            Infolists\Components\TextEntry::make('appointment_time')
+                                                ->label('Appointment Time')
+                                                ->time()
+                                                ->icon('heroicon-m-clock'),
+                                            Infolists\Components\TextEntry::make('appointment_type')
+                                                ->label('Appointment Type')
+                                                ->badge()
+                                                ->color(fn (AppointmentType $state): string => match ($state) {
+                                                    AppointmentType::ONLINE => 'info',
+                                                    AppointmentType::WALK_IN => 'warning',
+                                                })
+                                                ->formatStateUsing(fn (AppointmentType $state): string => $state->label()),
+                                            Infolists\Components\TextEntry::make('status')
+                                                ->label('Status')
+                                                ->badge()
+                                                ->color(fn (string $state): string => match ($state) {
+                                                    'pending' => 'warning',
+                                                    'scheduled' => 'info',
+                                                    'on-going' => 'primary',
+                                                    'completed' => 'success',
+                                                    'cancelled' => 'danger',
+                                                    'declined' => 'danger',
+                                                    'reschedule' => 'secondary',
+                                                    default => 'gray',
+                                                })
+                                                ->formatStateUsing(fn (string $state): string => strtoupper($state)),
+                                        ]),
+                                    Infolists\Components\Grid::make(3)
+                                        ->schema([
+                                            Infolists\Components\IconEntry::make('is_paid')
+                                                ->label('Payment Received')
+                                                ->boolean()
+                                                ->trueIcon('heroicon-o-check-circle')
+                                                ->falseIcon('heroicon-o-x-circle')
+                                                ->trueColor('success')
+                                                ->falseColor('danger'),
+                                            Infolists\Components\IconEntry::make('is_rescheduled')
+                                                ->label('Rescheduled')
+                                                ->boolean()
+                                                ->trueIcon('heroicon-o-arrow-path')
+                                                ->falseIcon('heroicon-o-minus-circle')
+                                                ->trueColor('warning')
+                                                ->falseColor('gray'),
+                                            Infolists\Components\TextEntry::make('created_at')
+                                                ->label('Created At')
+                                                ->dateTime()
+                                                ->icon('heroicon-m-clock'),
+                                        ]),
+                                ]),
+                            Infolists\Components\Section::make('Client Details')
+                                ->schema([
+                                    Infolists\Components\Grid::make(2)
+                                        ->schema([
+                                            Infolists\Components\TextEntry::make('client.phone')
+                                                ->label('Client Phone')
+                                                ->icon('heroicon-m-phone')
+                                                ->placeholder('Not provided'),
+                                            Infolists\Components\TextEntry::make('client.date_of_birth')
+                                                ->label('Date of Birth')
+                                                ->date()
+                                                ->icon('heroicon-m-cake')
+                                                ->placeholder('Not provided'),
+                                            Infolists\Components\TextEntry::make('client.address')
+                                                ->label('Client Address')
+                                                ->icon('heroicon-m-map-pin')
+                                                ->placeholder('Not provided')
+                                                ->columnSpanFull(),
+                                        ]),
+                                ])
+                                ->collapsible()
+                                ->collapsed(),
+                            Infolists\Components\Section::make('Service Details')
+                                ->schema([
+                                    Infolists\Components\Grid::make(2)
+                                        ->schema([
+                                            Infolists\Components\TextEntry::make('service.category.category_name')
+                                                ->label('Service Category')
+                                                ->badge()
+                                                ->color('secondary'),
+                                            Infolists\Components\TextEntry::make('service.duration')
+                                                ->label('Service Duration')
+                                                ->suffix(' minutes')
+                                                ->icon('heroicon-m-clock'),
+                                            Infolists\Components\TextEntry::make('service.description')
+                                                ->label('Service Description')
+                                                ->placeholder('No description available')
+                                                ->columnSpanFull(),
+                                        ]),
+                                ])
+                                ->collapsible(),
+                        ]),
+
+
+                    Tables\Actions\Action::make('cancel')
+                        ->label('Cancel')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn ($record) => in_array($record->status, ['PENDING', 'SCHEDULED']))
+                        ->visible(fn ($record) => in_array($record->status, ['pending', 'scheduled']))
                         ->requiresConfirmation()
-                        ->action(fn ($record) => $record->update(['status' => 'CANCELLED'])),
-                    Tables\Actions\Action::make('update_status_declined')
-                        ->label('Set to Declined')
+                        ->modalHeading('Cancel Appointment')
+                        ->modalDescription('Are you sure you want to cancel this appointment?')
+                        ->action(fn ($record) => $record->update(['status' => 'cancelled'])),
+
+                    Tables\Actions\Action::make('decline')
+                        ->label('Decline')
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
-                        ->visible(fn ($record) => in_array($record->status, ['PENDING']))
+                        ->visible(fn ($record) => $record->status === 'pending')
                         ->requiresConfirmation()
-                        ->action(fn ($record) => $record->update(['status' => 'DECLINED'])),
+                        ->modalHeading('Decline Appointment')
+                        ->modalDescription('Are you sure you want to decline this appointment?')
+                        ->action(fn ($record) => $record->update(['status' => 'declined'])),
                 ])
-                    ->label('Change Status')
+                    ->label('More Actions')
                     ->icon('heroicon-o-ellipsis-vertical')
-                    ->button()
-                    ->visible(fn ($record) => !in_array($record->status, ['COMPLETED', 'DECLINED', 'CANCELLED', 'RESCHEDULE'])),
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

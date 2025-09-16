@@ -19,11 +19,18 @@
 
                         @if ($errors->any())
                             <div class="alert alert-danger mb-30">
-                                <ul class="mb-0">
+                                <strong>Registration Failed:</strong>
+                                <ul class="mb-0 mt-2">
                                     @foreach ($errors->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach
                                 </ul>
+                            </div>
+                        @endif
+
+                        @if (session('error'))
+                            <div class="alert alert-danger mb-30">
+                                <strong>Error:</strong> {{ session('error') }}
                             </div>
                         @endif
 
@@ -63,7 +70,11 @@
                             <div class="form-group mb-25">
                                 <label for="password_confirmation">Confirm Password</label>
                                 <input type="password" id="password_confirmation" name="password_confirmation"
-                                    class="form-control" placeholder="Confirm your password" required>
+                                    class="form-control @error('password_confirmation') is-invalid @enderror"
+                                    placeholder="Confirm your password" required>
+                                @error('password_confirmation')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="form-group mb-30">
@@ -190,6 +201,20 @@
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-danger strong {
+            font-weight: 600;
+        }
+
+        .alert-danger ul {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+
+        .alert-danger li {
+            margin-bottom: 4px;
         }
 
         .theme-btn {
@@ -289,33 +314,11 @@
             const googleBtnText = document.getElementById('google-btn-text');
 
             form.addEventListener('submit', function(e) {
-                // Clear previous errors
-                clearErrors();
-
-                // Basic validation
-                const formData = new FormData(form);
-                const name = formData.get('name');
-                const email = formData.get('email');
-                const password = formData.get('password');
-                const passwordConfirmation = formData.get('password_confirmation');
-
-                if (!name || !email || !password || !passwordConfirmation) {
-                    e.preventDefault();
-                    showGeneralError('Please fill in all required fields.');
-                    return;
-                }
-
-                if (password !== passwordConfirmation) {
-                    e.preventDefault();
-                    showGeneralError('Passwords do not match.');
-                    return;
-                }
-
-                // Show loading state
+                // Show loading state only
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span>Creating Account...</span>';
 
-                // Let the form submit normally - browser will handle everything
+                // Let the form submit normally - server will handle all validation
             });
 
             // Google Sign-in Handler
@@ -330,45 +333,8 @@
                 window.location.href = '/auth/google';
             });
 
-            function clearErrors() {
-                // Remove error classes and messages
-                const inputs = form.querySelectorAll('.form-control');
-                inputs.forEach(input => {
-                    input.classList.remove('is-invalid');
-                    const feedback = input.parentNode.querySelector('.invalid-feedback');
-                    if (feedback) {
-                        feedback.remove();
-                    }
-                });
-
-                // Remove general error alert
-                const errorAlert = form.querySelector('.alert-danger');
-                if (errorAlert) {
-                    errorAlert.remove();
-                }
-            }
-
-            function showErrors(errors) {
-                Object.keys(errors).forEach(fieldName => {
-                    const input = form.querySelector(`[name="${fieldName}"]`);
-                    if (input) {
-                        input.classList.add('is-invalid');
-                        const feedback = document.createElement('div');
-                        feedback.className = 'invalid-feedback';
-                        feedback.textContent = errors[fieldName][0];
-                        input.parentNode.appendChild(feedback);
-                    }
-                });
-            }
-
-            function showGeneralError(message) {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger mb-30';
-                errorAlert.innerHTML = `<ul class="mb-0"><li>${message}</li></ul>`;
-
-                const sectionTitle = form.querySelector('.section-title');
-                sectionTitle.parentNode.insertBefore(errorAlert, form);
-            }
+            // Error handling is now done server-side with Laravel validation
+            // This provides better security and more detailed error messages
         });
     </script>
 @endpush

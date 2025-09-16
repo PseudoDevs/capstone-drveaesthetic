@@ -40,7 +40,7 @@ class Chat extends Model
 
     public function latestMessage(): HasOne
     {
-        return $this->hasOne(Message::class)->latestOfMany();
+        return $this->hasOne(Message::class)->latestOfMany('created_at');
     }
 
     public static function findOrCreateChat(int $userId1, int $userId2): Chat

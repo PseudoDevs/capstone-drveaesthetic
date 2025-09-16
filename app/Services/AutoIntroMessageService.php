@@ -36,9 +36,6 @@ class AutoIntroMessageService
             'is_read' => false,
         ]);
 
-        // Update chat's last message timestamp
-        $chat->update(['last_message_at' => now()]);
-
         return $message;
     }
 

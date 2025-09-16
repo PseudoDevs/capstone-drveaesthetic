@@ -208,8 +208,6 @@ class ChatMobileController extends Controller
             'message' => $validated['message'],
         ]);
 
-        $chat->update(['last_message_at' => now()]);
-
         // Format response for mobile
         return response()->json([
             'success' => true,

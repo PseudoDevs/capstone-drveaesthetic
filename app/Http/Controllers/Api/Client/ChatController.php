@@ -36,16 +36,28 @@ class ChatController extends Controller
                 $chatUsers->push([
                     'user' => $client,
                     'chat' => $existingChat,
-                    'has_messages' => $existingChat->latestMessage !== null
+                    'has_messages' => $existingChat->latestMessage !== null,
+                    'last_message_at' => $existingChat->last_message_at
                 ]);
             } else {
                 $chatUsers->push([
                     'user' => $client,
                     'chat' => null,
-                    'has_messages' => false
+                    'has_messages' => false,
+                    'last_message_at' => null
                 ]);
             }
         }
+
+        // Sort chat_users by last_message_at (latest first), putting chats with messages at the top
+        $chatUsers = $chatUsers->sortByDesc(function ($chatUser) {
+            // Prioritize chats with messages, then sort by last_message_at
+            if ($chatUser['has_messages'] && $chatUser['last_message_at']) {
+                return $chatUser['last_message_at'];
+            }
+            // Chats without messages go to the bottom
+            return '1900-01-01 00:00:00'; // Very old date to ensure they appear last
+        });
 
         return response()->json([
             'success' => true,
@@ -222,8 +234,6 @@ class ChatController extends Controller
             'user_id' => $validated['sender_id'],
             'message' => $validated['message'],
         ]);
-
-        $chat->update(['last_message_at' => now()]);
 
         return response()->json([
             'success' => true,
