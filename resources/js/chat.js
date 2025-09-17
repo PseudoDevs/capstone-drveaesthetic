@@ -348,7 +348,7 @@ class ChatManager {
             }
         } else {
             // If current user is staff, show all clients (original behavior)
-            if (data.chat_users) {
+            if (data.chat_users && Array.isArray(data.chat_users)) {
                 data.chat_users.forEach(chatUser => {
                     const user = chatUser.user;
                     const chat = chatUser.chat;
@@ -392,6 +392,9 @@ class ChatManager {
                 } else {
                     console.log('🚫 Skipping auto-selection - staff has manual selection');
                 }
+            } else {
+                console.log('⚠️ No chat_users array found in data:', data);
+                this.showEmptyConversations();
             }
         }
     }
