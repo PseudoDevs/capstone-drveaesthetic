@@ -7,7 +7,6 @@ use App\Models\Chat;
 use App\Models\Message;
 use App\Models\User;
 use App\Services\AutoIntroMessageService;
-use App\Services\PushNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -210,8 +209,6 @@ class ChatMobileController extends Controller
             'message' => $validated['message'],
         ]);
 
-        // Send push notification to the other user
-        $this->sendNotificationToRecipient($chat, $user, $validated['message']);
 
         // Format response for mobile
         return response()->json([
@@ -648,53 +645,4 @@ class ChatMobileController extends Controller
         ], 201);
     }
 
-    /**
-     * Send push notification to the recipient when a new message is sent
-     */
-    private function sendNotificationToRecipient(Chat $chat, User $sender, string $message): void
-    {
-        try {
-            // Determine who the recipient is (the other user in the chat)
-            $recipient = null;
-            if ($chat->client_id === $sender->id) {
-                $recipient = $chat->staff; // Client sent message, notify staff
-            } else {
-                $recipient = $chat->client; // Staff sent message, notify client
-            }
-
-            // Only send notification if recipient has FCM token and is not the sender
-            if ($recipient && $recipient->fcm_token && $recipient->id !== $sender->id) {
-                $pushService = new PushNotificationService();
-
-                // Send push notification
-                $pushService->sendChatNotification(
-                    $recipient,
-                    $sender,
-                    $message,
-                    $chat->id
-                );
-
-                \Log::info('Chat push notification sent', [
-                    'chat_id' => $chat->id,
-                    'sender_id' => $sender->id,
-                    'recipient_id' => $recipient->id,
-                    'message_preview' => substr($message, 0, 50)
-                ]);
-            } else {
-                \Log::info('Chat push notification not sent', [
-                    'chat_id' => $chat->id,
-                    'sender_id' => $sender->id,
-                    'recipient_id' => $recipient?->id,
-                    'has_fcm_token' => $recipient?->fcm_token ? true : false,
-                    'reason' => !$recipient ? 'No recipient found' : (!$recipient->fcm_token ? 'No FCM token' : 'Unknown')
-                ]);
-            }
-        } catch (\Exception $e) {
-            \Log::error('Failed to send chat push notification', [
-                'chat_id' => $chat->id,
-                'sender_id' => $sender->id,
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
 }
