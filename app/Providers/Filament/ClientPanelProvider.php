@@ -8,7 +8,6 @@ use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationItem;
-use Rupadana\ApiService\ApiServicePlugin;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -68,7 +67,6 @@ class ClientPanelProvider extends PanelProvider
                     ->sort(1),
             ])
             ->plugins([
-                ApiServicePlugin::make(),
                 FilamentApexChartsPlugin::make(),
                 FilamentFullCalendarPlugin::make()
             ]);

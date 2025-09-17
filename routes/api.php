@@ -51,11 +51,6 @@ Route::prefix('client/auth')->name('client.auth.')->middleware('auth:sanctum')->
     Route::get('profile', [AuthController::class, 'profile'])->name('profile');
     Route::put('profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::post('unlink-google', [AuthController::class, 'unlinkGoogle'])->name('unlink-google');
-
-    // FCM Token Management
-    Route::post('fcm-token', [AuthController::class, 'updateFcmToken'])->name('fcm-token.update');
-    Route::delete('fcm-token', [AuthController::class, 'removeFcmToken'])->name('fcm-token.remove');
-    Route::post('test-notification', [AuthController::class, 'testPushNotification'])->name('test-notification');
 });
 
 // Client API Routes with /api/client prefix
