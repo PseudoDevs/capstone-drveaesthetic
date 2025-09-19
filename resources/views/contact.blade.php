@@ -10,12 +10,16 @@
     <!--====================================================================
                Start Banner Section
            =====================================================================-->
-    <section class="banner-section">
+    <section style="position: relative; 
+           background: url('{{ asset('assets/images/banner/contact_banner.jpg') }}'); 
+           background-size: cover; 
+           background-position: center;">
         <div class="container">
             <div class="banner-inner">
                 <div class="banner-content">
                     <h2 class="page-title">{{ setting('contact.banner_title', 'Contact Us.') }}</h2>
-                    <p>{{ setting('contact.banner_description', 'Saunas are used all over the world to improve health to enjoy and relax electronic typesetting.') }}
+                    <!--<p>{{ setting('contact.banner_description', 'Saunas are used all over the world to improve
+                     health to enjoy and relax electronic typesetting.') }}-->
                     </p>
                 </div>
                 <nav aria-label="breadcrumb">

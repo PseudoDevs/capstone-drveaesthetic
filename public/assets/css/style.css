@@ -646,6 +646,12 @@ a.theme-btn.style-three:before,
     background-size: cover;
     background-position: center;
 }
+.banner-contact {
+    position: relative;
+    background: url(../images/banner/contact_banner.jpg);
+    background-size: cover;
+    background-position: center;
+}
 
 .banner-inner {
     height: 490px;
@@ -813,7 +819,7 @@ a.theme-btn.style-three:before,
 .what-experct-img {
     height: 100%;
     min-height: 400px;
-    background: url('../images/services/service-man.png') center/cover;
+    background: url('../images/banner/service-man.png') center/cover;
 }
 
 .what-experct-content {

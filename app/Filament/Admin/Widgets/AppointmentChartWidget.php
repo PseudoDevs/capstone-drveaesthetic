@@ -17,13 +17,13 @@ class AppointmentChartWidget extends ApexChartWidget
     {
         // Define status colors mapping
         $statusColors = [
-            'PENDING' => '#F59E0B',     // Orange
-            'CONFIRMED' => '#3B82F6',   // Blue
-            'ON-GOING' => '#8B5CF6',    // Purple
-            'COMPLETED' => '#10B981',   // Green
-            'CANCELLED' => '#EF4444',   // Red
-            'DECLINED' => '#6B7280',    // Gray
-            'RESCHEDULED' => '#F97316', // Dark Orange
+            'pending' => '#F59E0B',     // Orange
+            'confirmed' => '#3B82F6',   // Blue
+            'on-going' => '#8B5CF6',    // Purple
+            'completed' => '#10B981',   // Green
+            'cancelled' => '#EF4444',   // Red
+            'decline' => '#6B7280',    // Gray
+            'rescheduled' => '#F97316', // Dark Orange
         ];
 
         $statusCounts = Appointment::select('status', DB::raw('count(*) as count'))

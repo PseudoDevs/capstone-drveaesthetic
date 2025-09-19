@@ -247,13 +247,16 @@
     <!--====================================================================
                            Start Banner Section
                        =====================================================================-->
-    <section class="banner-section">
+    <section style="position: relative; 
+           background: url('{{ asset('assets/images/banner/services_banner.jpg') }}'); 
+           background-size: cover; 
+           background-position: center;">
         <div class="container">
             <div class="banner-inner">
                 <div class="banner-content">
-                    <h2 class="page-title">Our Services</h2>
-                    <p>Discover our comprehensive range of aesthetic and dermatology services <br> designed to enhance your
-                        natural beauty and confidence.</p>
+                    <h2 class="page-title" style="color: white;">Our <span style="color: #fbaaa9;">Services</span></h2>
+                    <!--<h5 style="color: black;">Discover our comprehensive range of aesthetic and dermatology services <br> designed to enhance your
+                        natural beauty and confidence.</h5>-->
                 </div>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
@@ -315,9 +318,9 @@
                                     @endif
                                     <p class="duration"><i class="far fa-clock"></i> Duration: {{ $service->duration }}
                                         minutes</p>
-                                    @if ($service->staff)
+                                    <!--@if ($service->staff)
                                         <p class="staff"><i class="far fa-user"></i> By: {{ $service->staff->name }}</p>
-                                    @endif
+                                    @endif-->
                                 </div>
                                 <button type="button" class="theme-btn" data-toggle="modal"
                                     data-target="#appointmentModal" data-service-id="{{ $service->id }}"

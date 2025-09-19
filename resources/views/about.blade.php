@@ -102,7 +102,7 @@
                             <h3>{{ setting('general.mission_title', 'Our Mission.') }}</h3>
                             <h6>{{ setting('general.mission_subtitle', 'Saunas are used all over the world to improve health enjoy relax. During the clients stay in sauna, body is sweating and from harmful substances and toxins.') }}</h6>
                             <p>{{ setting('general.mission_description', 'It has different attractions – tropical rain, fog, dew, wall jets and it is combined with sound, caribbian storm, aroma and various lighting effects, what makes you have an unforgettable filling.') }}</p>
-                            <a href="{{ url('/services') }}" class="theme-btn style-two mt-15">Our Services</a>
+                            <!--<a href="{{ url('/services') }}" class="theme-btn style-two mt-15">Our Services</a>-->
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -110,7 +110,7 @@
                             <h3>{{ setting('general.vision_title', 'Our Vision.') }}</h3>
                             <p>{{ setting('general.vision_description_1', 'It has different attractions – tropical rain, fog, dew, wall jets and it is combined with sound, caribbian storm, aroma and various lighting effects, what makes you have an unforgettable filling.') }}</p>
                             <p>{{ setting('general.vision_description_2', 'It has different attractions – tropical rain, fog, dew, wall jets and it is combined with sound, caribbian storm, aroma and various lighting effects, what makes you have an unforgettable filling.') }}</p>
-                            <a href="{{ url('/about') }}" class="theme-btn style-four mt-15">Our Experts</a>
+                            <!--<a href="{{ url('/about') }}" class="theme-btn style-four mt-15">Our Experts</a>-->
                         </div>
                     </div>
                 </div>
