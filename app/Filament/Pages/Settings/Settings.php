@@ -46,7 +46,7 @@ class Settings extends BaseSettings
 
                                     Textarea::make('general.about_banner_description')
                                         ->label('Banner Description')
-                                        ->default('Saunas are used all over the world to improve health, to enjoy and relax.')
+                                        ->default('Discover the perfect blend of medical expertise and aesthetic artistry at our dermatology clinic.')
                                         ->rows(2),
 
                                     FileUpload::make('general.about_banner_image')
@@ -65,17 +65,17 @@ class Settings extends BaseSettings
                                 ->schema([
                                     TextInput::make('general.about_title')
                                         ->label('About Section Title')
-                                        ->default('We Have 25+ Years Experience.')
+                                        ->default('Excellence in Dermatology & Aesthetic Medicine.')
                                         ,
 
                                     Textarea::make('general.about_description')
                                         ->label('About Description')
-                                        ->default('Saunas are used all over the world to improve health enjoy relax. During the clients stay in sauna, body is sweating and from harmful substances and toxins.')
+                                        ->default('With over two decades of dedicated service, we have established ourselves as a premier destination for advanced dermatological care and aesthetic treatments. Our clinic combines cutting-edge medical technology with personalized patient care.')
                                         ->rows(3),
 
                                     Textarea::make('general.about_content')
                                         ->label('About Content')
-                                        ->default('It has different attractions – tropical rain, fog, dew, wall jets and it is combined with sound, caribbian storm, aroma and various lighting effects, what makes you have an unforgettable filling.')
+                                        ->default('Our state-of-the-art facility offers a comprehensive range of services from medical dermatology to cosmetic procedures, ensuring every patient receives the highest standard of care in a comfortable and welcoming environment.')
                                         ->rows(3),
 
                                     FileUpload::make('general.about_image_1')
@@ -112,12 +112,12 @@ class Settings extends BaseSettings
 
                                     Textarea::make('general.mission_subtitle')
                                         ->label('Mission Subtitle')
-                                        ->default('Saunas are used all over the world to improve health enjoy relax. During the clients stay in sauna, body is sweating and from harmful substances and toxins.')
+                                        ->default('To provide exceptional dermatological care that enhances both the health and beauty of our patients\' skin through innovative treatments and personalized attention.')
                                         ->rows(3),
 
                                     Textarea::make('general.mission_description')
                                         ->label('Mission Description')
-                                        ->default('It has different attractions – tropical rain, fog, dew, wall jets and it is combined with sound, caribbian storm, aroma and various lighting effects, what makes you have an unforgettable filling.')
+                                        ->default('We are committed to delivering the highest quality dermatological and aesthetic services using advanced technology, evidence-based treatments, and a patient-centered approach. Our goal is to help every patient achieve optimal skin health while feeling confident and beautiful in their own skin.')
                                         ->rows(4),
 
                                     TextInput::make('general.vision_title')
@@ -127,12 +127,12 @@ class Settings extends BaseSettings
 
                                     Textarea::make('general.vision_description_1')
                                         ->label('Vision Description (Paragraph 1)')
-                                        ->default('It has different attractions – tropical rain, fog, dew, wall jets and it is combined with sound, caribbian storm, aroma and various lighting effects, what makes you have an unforgettable filling.')
+                                        ->default('To be the leading dermatology and aesthetic medicine clinic, recognized for our excellence in patient care, innovative treatments, and commitment to advancing the field of dermatological health.')
                                         ->rows(3),
 
                                     Textarea::make('general.vision_description_2')
                                         ->label('Vision Description (Paragraph 2)')
-                                        ->default('It has different attractions – tropical rain, fog, dew, wall jets and it is combined with sound, caribbian storm, aroma and various lighting effects, what makes you have an unforgettable filling.')
+                                        ->default('We envision a future where everyone has access to comprehensive skin care solutions that not only treat medical conditions but also enhance natural beauty, boosting confidence and improving quality of life.')
                                         ->rows(3),
                                 ]),
                         ]),
@@ -196,7 +196,7 @@ class Settings extends BaseSettings
 
                                     Textarea::make('team.section_description')
                                         ->label('Section Description')
-                                        ->default('Meet our professional team of experts dedicated to providing you with the best aesthetic and dermatological care.')
+                                        ->default('Meet our highly qualified team of board-certified dermatologists, aesthetic specialists, and licensed practitioners dedicated to delivering exceptional patient care and outstanding results.')
                                         ->rows(3),
 
                                     Repeater::make('team.members')
@@ -232,19 +232,19 @@ class Settings extends BaseSettings
                                         ->defaultItems(3)
                                         ->default([
                                             [
-                                                'name' => 'Dr. Sarah Johnson',
-                                                'position' => 'Chief Dermatologist',
-                                                'bio' => 'Experienced dermatologist with over 15 years in aesthetic treatments.',
+                                                'name' => 'Dr. Maria Elena Santos',
+                                                'position' => 'Chief Dermatologist & Medical Director',
+                                                'bio' => 'Board-certified dermatologist with over 18 years of experience in medical and cosmetic dermatology. Fellowship-trained in Mohs surgery and dermatopathology.',
                                             ],
                                             [
-                                                'name' => 'Dr. Michael Chen',
-                                                'position' => 'Aesthetic Specialist',
-                                                'bio' => 'Specialized in advanced skin care and cosmetic procedures.',
+                                                'name' => 'Dr. James Richardson',
+                                                'position' => 'Aesthetic Medicine Specialist',
+                                                'bio' => 'Specialized in advanced injectable treatments, laser procedures, and non-surgical facial rejuvenation with 12+ years of expertise.',
                                             ],
                                             [
-                                                'name' => 'Emily Rodriguez',
-                                                'position' => 'Senior Aesthetician',
-                                                'bio' => 'Licensed aesthetician passionate about healthy, beautiful skin.',
+                                                'name' => 'Sarah Michelle Torres',
+                                                'position' => 'Senior Medical Aesthetician',
+                                                'bio' => 'Licensed medical aesthetician with advanced certifications in chemical peels, microneedling, and clinical skin care treatments.',
                                             ],
                                         ])
                                         ->collapsible()
