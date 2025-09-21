@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\FormType;
+use App\Enums\FormType;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -63,7 +63,7 @@ class AppointmentResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('form_type')
                     ->label('Appointment Type')
-                    ->options(\App\FormType::getOptions())
+                    ->options(FormType::getOptions())
                     ->native(false)
                     ->nullable()
                     ->placeholder('Select appointment type (optional)'),
