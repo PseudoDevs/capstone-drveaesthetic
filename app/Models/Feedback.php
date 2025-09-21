@@ -19,7 +19,7 @@ class Feedback extends Model
 
     public function client(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'client_id');
+        return $this->belongsTo(User::class, 'client_id', 'id');
     }
 
     public function appointment(): BelongsTo

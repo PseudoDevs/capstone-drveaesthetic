@@ -20,9 +20,9 @@ class FeedbackResource extends Resource
     protected static ?string $model = Feedback::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-star';
-    
+
     protected static ?string $navigationGroup = 'Feedback & Reviews';
-    
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
