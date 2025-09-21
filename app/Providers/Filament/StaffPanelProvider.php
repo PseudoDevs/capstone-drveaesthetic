@@ -42,6 +42,8 @@ class StaffPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Staff/Widgets'), for: 'App\\Filament\\Staff\\Widgets')
             ->widgets([
                 \App\Filament\Staff\Widgets\StatsOverviewWidget::class,
+                \App\Filament\Staff\Widgets\OnlineAppointmentsWidget::class,
+                \App\Filament\Staff\Widgets\WalkInAppointmentsWidget::class,
                 \App\Filament\Staff\Widgets\AppointmentChartWidget::class,
                 \App\Filament\Staff\Widgets\MonthlyAppointmentsTrendWidget::class,
                 \App\Filament\Staff\Widgets\PopularServicesWidget::class,

@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +26,8 @@ Route::get('/services', function () {
 Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
+
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 Route::middleware('guest')->group(function () {
     Route::get('/users/login', [LoginController::class, 'showLoginForm'])->name('login');

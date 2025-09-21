@@ -98,36 +98,52 @@
                     <p>{{ setting('contact.form_description', 'It has different attractions tropical rain fog dew wall jets and it is combined with sound, caribbian storm.') }}
                     </p>
                 </div>
-                <form method="POST" action="#">
+                @if(session('success'))
+                    <div class="alert alert-success mb-4 text-center">
+                        <strong>{{ session('success') }}</strong>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-danger mb-4">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('contact.submit') }}">
                     @csrf
                     <div class="row clearfix">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="text" name="first_name" id="first_name" class="form-control" value=""
+                                <input type="text" name="first_name" id="first_name" class="form-control" value="{{ old('first_name') }}"
                                     required="" placeholder="Name Here">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="email" name="email" id="email" class="form-control" value=""
+                                <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}"
                                     required="" placeholder="Email Here">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="tel" name="phone-no" id="phone-no" class="form-control" value=""
+                                <input type="tel" name="phone-no" id="phone-no" class="form-control" value="{{ old('phone-no') }}"
                                     required="" placeholder="Phone No.">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="text" name="subject" id="subject" class="form-control" value=""
+                                <input type="text" name="subject" id="subject" class="form-control" value="{{ old('subject') }}"
                                     required="" placeholder="Subject">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group mb-60">
-                                <textarea name="message" id="message" class="form-control" rows="7" required="" placeholder="Message"></textarea>
+                                <textarea name="message" id="message" class="form-control" rows="7" required="" placeholder="Message">{{ old('message') }}</textarea>
                             </div>
                         </div>
                         <div class="col-md-12 text-center">
