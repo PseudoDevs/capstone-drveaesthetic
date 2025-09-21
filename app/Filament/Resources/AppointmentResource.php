@@ -2,25 +2,26 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AppointmentResource\Pages;
-use App\Filament\Resources\AppointmentResource\RelationManagers;
-use App\Models\Appointment;
+use App\FormType;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\Appointment;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\AppointmentResource\Pages;
+use App\Filament\Resources\AppointmentResource\RelationManagers;
 
 class AppointmentResource extends Resource
 {
     protected static ?string $model = Appointment::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
-    
+
     protected static ?string $navigationGroup = 'Appointment Management';
-    
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -95,8 +96,8 @@ class AppointmentResource extends Resource
                 Tables\Columns\TextColumn::make('form_type')
                     ->label('Appointment Type')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => 
-                        $state ? \App\FormType::from($state)->getLabel() : 'No Form Type'
+                    ->formatStateUsing(fn (?string $state): string =>
+                        $state ? FormType::from($state)->getLabel() : 'No Form Type'
                     )
                     ->color(fn (?string $state): string => match ($state) {
                         'medical_information' => 'info',
