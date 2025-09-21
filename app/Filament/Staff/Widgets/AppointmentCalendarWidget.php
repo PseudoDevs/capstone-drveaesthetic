@@ -20,11 +20,13 @@ class AppointmentCalendarWidget extends FullCalendarWidget
         return Appointment::query()
             ->with(['client', 'service', 'staff'])
             ->whereBetween('appointment_date', [$fetchInfo['start'], $fetchInfo['end']])
+            ->whereNotNull('client_id')
+            ->whereNotNull('service_id')
             ->get()
             ->map(
                 fn (Appointment $appointment) => [
                     'id' => $appointment->id,
-                    'title' => $appointment->client->name . ' - ' . $appointment->service->service_name,
+                    'title' => ($appointment->client?->name ?? 'Unknown Client') . ' - ' . ($appointment->service?->service_name ?? 'Unknown Service'),
                     'start' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->appointment_time,
                     'end' => $appointment->appointment_date->format('Y-m-d') . 'T' .
                         Carbon::parse($appointment->appointment_time)->addHour()->format('H:i:s'),
@@ -32,9 +34,9 @@ class AppointmentCalendarWidget extends FullCalendarWidget
                     'borderColor' => $this->getEventColor($appointment->status),
                     'textColor' => '#ffffff',
                     'extendedProps' => [
-                        'client' => $appointment->client->name,
-                        'service' => $appointment->service->service_name,
-                        'staff' => $appointment->staff->name ?? 'Not assigned',
+                        'client' => $appointment->client?->name ?? 'Unknown Client',
+                        'service' => $appointment->service?->service_name ?? 'Unknown Service',
+                        'staff' => $appointment->staff?->name ?? 'Not assigned',
                         'status' => $appointment->status,
                         'is_paid' => $appointment->is_paid,
                         'is_rescheduled' => $appointment->is_rescheduled,
@@ -96,11 +98,14 @@ class AppointmentCalendarWidget extends FullCalendarWidget
             Actions\ViewAction::make()
                 ->infolist([
                     \Filament\Infolists\Components\TextEntry::make('client.name')
-                        ->label('Client'),
+                        ->label('Client')
+                        ->placeholder('Unknown Client'),
                     \Filament\Infolists\Components\TextEntry::make('service.service_name')
-                        ->label('Service'),
+                        ->label('Service')
+                        ->placeholder('Unknown Service'),
                     \Filament\Infolists\Components\TextEntry::make('staff.name')
-                        ->label('Staff'),
+                        ->label('Staff')
+                        ->placeholder('Not assigned'),
                     \Filament\Infolists\Components\TextEntry::make('appointment_date')
                         ->label('Date')
                         ->date(),
