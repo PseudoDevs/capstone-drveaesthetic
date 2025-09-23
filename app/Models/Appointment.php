@@ -35,6 +35,7 @@ class Appointment extends Model
         'is_paid' => 'boolean',
         'form_completed' => 'boolean',
         'appointment_type' => AppointmentType::class,
+        'form_type' => FormType::class,
         'medical_form_data' => 'array',
         'consent_waiver_form_data' => 'array',
     ];

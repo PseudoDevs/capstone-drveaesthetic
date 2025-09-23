@@ -399,6 +399,22 @@ class AppointmentResource extends Resource
                                         ]),
                                 ])
                                 ->collapsible(),
+                            Infolists\Components\Section::make('Pre-Assessment Forms')
+                                ->schema([
+                                    Infolists\Components\ViewEntry::make('assessment_status')
+                                        ->label('')
+                                        ->view('filament.forms.components.assessment-status-display'),
+                                    Infolists\Components\ViewEntry::make('medical_form_data')
+                                        ->label('')
+                                        ->view('filament.forms.components.medical-form-display')
+                                        ->visible(fn ($record) => !empty($record->medical_form_data)),
+                                    Infolists\Components\ViewEntry::make('consent_waiver_form_data')
+                                        ->label('')
+                                        ->view('filament.forms.components.consent-form-display')
+                                        ->visible(fn ($record) => !empty($record->consent_waiver_form_data)),
+                                ])
+                                ->collapsible()
+                                ->collapsed(fn ($record) => !$record->form_completed),
                         ]),
 
 
