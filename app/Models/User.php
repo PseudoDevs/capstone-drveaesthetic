@@ -86,12 +86,12 @@ class User extends Authenticatable
     }
 
     // Filament panel access control
-    // public function canAccessPanel(Panel $panel): bool
-    // {
-    //     return match ($panel->getId()) {
-    //         'admin' => $this->role === 'Admin',
-    //         'staff' => in_array($this->role, ['Staff', 'Doctor']),
-    //         default => false,
-    //     };
-    // }
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return match ($panel->getId()) {
+            'admin' => $this->role === 'Admin',
+            'staff' => in_array($this->role, ['Staff', 'Doctor']),
+            default => false,
+        };
+    }
 }
