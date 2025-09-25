@@ -33,6 +33,8 @@ class StaffPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->login()
+            ->brandLogo(asset('assets/images/new-logo.png'))
+            ->brandLogoHeight('10rem')
             ->maxContentWidth(MaxWidth::Full)
             ->discoverResources(in: app_path('Filament/Staff/Resources'), for: 'App\\Filament\\Staff\\Resources')
             ->discoverPages(in: app_path('Filament/Staff/Pages'), for: 'App\\Filament\\Staff\\Pages')
