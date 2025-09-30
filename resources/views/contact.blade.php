@@ -11,26 +11,36 @@
                Start Banner Section
            =====================================================================-->
     <section style="position: relative; 
-           background: url('{{ asset('assets/images/banner/contact_banner.jpg') }}'); 
+           background: url('{{ asset('assets/images/banner/contact_banner.png') }}'); 
            background-size: cover; 
            background-position: center;">
-        <div class="container">
-            <div class="banner-inner">
+        <!-- Black transparent overlay -->
+        <div style="position: absolute; 
+             top: 0; 
+             left: 0; 
+             right: 0; 
+             bottom: 0; 
+             background: rgba(0, 0, 0, 0.5); 
+             z-index: 1;"></div>
+        <div class="container" style="position: relative; z-index: 2;">
+            <div class="banner-inner" style="text-align: center;">
                 <div class="banner-content">
-                    <h2 class="page-title">{{ setting('contact.banner_title', 'Contact Us.') }}</h2>
-                    <!--<p>{{ setting('contact.banner_description', 'Saunas are used all over the world to improve
-                     health to enjoy and relax electronic typesetting.') }}-->
-                    </p>
+                    <h2 class="page-title" style="font-family: 'Georgia', 'Times New Roman', serif; font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
+                        <span style="color: #fbaaa9;">Contact</span> <span style="color: white;">Us</span>
+                    </h2>
+                    <h4 style="font-size: 1.5rem; font-weight: 400; margin-bottom: 1.5rem; color: white;">
+                        Get in touch with us for consultations and appointments. We're here to help you on your aesthetic journey.
+                    </h4>
                 </div>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Contact</li>
+                <nav aria-label="breadcrumb" style="margin-top: 2rem;">
+                    <ol class="breadcrumb" style="justify-content: center;">
+                        <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color: white; text-decoration: none;">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" style="color: #fbaaa9;">Contact</li>
                     </ol>
                 </nav>
             </div>
         </div>
-        <div class="banner-angle">
+        <div class="banner-angle" style="position: absolute; bottom: 0; right: 0; z-index: 2;">
             <img src="{{ asset('assets/images/banner/banner-angle.png') }}" alt="Angle">
         </div>
     </section>
@@ -62,8 +72,8 @@
                             <i class="flaticon-location"></i>
                         </div>
                         <div class="info-content">
-                            <span>{{ setting('contact.address_line_1', '1569  Davis Place,') }}</span>
-                            <span>{{ setting('contact.address_line_2', 'Filkon, USA.') }}</span>
+                            <span>{{ setting('contact.address_line_1', 'San Jose,') }}</span>
+                            <span>{{ setting('contact.address_line_2', 'Iriga City, Philippines, 4431') }}</span>
                         </div>
                     </div>
                 </div>

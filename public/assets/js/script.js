@@ -66,11 +66,10 @@
                 loop:true,
                 margin:30,
                 dots:false,
-                nav:true,
+                nav:false,
                 active: true,
                 smartSpeed: 1000,
                 autoplay: 5000,
-                navText: [ '<span class="flaticon-left-arrow-1"></span>', '<span class="flaticon-right-arrow-1"></span>' ],
                 responsive:{
                     0:{
                         items:1
@@ -189,13 +188,17 @@
         /* initialize the contact page map on the "map" div with a given center and zoom*/
         if($('#map').length !== 0){
             var map = L.map('map', {
-                center: [-6.185033, 106.798862],
-                zoom: 18,
+                center: [13.4200, 123.4100],
+                zoom: 15,
                 zoomControl: false,
                 scrollWheelZoom: true,
             });
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
+            
+            // Add a marker for the clinic location
+            var clinicMarker = L.marker([13.4200, 123.4100]).addTo(map);
+            clinicMarker.bindPopup('<b>Dr. Ve Aesthetic Clinic</b><br>San Jose, Iriga City, Philippines, 4431').openPopup();
         }
 
 

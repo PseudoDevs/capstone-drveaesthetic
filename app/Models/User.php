@@ -8,6 +8,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -32,6 +33,7 @@ class User extends Authenticatable implements FilamentUser
         'date_of_birth',
         'address',
         'email_verified_at',
+        'last_activity_at',
     ];
 
     /**
@@ -54,6 +56,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_activity_at' => 'datetime',
         ];
     }
 
@@ -93,5 +96,49 @@ class User extends Authenticatable implements FilamentUser
             'staff' => in_array($this->role, ['Staff', 'Doctor']),
             default => false,
         };
+    }
+
+    // Notification preferences relationship
+    public function notificationPreferences(): HasOne
+    {
+        return $this->hasOne(NotificationPreference::class);
+    }
+
+    // Get or create notification preferences
+    public function getNotificationPreferences(): NotificationPreference
+    {
+        return $this->notificationPreferences ?? $this->notificationPreferences()->create(
+            NotificationPreference::getDefaults()
+        );
+    }
+
+    // Check if user wants to receive specific notification type
+    public function wantsNotification(string $type): bool
+    {
+        $preferences = $this->getNotificationPreferences();
+        
+        return match($type) {
+            'appointment_confirmation' => $preferences->appointment_confirmations,
+            'appointment_reminder_24h' => $preferences->appointment_reminders_24h,
+            'appointment_reminder_2h' => $preferences->appointment_reminders_2h,
+            'appointment_cancellation' => $preferences->appointment_cancellations,
+            'feedback_request' => $preferences->feedback_requests,
+            'service_update' => $preferences->service_updates,
+            'promotional_offer' => $preferences->promotional_offers,
+            'newsletter' => $preferences->newsletter,
+            default => $preferences->email_notifications,
+        };
+    }
+
+    // Update user's last activity timestamp
+    public function updateLastActivity(): void
+    {
+        $this->update(['last_activity_at' => now()]);
+    }
+
+    // Check if user is currently online (active within last 5 minutes)
+    public function isOnline(): bool
+    {
+        return $this->last_activity_at && $this->last_activity_at->isAfter(now()->subMinutes(5));
     }
 }

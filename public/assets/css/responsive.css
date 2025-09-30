@@ -87,6 +87,7 @@
     }
     .owl-carousel.team-carousel.style-two .owl-nav {
         top: -150px;
+        display: none !important;
     }
     .owl-carousel.team-carousel .owl-nav button {
         height: 55px;
@@ -146,7 +147,7 @@
     .owl-carousel.team-carousel.style-two .owl-nav {
         top: 50%;
         width: 100%;
-        display: flex;
+        display: none !important;
         transform: translateY(-85px);
         justify-content: space-between;
     }

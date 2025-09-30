@@ -21,6 +21,12 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// Admin Analytics API Routes
+Route::prefix('admin')->name('admin.')->middleware('auth:sanctum')->group(function () {
+    Route::get('online-users-count', [\App\Http\Controllers\Api\Admin\AnalyticsController::class, 'getOnlineUsersCount'])->name('online-users-count');
+    Route::get('real-time-stats', [\App\Http\Controllers\Api\Admin\AnalyticsController::class, 'getRealTimeStats'])->name('real-time-stats');
+});
+
 // Public Authentication Routes (no auth required)
 Route::prefix('client/auth')->name('client.auth.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
@@ -110,6 +116,16 @@ Route::prefix('client')->name('client.')->group(function () {
     // Training API
     Route::apiResource('trainings', TrainingController::class);
     Route::get('trainings/published/list', [TrainingController::class, 'published'])->name('trainings.published');
+    
+    // Mobile App API Routes
+    Route::prefix('mobile')->name('mobile.')->middleware('auth:sanctum')->group(function () {
+        Route::get('dashboard', [\App\Http\Controllers\Api\Mobile\MobileAppController::class, 'dashboard'])->name('dashboard');
+        Route::get('services', [\App\Http\Controllers\Api\Mobile\MobileAppController::class, 'services'])->name('services');
+        Route::get('appointments', [\App\Http\Controllers\Api\Mobile\MobileAppController::class, 'appointments'])->name('appointments');
+        Route::get('available-slots', [\App\Http\Controllers\Api\Mobile\MobileAppController::class, 'availableSlots'])->name('available-slots');
+        Route::get('notification-preferences', [\App\Http\Controllers\Api\Mobile\MobileAppController::class, 'getNotificationPreferences'])->name('notification-preferences');
+        Route::put('notification-preferences', [\App\Http\Controllers\Api\Mobile\MobileAppController::class, 'updateNotificationPreferences'])->name('notification-preferences.update');
+    });
     
 });
 

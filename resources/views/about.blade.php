@@ -6,27 +6,70 @@
 
 @section('content')
 
+    <style>
+        /* Custom styling for Mission and Vision headings */
+        .vission-mission h3 {
+            font-family: 'Georgia', 'Times New Roman', serif !important;
+            font-weight: 700 !important;
+            letter-spacing: 1px !important;
+        }
+        
+        /* Make Vision heading white */
+        .vission.vission-mission h3 {
+            color: white !important;
+        }
+        
+        /* Make Mission heading a darker color for better contrast */
+        .mission.vission-mission h3 {
+            color: #2c3e50 !important;
+        }
+        
+        /* Add borders to about images */
+        .about-images img {
+            border: 3px solid #fbaaa9 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .about-images img:hover {
+            border-color: #e74c3c !important;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-2px) !important;
+        }
+    </style>
 
         <!--====================================================================
            Start Banner Section
        =====================================================================-->
-        <section class="banner-section" @if(setting('general.about_banner_image')) style="background-image: url('{{ Storage::url(setting('general.about_banner_image')) }}');" @endif>
-            <div class="container">
-                <div class="banner-inner">
+        <section class="banner-section" @if(setting('general.about_banner_image')) style="background-image: url('{{ Storage::url(setting('general.about_banner_image')) }}'); position: relative;" @else style="position: relative;" @endif>
+            <!-- Black transparent overlay -->
+            <div style="position: absolute; 
+                 top: 0; 
+                 left: 0; 
+                 right: 0; 
+                 bottom: 0; 
+                 background: rgba(0, 0, 0, 0.5); 
+                 z-index: 1;"></div>
+            <div class="container" style="position: relative; z-index: 2;">
+                <div class="banner-inner" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <div class="banner-content">
-                        <h2 class="page-title">{{ setting('general.about_banner_title', 'About Us.') }}</h2>
-                        <h4 class="text-black">The <span>Art of </span>Natural  <span>Enhancement.</span></h4>
-                        <!--<p>{{ setting('general.about_banner_description', 'Saunas are used all over the world to improve health, to enjoy and relax.') }}</p>-->
+                        <h2 class="page-title" style="font-family: 'Georgia', 'Times New Roman', serif; font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
+                            <span style="color: #fbaaa9;">About</span> <span style="color: white;">Us</span>
+                        </h2>
+                        <h4 style="font-size: 1.5rem; font-weight: 400; margin-bottom: 1.5rem; color: white;">
+                            The Art of Natural Enhancement
+                        </h4>
                     </div>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">About Us</li>
+                    <nav aria-label="breadcrumb" style="margin-top: 2rem;">
+                        <ol class="breadcrumb" style="justify-content: center;">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color: white; text-decoration: none;">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page" style="color: #fbaaa9;">About Us</li>
                         </ol>
                     </nav>
                 </div>
             </div>
-            <div class="banner-angle">
+            <div class="banner-angle" style="position: absolute; bottom: 0; right: 0; z-index: 2;">
                 <img src="{{ asset('assets/images/banner/banner-angle.png') }}" alt="Angle">
             </div>
         </section>
@@ -79,7 +122,6 @@
                                         Our philosophy is to enhance your natural features, not alter them, achieving results that are both transformative and authentically you.</p>
                                 </div>
                             </div>
-                            <a href="#" class="theme-btn style-two">Expert Team</a>
                         </div>
                     </div>
                 </div>

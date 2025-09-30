@@ -6,8 +6,52 @@
 
 @section('content')
 
+<style>
+    /* Enhanced Services Section Styles */
+    .service-item:hover {
+        transform: translateY(-10px) !important;
+        box-shadow: 0 20px 40px rgba(251, 170, 169, 0.2) !important;
+    }
+    
+    .service-item:hover .service-hover-bg {
+        opacity: 1 !important;
+    }
+    
+    .service-item:hover .read-more {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(251, 170, 169, 0.4) !important;
+    }
+    
+    .theme-btn:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(251, 170, 169, 0.4) !important;
+    }
+    
+    .theme-btn:hover div {
+        left: 100% !important;
+    }
+    
+    .service-icon img {
+        transition: transform 0.3s ease !important;
+    }
+    
+    .service-item:hover .service-icon img {
+        transform: scale(1.1) !important;
+    }
+    
+    /* Feedback Section Styles */
+    .feedback-card:hover {
+        transform: translateY(-10px) !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .feedback-card:hover .feedback-hover-bg {
+        opacity: 1 !important;
+    }
+</style>
 
-    <!--====================================================================
+
+    <!--====================================================================    
                                    Start Hero Section
                                =====================================================================-->
     <section class="hero-section">
@@ -15,11 +59,11 @@
             <div class="hero-content">
                 <h1 class="text-white">Extra <span>Care, </span>Extraordinary  <span>Result.</span></h1>
                 <h5 class="text-white">Expert cosmetic treatments to rejuvenate your look and boost your confidence. Look as vibrant as you feel.</h5>
-                <a href="{{ url('/services') }}" class="theme-btn">Book now</a>
+                <a href="{{ url('/services') }}" class="theme-btn">Book now</a> 
             </div>
         </div>
         <div class="hero-angle">
-            <img src="{{ asset('assets/images/hero/hero-angle.png') }}" alt="hero angle">
+            <img src="{{ asset('assets/images/hero/hero-angle.png') }}" alt="Hero Angle">
         </div>
     </section>
     <!--====================================================================
@@ -27,20 +71,35 @@
                                =====================================================================-->
 
 
+
     <!--====================================================================
                                    Start About Section
                                =====================================================================-->
-    <section class="about-section my-150 rmy-100">
+    <section class="about-section pt-150 rpt-100 pb-150 rpb-100">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <div class="about-images rmb-50">
-                        <img src="{{ Storage::url(setting('general.about_image_1')) }}" alt="about image">
-                        <img src="{{ Storage::url(setting('general.about_image_2')) }}" alt="about image">
-                        <img src="{{ Storage::url(setting('general.about_image_3')) }}" alt="about image">
+                <div class="col-lg-6">
+                    <div class="about-images">
+                        @if(setting('general.about_image_1'))
+                            <img src="{{ Storage::url(setting('general.about_image_1')) }}" alt="About Image 1">
+                        @else
+                            <img src="{{ asset('assets/images/about/about1.png') }}" alt="about image">
+                        @endif
+                        
+                        @if(setting('general.about_image_2'))
+                            <img src="{{ Storage::url(setting('general.about_image_2')) }}" alt="About Image 2">
+                        @else
+                            <img src="{{ asset('assets/images/about/about2.png') }}" alt="about image">
+                        @endif
+                        
+                        @if(setting('general.about_image_3'))
+                            <img src="{{ Storage::url(setting('general.about_image_3')) }}" alt="About Image 3">
+                        @else
+                            <img src="{{ asset('assets/images/about/about3.png') }}" alt="about image">
+                        @endif
                     </div>
                 </div>
-                <div class="col-lg-5">
+                <div class="col-lg-6">
                     <div class="about-content">
                         <div class="section-title">
                             <h2>{{ setting('general.about_title', 'We Have 25+ Years Experience.') }}</h2>
@@ -54,10 +113,10 @@
                             <div class="vm-content">
                                 <h4>Where Art Meets Science</h4>
                                 <p>We believe aesthetic medicine is a delicate balance between precise medical science and intuitive artistry. 
-                                        Our philosophy is to enhance your natural features, not alter them, achieving results that are both transformative and authentically you.</p>
+                                    Our philosophy is to enhance your natural features, not alter them, achieving results that are both transformative and authentically you.</p>
                             </div>
                         </div>
-                        <a href={{ url('/about') }} class="theme-btn style-two">About Us</a>
+                        <a href="#" class="theme-btn style-two">Expert Team</a>
                     </div>
                 </div>
             </div>
@@ -68,74 +127,79 @@
                                =====================================================================-->
 
 
+
     <!--====================================================================
                                    Start Services Section
                                =====================================================================-->
-    <section class="services-section pt-150 rpt-95 mb-145 rmb-95">
+    <section class="services-section pt-150 rpt-100 pb-150 rpb-100" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
         <div class="container">
-            <div class="section-title text-center mb-95">
-                <h2>Services We Offer</h2>
-                <p>It has different attractions tropical rain fog dew wall jets and it is <br> combined with sound,
-                    caribbian storm.</p>
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-8 text-center">
+                    <div class="section-title">
+                        <span class="sub-title mb-15" style="color: #fbaaa9; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Our Services</span>
+                        <h2 style="color: #333; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">{{ setting('general.services_title', 'We Provide Best Services') }}</h2>
+                        <p style="color: #666; font-size: 1.1rem; line-height: 1.6;">{{ setting('general.services_description', 'We offer a comprehensive range of aesthetic and dermatological treatments designed to enhance your natural beauty and improve your skin health.') }}</p>
+                    </div>
+                </div>
             </div>
+            
             <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="service-item style-one">
-                        <i class="flaticon-eyepatch"></i>
-                        <h4><a href={{ url('/services') }}>Facial Implants</a></h4>
-                        <p>It has different attractions combined with sound, caribbian storm, aroma and various.</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="service-item style-two">
-                        <i class="flaticon-aesthetic"></i>
-                        <h4><a href={{ url('/services') }}>Lip Augmentation</a></h4>
-                        <p>It has different attractions combined with sound, caribbian storm, aroma and various.</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="service-item style-three">
-                        <i class="flaticon-beauty"></i>
-                        <h4><a href={{ url('/services') }}>Blepharoplasty</a></h4>
-                        <p>It has different attractions combined with sound, caribbian storm, aroma and various.</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="service-item style-four">
-                        <i class="flaticon-ear"></i>
-                        <h4><a href={{ url('/services') }}>Ear Surgery</a></h4>
-                        <p>It has different attractions combined with sound, caribbian storm, aroma and various.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="service-angle">
-            <img src="{{ asset('assets/images/services/service-angle.png') }}" alt="hero angle">
-        </div>
-        <div class="service-ellipse">
-            <img src="{{ asset('assets/images/services/ellipse.png') }}" alt="Ellipse">
-        </div>
-
-        <div class="what-experct mt-120 rmt-70">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div style="height: 100%; 
-            min-height: 400px; 
-            background-image: url('{{ asset('assets/images/banner/beauty_pic1.png') }}'); 
-            background-position: center; 
-            background-size: cover;" ></div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="what-experct-content">
-                            <h3>Enhance Your Beauty, Elevate Your Confidence</h3>
-                            <p>Discover a wide range of aesthetic and wellness services designed to help you look radiant
-                                 and feel your absolute best.</p>
-                            <a href={{ url('/services') }} class="theme-btn style-three">Our Services</a>
+                @php
+                    $categories = \App\Models\Category::withCount('clinicServices')->whereHas('clinicServices', function($query) {
+                        $query->where('status', 'active');
+                    })->get();
+                @endphp
+                @foreach($categories as $category)
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="service-item" style="background: white; border-radius: 15px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; border: 1px solid rgba(251, 170, 169, 0.1); height: 100%; position: relative; overflow: hidden;">
+                        <div class="service-icon" style="width: 80px; height: 80px; background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; position: relative; z-index: 2;">
+                            <i class="fas fa-spa" style="color: white; font-size: 2rem;"></i>
                         </div>
+                        
+                        <div class="service-content" style="position: relative; z-index: 2;">
+                            <h4 style="color: #333; font-size: 1.3rem; font-weight: 600; margin-bottom: 15px;">
+                                <a href="{{ route('services') }}" style="color: #333; text-decoration: none;">{{ $category->category_name }}</a>
+                            </h4>
+                            
+                            <div class="service-count" style="background: rgba(251, 170, 169, 0.1); color: #fbaaa9; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; margin-bottom: 15px; display: inline-block;">
+                                {{ $category->clinic_services_count }} {{ $category->clinic_services_count == 1 ? 'Service' : 'Services' }}
+                            </div>
+                            
+                            <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+                                @if($category->description)
+                                    {{ Str::limit($category->description, 120) }}
+                                @else
+                                    Explore our comprehensive range of {{ strtolower($category->category_name) }} treatments designed to enhance your natural beauty.
+                                @endif
+                            </p>
+                            
+                            <div class="service-price" style="margin-bottom: 20px;">
+                                <span style="color: #999; font-size: 0.9rem; display: block;">Starting from</span>
+                                <span class="price" style="color: #fbaaa9; font-size: 1.5rem; font-weight: 700;">
+                                    @php
+                                        $minPrice = $category->clinicServices()->where('status', 'active')->min('price');
+                                    @endphp
+                                    ₱{{ $minPrice ? number_format($minPrice, 0) : 'Contact Us' }}
+                                </span>
+                            </div>
+                            
+                            <a href="{{ route('services') }}" class="read-more" style="background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: inline-block;">
+                                View Services <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                            </a>
+                        </div>
+                        
+                        <!-- Hover Effect Background -->
+                        <div class="service-hover-bg" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(251, 170, 169, 0.05) 0%, rgba(255, 154, 158, 0.05) 100%); opacity: 0; transition: opacity 0.3s ease; z-index: 1;"></div>
                     </div>
                 </div>
+                @endforeach
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="{{ route('services') }}" class="theme-btn" style="background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; position: relative; overflow: hidden;">
+                    <span style="position: relative; z-index: 2;">View All Services</span>
+                    <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: left 0.5s;"></div>
+                </a>
             </div>
         </div>
     </section>
@@ -143,118 +207,144 @@
                                    End Services Section
                                =====================================================================-->
 
+
+
     <!--====================================================================
-                                   Start Beauty Section
+                                   Start Customer Feedback Section
                                =====================================================================-->
-    <section  style="background: url('{{ asset('assets/images/banner/beauty_section.jpg') }}') center/cover;">
+    <section class="feedback-section pt-150 rpt-100 pb-150 rpb-100" style="background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); color: white;">
         <div class="container">
-            <div class="row align-items-center justify-content-between">
-                <div class="col-lg-5">
-                    <div class="beauty-content rmb-50 mr-25 rmr-0">
-                        <h3>Rediscover Your Radiance.</h3>
-                        <p>Enhance your natural beauty with our specialized treatments designed to refresh your skin, 
-                            restore confidence, and bring out your healthiest glow.</p>
-                        <!--<a href="#" class="theme-btn style-two">Expert Team</a>-->
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-8 text-center">
+                    <div class="section-title">
+                        <span class="sub-title mb-15" style="color: rgba(255, 255, 255, 0.9); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Customer Reviews</span>
+                        <h2 style="color: white; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">What Our Clients Say</h2>
+                        <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.6;">Real experiences from our satisfied customers who have transformed their skin and confidence.</p>
                     </div>
                 </div>
-                <div class="col-lg-5 text-center">
-                    <div class="beauty-image ml-30 rml-0">
-                        <img src="{{ asset('assets/images/banner/beauty_pic2.png') }}" alt="beauty man">
+            </div>
+            
+            <div class="row">
+                @php
+                    $feedbacks = \App\Models\Feedback::with('client')->orderBy('created_at', 'desc')->take(3)->get();
+                @endphp
+                
+                @if($feedbacks->count() > 0)
+                    @foreach($feedbacks as $feedback)
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="feedback-card" style="background: rgba(255, 255, 255, 0.95); color: #333; border-radius: 15px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; height: 100%; position: relative; overflow: hidden;">
+                            <div class="feedback-rating" style="margin-bottom: 15px;">
+                                @for($i = 1; $i <= $feedback->rating; $i++)
+                                    <i class="fas fa-star" style="color: #ffc107; font-size: 1.2rem; margin-right: 2px;"></i>
+                                @endfor
+                                @for($i = $feedback->rating + 1; $i <= 5; $i++)
+                                    <i class="far fa-star" style="color: #ddd; font-size: 1.2rem; margin-right: 2px;"></i>
+                                @endfor
+                            </div>
+                            
+                            <div class="feedback-content" style="margin-bottom: 20px;">
+                                <p style="color: #666; line-height: 1.6; font-style: italic; margin-bottom: 20px;">
+                                    "{{ Str::limit($feedback->comment, 150) }}"
+                                </p>
+                            </div>
+                            
+                            <div class="feedback-author" style="border-top: 1px solid #e1e8ed; padding-top: 20px;">
+                                <div class="author-avatar" style="width: 50px; height: 50px; background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                                    <i class="fas fa-user" style="color: white; font-size: 1.2rem;"></i>
+                                </div>
+                                <h5 style="color: #333; font-weight: 600; margin-bottom: 5px;">
+                                    {{ $feedback->client ? $feedback->client->name : 'Anonymous' }}
+                                </h5>
+                                <p style="color: #999; font-size: 0.9rem; margin-bottom: 0;">
+                                    {{ $feedback->created_at->format('M d, Y') }}
+                                </p>
+                            </div>
+                            
+                            <!-- Hover Effect Background -->
+                            <div class="feedback-hover-bg" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(251, 170, 169, 0.05) 0%, rgba(255, 154, 158, 0.05) 100%); opacity: 0; transition: opacity 0.3s ease; z-index: 1;"></div>
+                        </div>
                     </div>
-                </div>
+                    @endforeach
+                @else
+                    <!-- Default testimonials if no feedback exists -->
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="feedback-card" style="background: rgba(255, 255, 255, 0.95); color: #333; border-radius: 15px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; height: 100%; position: relative; overflow: hidden;">
+                            <div class="feedback-rating" style="margin-bottom: 15px;">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star" style="color: #ffc107; font-size: 1.2rem; margin-right: 2px;"></i>
+                                @endfor
+                            </div>
+                            <div class="feedback-content" style="margin-bottom: 20px;">
+                                <p style="color: #666; line-height: 1.6; font-style: italic; margin-bottom: 20px;">
+                                    "The facial treatment was absolutely amazing! My skin has never looked better. The staff is professional and the results exceeded my expectations."
+                                </p>
+                            </div>
+                            <div class="feedback-author" style="border-top: 1px solid #e1e8ed; padding-top: 20px;">
+                                <div class="author-avatar" style="width: 50px; height: 50px; background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                                    <i class="fas fa-user" style="color: white; font-size: 1.2rem;"></i>
+                                </div>
+                                <h5 style="color: #333; font-weight: 600; margin-bottom: 5px;">Sarah M.</h5>
+                                <p style="color: #999; font-size: 0.9rem; margin-bottom: 0;">Facial Treatment Client</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="feedback-card" style="background: rgba(255, 255, 255, 0.95); color: #333; border-radius: 15px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; height: 100%; position: relative; overflow: hidden;">
+                            <div class="feedback-rating" style="margin-bottom: 15px;">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star" style="color: #ffc107; font-size: 1.2rem; margin-right: 2px;"></i>
+                                @endfor
+                            </div>
+                            <div class="feedback-content" style="margin-bottom: 20px;">
+                                <p style="color: #666; line-height: 1.6; font-style: italic; margin-bottom: 20px;">
+                                    "Dr. Ve Aesthetic transformed my confidence with their laser treatments. The results are incredible and the staff made me feel comfortable throughout the process."
+                                </p>
+                            </div>
+                            <div class="feedback-author" style="border-top: 1px solid #e1e8ed; padding-top: 20px;">
+                                <div class="author-avatar" style="width: 50px; height: 50px; background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                                    <i class="fas fa-user" style="color: white; font-size: 1.2rem;"></i>
+                                </div>
+                                <h5 style="color: #333; font-weight: 600; margin-bottom: 5px;">Maria L.</h5>
+                                <p style="color: #999; font-size: 0.9rem; margin-bottom: 0;">Laser Treatment Client</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="feedback-card" style="background: rgba(255, 255, 255, 0.95); color: #333; border-radius: 15px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; height: 100%; position: relative; overflow: hidden;">
+                            <div class="feedback-rating" style="margin-bottom: 15px;">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star" style="color: #ffc107; font-size: 1.2rem; margin-right: 2px;"></i>
+                                @endfor
+                            </div>
+                            <div class="feedback-content" style="margin-bottom: 20px;">
+                                <p style="color: #666; line-height: 1.6; font-style: italic; margin-bottom: 20px;">
+                                    "Professional service and amazing results! The anti-aging treatments have made such a difference. I highly recommend Dr. Ve Aesthetic to anyone looking for quality care."
+                                </p>
+                            </div>
+                            <div class="feedback-author" style="border-top: 1px solid #e1e8ed; padding-top: 20px;">
+                                <div class="author-avatar" style="width: 50px; height: 50px; background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                                    <i class="fas fa-user" style="color: white; font-size: 1.2rem;"></i>
+                                </div>
+                                <h5 style="color: #333; font-weight: 600; margin-bottom: 5px;">Jennifer K.</h5>
+                                <p style="color: #999; font-size: 0.9rem; margin-bottom: 0;">Anti-Aging Client</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="{{ route('contact') }}" class="theme-btn" style="background: white; color: #fbaaa9; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; position: relative; overflow: hidden;">
+                    <span style="position: relative; z-index: 2;">Share Your Experience</span>
+                    <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(251, 170, 169, 0.1), transparent); transition: left 0.5s;"></div>
+                </a>
             </div>
         </div>
     </section>
     <!--====================================================================
-                                   End Beauty Section
+                                   End Customer Feedback Section
                                =====================================================================-->
-
-
-
-    <!--====================================================================
-                                   Start Testimonials Section
-                               =====================================================================-->
-    <section class="testimonial-section bg-three py-135 rpy-95 mb-150">
-        <div class="container">
-            <div class="testimonial-wrap owl-carousel">
-                <div class="testimonial-item">
-                    <div class="row align-items-center">
-                        <div class="col-lg-5">
-                            <div class="testimonial-image">
-                                <img src="{{ asset('assets/images/testimonials/sample-face1.png') }}" alt="Testimonial">
-                            </div>
-                        </div>
-                        <div class="col-lg-7">
-                            <div class="testimonial-content">
-                                <h3>Welcome to our clinic, where we don't just treat skin, we care for people.</h3>
-                                <p>When I founded Dr Ve Aesthetic Clinic and Wellness Center, it was with a simple but powerful vision: to create a sanctuary where science 
-                                    and artistry meet compassion. I was tired of seeing clinics that either felt too clinical and cold or too sales-driven. 
-                                    I wanted a place where our patients are treated like family, where we listen first, then guide with absolute honesty and 
-                                    medical expertise.</p>
-                                <h4>Dr. Ve R. Orcine-Manuel</h4>
-                                <span>CLinic Owner</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-item">
-                    <div class="row align-items-center">
-                        <div class="col-lg-5">
-                            <div class="testimonial-image">
-                                <img src="{{ asset('assets/images/testimonials/sample-face1.png') }}" alt="Testimonial">
-                            </div>
-                        </div>
-                        <div class="col-lg-7">
-                            <div class="testimonial-content">
-                                <h3>Alias dicta iusto sapiente hic. Harum voluptatibus minima officia, labore
-                                    deserunt nobis adipisci.</h3>
-                                <p>In perferendis delectus a aperiam iste aliquid dolorum nisi porro maiores
-                                    asperiores vero eius inventore pariatur sed iure, aut fugiat vitae doloremque
-                                    placeat commodi officia accusantium. Inventore dolorum itaque natus, ab expedita
-                                    ducimus odit quis Nobis.</p>
-                                <h4>Sandra Lyons</h4>
-                                <span>Lead beautician</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-item">
-                    <div class="row align-items-center">
-                        <div class="col-lg-5">
-                            <div class="testimonial-image">
-                                <img src="{{ asset('assets/images/testimonials/sample-face2.jpg') }}" alt="Testimonial">
-                            </div>
-                        </div>
-                        <div class="col-lg-7">
-                            <div class="testimonial-content">
-                                <h3>Doloremque eum eaque, cupiditate sequi est voluptas quibusdam delectus nulla
-                                    harum earum.</h3>
-                                <p>Reprehenderit, minima consequatur animi nesciunt. Enim quis repellat repellendus
-                                    voluptates vero. Saepe laudantium, quas vel, unde in deleniti veniam placeat
-                                    repudiandae blanditiis sint dolores error reprehenderit obcaecati.</p>
-                                <h4>Edna P. Meza</h4>
-                                <span>Lead beautician</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="testimonial-dotted">
-            <img src="{{ asset('assets/images/testimonials/testimonial-dotted.png') }}" alt="dotted">
-        </div>
-        <div class="testimonial-angle">
-            <img src="{{ asset('assets/images/testimonials/testimonial-angle.png') }}" alt="angle">
-        </div>
-        <div class="testimonial-quote">
-            <img src="{{ asset('assets/images/testimonials/quote.png') }}" alt="angle">
-        </div>
-    </section>
-    <!--====================================================================
-                                   End Testimonials Section
-                               =====================================================================-->
-
-
 
 @endsection
