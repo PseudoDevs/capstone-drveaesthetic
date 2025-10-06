@@ -16,6 +16,7 @@ class PopularServicesWidget extends ApexChartWidget
     {
         $servicesData = Appointment::select('clinic_services.service_name', DB::raw('count(*) as appointment_count'))
             ->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')
+            ->where('appointments.status', 'COMPLETED')
             ->groupBy('clinic_services.service_name', 'clinic_services.id')
             ->orderBy('appointment_count', 'desc')
             ->limit(8)
@@ -23,8 +24,7 @@ class PopularServicesWidget extends ApexChartWidget
 
         $serviceNames = $servicesData->pluck('service_name')->toArray();
         $appointmentCounts = $servicesData->pluck('appointment_count')->map(fn($value) => (int) $value)->toArray();
-        
-        // Handle empty data case
+
         if (empty($serviceNames)) {
             $serviceNames = ['No Data'];
             $appointmentCounts = [0];

@@ -13,7 +13,8 @@
       "Bash(npm uninstall:*)",
       "WebFetch(domain:drveaestheticclinic.online)",
       "Bash(timeout:*)",
-      "WebFetch(domain:igloo.hr)"
+      "WebFetch(domain:igloo.hr)",
+      "WebFetch(domain:media.discordapp.net)"
     ],
     "deny": [],
     "ask": []

@@ -22,6 +22,7 @@ class ServiceRevenueWidget extends ApexChartWidget
                 DB::raw('SUM(CAST(clinic_services.price AS DECIMAL(10,2))) as total_revenue')
             )
             ->where('appointments.is_paid', '=', 1)
+            ->where('appointments.status', '=', 'COMPLETED')
             ->groupBy('clinic_services.id', 'clinic_services.service_name')
             ->orderByDesc('total_revenue')
             ->limit(8)

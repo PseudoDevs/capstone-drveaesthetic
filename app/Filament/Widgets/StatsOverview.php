@@ -36,7 +36,7 @@ class StatsOverview extends BaseWidget
                 ->color('info'),
                 
             Stat::make('Total Revenue', '₱' . number_format(
-                Appointment::where('is_paid', true)->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')->sum('clinic_services.price')
+                Appointment::where('appointments.is_paid', true)->where('appointments.status', 'COMPLETED')->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')->sum('clinic_services.price')
             ))
                 ->description('From paid appointments')
                 ->descriptionIcon('heroicon-m-banknotes')

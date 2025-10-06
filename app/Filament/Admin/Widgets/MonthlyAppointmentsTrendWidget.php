@@ -15,14 +15,13 @@ class MonthlyAppointmentsTrendWidget extends ApexChartWidget
 
     protected function getOptions(): array
     {
-        // Get last 12 months data
         $monthlyData = collect();
         for ($i = 11; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
             $count = Appointment::whereYear('appointments.created_at', $date->year)
                 ->whereMonth('appointments.created_at', $date->month)
                 ->count();
-            
+
             $monthlyData->push([
                 'month' => $date->format('M Y'),
                 'count' => $count
@@ -31,8 +30,7 @@ class MonthlyAppointmentsTrendWidget extends ApexChartWidget
 
         $months = $monthlyData->pluck('month')->toArray();
         $counts = $monthlyData->pluck('count')->map(fn($value) => (int) $value)->toArray();
-        
-        // Handle empty data case
+
         if (empty($months)) {
             $months = ['No Data'];
             $counts = [0];

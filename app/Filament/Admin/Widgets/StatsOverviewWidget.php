@@ -22,6 +22,7 @@ class StatsOverviewWidget extends BaseWidget
         $averageRating = Feedback::avg('rating') ?? 0;
         $totalTrainings = Training::where('is_published', true)->count();
         $totalRevenue = Appointment::where('appointments.is_paid', true)
+            ->where('appointments.status', 'COMPLETED')
             ->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')
             ->sum('clinic_services.price') ?? 0;
 

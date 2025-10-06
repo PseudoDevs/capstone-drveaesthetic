@@ -57,7 +57,7 @@ class LoginController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'Client',
-                'email_verified_at' => now(), // Auto-verify for now
+                'email_verified_at' => now(),
             ]);
 
             Auth::login($user);
@@ -111,19 +111,15 @@ class LoginController extends Controller
     public function redirectToGoogle()
     {
         try {
-            // Start session but don't regenerate to maintain consistency
             if (!session()->isStarted()) {
                 session()->start();
             }
 
-            // Generate and store state in cache instead of session
             $state = \Str::random(40);
             $sessionId = session()->getId();
 
-            // Store state in cache with longer TTL (10 minutes)
             \Cache::put("oauth_state_{$state}", $sessionId, 600);
 
-            // Also try to store in session as backup
             session()->put('oauth_state', $state);
             session()->save();
 
@@ -137,7 +133,9 @@ class LoginController extends Controller
                 ->scopes(['openid', 'profile', 'email'])
                 ->with(['state' => $state])
                 ->redirect();
-        } catch (\Exception $e) {
+        }
+        
+        catch (\Exception $e) {
             \Log::error('Google OAuth: Redirect error', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
