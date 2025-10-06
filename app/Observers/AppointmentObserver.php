@@ -3,6 +3,9 @@
 namespace App\Observers;
 
 use App\Models\Appointment;
+use App\Notifications\AppointmentConfirmationNotification;
+use App\Notifications\FeedbackRequestNotification;
+use App\Events\AppointmentStatusUpdated;
 use App\Mail\AppointmentStatusNotification;
 use Illuminate\Support\Facades\Mail;
 
@@ -13,8 +16,10 @@ class AppointmentObserver
      */
     public function created(Appointment $appointment): void
     {
-        // Optional: Send notification when appointment is created
-        // This would be for new appointments created by staff
+        // Send confirmation notification when appointment is created
+        if ($appointment->client && $appointment->client->wantsNotification('appointment_confirmation')) {
+            $appointment->client->notify(new AppointmentConfirmationNotification($appointment));
+        }
     }
 
     /**
@@ -47,6 +52,17 @@ class AppointmentObserver
                                 ->send();
                         }
                     }
+
+                    // Send feedback request when appointment is completed
+                    if ($newStatus === 'completed' && $appointment->client->wantsNotification('feedback_request')) {
+                        // Delay feedback request by 2 hours to allow for immediate post-treatment experience
+                        $appointment->client->notify(
+                            (new FeedbackRequestNotification($appointment))->delay(now()->addHours(2))
+                        );
+                    }
+
+                    // Broadcast real-time update
+                    broadcast(new AppointmentStatusUpdated($appointment, $oldStatus, $newStatus));
                 } catch (\Exception $e) {
                     // Log the error but don't fail the update
                     \Log::error('Failed to send appointment status notification', [

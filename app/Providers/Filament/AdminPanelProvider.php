@@ -45,7 +45,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                \App\Filament\Admin\Widgets\RealTimeStatsWidget::class,
                 \App\Filament\Admin\Widgets\StatsOverviewWidget::class,
+                \App\Filament\Admin\Widgets\AdvancedAnalyticsWidget::class,
+                \App\Filament\Admin\Widgets\RevenueChartWidget::class,
+                \App\Filament\Admin\Widgets\ServicePopularityChartWidget::class,
+                \App\Filament\Admin\Widgets\ClientAcquisitionChartWidget::class,
+                \App\Filament\Admin\Widgets\SatisfactionTrendChartWidget::class,
                 \App\Filament\Admin\Widgets\OnlineAppointmentsWidget::class,
                 \App\Filament\Admin\Widgets\WalkInAppointmentsWidget::class,
                 \App\Filament\Admin\Widgets\AppointmentChartWidget::class,

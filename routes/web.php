@@ -27,6 +27,19 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
+Route::get('/notification-preferences', function () {
+    return view('notification-preferences');
+})->name('notification-preferences')->middleware('auth');
+
+Route::get('/feedback', [\App\Http\Controllers\FeedbackController::class, 'create'])->name('feedback.create')->middleware('auth');
+Route::post('/feedback', [\App\Http\Controllers\FeedbackController::class, 'store'])->name('feedback.submit')->middleware('auth');
+Route::get('/feedback/{id}', [\App\Http\Controllers\FeedbackController::class, 'show'])->name('feedback.show');
+
+// Form completion routes
+Route::get('/appointments/{appointment}/form', [\App\Http\Controllers\FormController::class, 'showMedicalForm'])->name('appointments.form')->middleware('auth');
+Route::post('/appointments/{appointment}/form', [\App\Http\Controllers\FormController::class, 'completeForm'])->name('appointments.complete-form')->middleware('auth');
+Route::get('/appointments/{appointment}/form/view', [\App\Http\Controllers\FormController::class, 'viewCompletedForm'])->name('appointments.form.view')->middleware('auth');
+
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 Route::middleware('guest')->group(function () {

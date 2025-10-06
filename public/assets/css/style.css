@@ -1101,6 +1101,7 @@ img.mfp-img {
 .owl-carousel.team-carousel .owl-nav {
     text-align: center;
     margin-top: 65px;
+    display: none !important;
 }
 
 .owl-carousel.team-carousel.style-two .team-item img:hover {
@@ -1114,6 +1115,7 @@ img.mfp-img {
     top: -200px;
     z-index: 5;
     margin-top: 0;
+    display: none !important;
 }
 
 .owl-carousel.team-carousel .owl-nav button {

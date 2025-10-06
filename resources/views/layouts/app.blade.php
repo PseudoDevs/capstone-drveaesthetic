@@ -139,6 +139,10 @@
                                                                 class="fas fa-user mr-2"></i>Edit Profile</a></li>
                                                     <li><a class="dropdown-item" href="{{ route('chat.index') }}"><i
                                                                 class="fas fa-comments mr-2"></i>Chat</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('notification-preferences') }}"><i
+                                                                class="fas fa-bell mr-2"></i>Notification Preferences</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('feedback.create') }}"><i
+                                                                class="fas fa-star mr-2"></i>Leave Feedback</a></li>
                                                     <div class="dropdown-divider"></div>
                                                     <li>
                                                         <form method="POST" action="{{ route('logout') }}"
@@ -204,10 +208,13 @@
                                     <h4 class="footer-title">{{ setting('footer.services_title', 'Our Services.') }}
                                     </h4>
                                     <ul class="list-style-one">
-                                        @foreach (setting('footer.services_list', [['name' => 'Breast Augmentation', 'url' => '#'], ['name' => 'Mommy Makeover', 'url' => '#'], ['name' => 'Eyelid Surgery', 'url' => '#'], ['name' => 'Skin Care Treatments', 'url' => '#'], ['name' => 'Useful Links', 'url' => '#'], ['name' => 'Free Consultation', 'url' => '#'], ['name' => 'Customer Support', 'url' => '#']]) as $service)
-                                            <li><a
-                                                    href="{{ $service['url'] ?? '#' }}">{{ $service['name'] ?? '' }}</a>
-                                            </li>
+                                        @php
+                                            $categories = \App\Models\Category::withCount('clinicServices')->whereHas('clinicServices', function($query) {
+                                                $query->where('status', 'active');
+                                            })->take(7)->get();
+                                        @endphp
+                                        @foreach($categories as $category)
+                                            <li><a href="{{ route('services') }}">{{ $category->category_name }}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>

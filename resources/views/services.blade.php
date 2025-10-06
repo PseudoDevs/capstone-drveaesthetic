@@ -241,6 +241,83 @@
             color: #6c757d !important;
             opacity: 1;
         }
+
+        /* Category Filter Styles */
+        .category-filters {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .category-filter-btn {
+            background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px 8px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(251, 170, 169, 0.4);
+            color: white;
+        }
+
+        .category-filter-btn.active {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .category-filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .category-filter-btn:hover::before {
+            left: 100%;
+        }
+
+        .service-card {
+            transition: all 0.3s ease;
+        }
+
+        .service-card.hidden {
+            display: none !important;
+        }
+
+        .no-services-message {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .no-services-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .category-filter-btn {
+                padding: 10px 20px;
+                margin: 3px 5px;
+                font-size: 13px;
+            }
+        }
     </style>
 
 
@@ -251,22 +328,33 @@
            background: url('{{ asset('assets/images/banner/services_banner.jpg') }}'); 
            background-size: cover; 
            background-position: center;">
-        <div class="container">
-            <div class="banner-inner">
+        <!-- Black transparent overlay -->
+        <div style="position: absolute; 
+             top: 0; 
+             left: 0; 
+             right: 0; 
+             bottom: 0; 
+             background: rgba(0, 0, 0, 0.5); 
+             z-index: 1;"></div>
+        <div class="container" style="position: relative; z-index: 2;">
+            <div class="banner-inner" style="text-align: center;">
                 <div class="banner-content">
-                    <h2 class="page-title" style="color: white;">Our <span style="color: #fbaaa9;">Services</span></h2>
-                    <!--<h5 style="color: black;">Discover our comprehensive range of aesthetic and dermatology services <br> designed to enhance your
-                        natural beauty and confidence.</h5>-->
+                    <h2 class="page-title" style="font-family: 'Georgia', 'Times New Roman', serif; font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
+                        <span style="color: #fbaaa9;">Our</span> <span style="color: white;">Services</span>
+                    </h2>
+                    <h4 style="font-size: 1.5rem; font-weight: 400; margin-bottom: 1.5rem; color: white;">
+                        Discover our comprehensive range of aesthetic and dermatology services designed to enhance your natural beauty and confidence.
+                    </h4>
                 </div>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Services</li>
+                <nav aria-label="breadcrumb" style="margin-top: 2rem;">
+                    <ol class="breadcrumb" style="justify-content: center;">
+                        <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color: white; text-decoration: none;">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" style="color: #fbaaa9;">Services</li>
                     </ol>
                 </nav>
             </div>
         </div>
-        <div class="banner-angle">
+        <div class="banner-angle" style="position: absolute; bottom: 0; right: 0; z-index: 2;">
             <img src="{{ asset('assets/images/banner/banner-angle.png') }}" alt="Angle">
         </div>
     </section>
@@ -285,14 +373,47 @@
                        =====================================================================-->
     <section class="pricing-section mt-145 rmt-95 mb-120 rmb-70">
         <div class="container">
-            <div class="section-title text-center mb-95">
+            <div class="section-title text-center mb-50">
                 <h2>Our <span>Services</span></h2>
                 <p>Discover our comprehensive range of aesthetic and dermatology services <br> designed to enhance your
                     natural beauty.</p>
             </div>
+
+            <!-- Category Filter Buttons -->
+            <div class="category-filters">
+                <button class="category-filter-btn active" data-category="all">
+                    <i class="fas fa-th-large"></i> All Services
+                </button>
+                @php
+                    $categories = \App\Models\Category::withCount('clinicServices')->whereHas('clinicServices', function($query) {
+                        $query->where('status', 'active');
+                    })->get();
+                    
+                    $iconMap = [
+                        'Dermatology' => 'fas fa-user-md',
+                        'Cosmetic Surgery' => 'fas fa-cut',
+                        'Laser Treatment' => 'fas fa-bolt',
+                        'Skin Care' => 'fas fa-leaf',
+                        'Anti-Aging' => 'fas fa-clock',
+                        'Hair Treatment' => 'fas fa-cut',
+                        'Body Contouring' => 'fas fa-dumbbell',
+                        'Facial Treatment' => 'fas fa-spa',
+                        'Wellness' => 'fas fa-heart',
+                        'Consultation' => 'fas fa-comments'
+                    ];
+                @endphp
+                @foreach($categories as $category)
+                    @php
+                        $icon = $iconMap[$category->category_name] ?? 'fas fa-spa';
+                    @endphp
+                    <button class="category-filter-btn" data-category="{{ $category->id }}">
+                        <i class="{{ $icon }}"></i> {{ $category->category_name }}
+                    </button>
+                @endforeach
+            </div>
             <div class="row justify-content-center">
                 @forelse($services as $service)
-                    <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="col-lg-4 col-md-6 mb-4 service-card" data-category="{{ $service->category_id }}">
                         <div class="price-item style-one">
                             <div class="price-image">
                                 @if ($service->thumbnail)
@@ -306,7 +427,7 @@
                             <div class="pricing-content">
                                 <div class="price-circle">
                                     <p>Starting From</p>
-                                    <h3>${{ number_format($service->price, 0) }}</h3>
+                                    <h3>₱{{ number_format($service->price, 0) }}</h3>
                                 </div>
                                 <div class="service-details">
                                     <h4>{{ $service->service_name }}</h4>
@@ -346,6 +467,15 @@
                 @endforelse
             </div>
 
+            <!-- No Services Message for Filtered Results -->
+            <div class="no-services-message" id="noServicesMessage">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Services Found</h4>
+                <p class="text-muted">No services found in this category. Please try selecting a different category or <a
+                        href="{{ url('/contact') }}" class="text-primary">contact us</a> for more information.
+                </p>
+            </div>
+
             <!-- Pagination Links -->
             @if($services->hasPages())
                 <div class="row">
@@ -379,7 +509,7 @@
                             <div class="col-md-12 mb-3">
                                 <div class="alert alert-info">
                                     <strong>Service:</strong> <span id="selectedServiceName"></span><br>
-                                    <strong>Price:</strong> $<span id="selectedServicePrice"></span><br>
+                                    <strong>Price:</strong> ₱<span id="selectedServicePrice"></span><br>
                                     <strong>Staff:</strong> <span id="selectedStaffName"></span>
                                 </div>
                             </div>
@@ -584,6 +714,63 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Category Filter Functionality
+    $('.category-filter-btn').on('click', function() {
+        var selectedCategory = $(this).data('category');
+        
+        // Update active button
+        $('.category-filter-btn').removeClass('active');
+        $(this).addClass('active');
+        
+        // Update URL without page reload
+        var url = new URL(window.location);
+        if (selectedCategory === 'all') {
+            url.searchParams.delete('category');
+        } else {
+            url.searchParams.set('category', selectedCategory);
+        }
+        window.history.pushState({}, '', url);
+        
+        // Filter services
+        filterServices(selectedCategory);
+    });
+    
+    function filterServices(categoryId) {
+        var visibleServices = 0;
+        
+        $('.service-card').each(function() {
+            var serviceCategory = $(this).data('category');
+            
+            if (categoryId === 'all' || serviceCategory == categoryId) {
+                $(this).removeClass('hidden').show();
+                visibleServices++;
+            } else {
+                $(this).addClass('hidden').hide();
+            }
+        });
+        
+        // Show/hide no services message
+        if (visibleServices === 0) {
+            $('#noServicesMessage').addClass('show');
+        } else {
+            $('#noServicesMessage').removeClass('show');
+        }
+        
+        // Smooth scroll to services section
+        $('html, body').animate({
+            scrollTop: $('.pricing-section').offset().top - 100
+        }, 500);
+    }
+    
+    // Initialize with all services visible or from URL parameter
+    var urlParams = new URLSearchParams(window.location.search);
+    var initialCategory = urlParams.get('category') || 'all';
+    
+    // Set initial active button
+    $('.category-filter-btn').removeClass('active');
+    $('.category-filter-btn[data-category="' + initialCategory + '"]').addClass('active');
+    
+    filterServices(initialCategory);
     // Handle appointment modal
     $('#appointmentModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);

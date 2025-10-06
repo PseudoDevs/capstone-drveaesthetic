@@ -14,26 +14,21 @@
                 <div class="col-lg-12">
                     <div class="dashboard-header mb-50">
                         <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h2>Welcome back, {{ $user->name }}!
-                                </h2>
-                                <p class="text-muted">Manage your appointments and view your schedule</p>
-
+                            <div class="welcome-content">
+                                <h2 class="welcome-title">Welcome back, {{ $user->name }}!</h2>
+                                <p class="welcome-subtitle">Manage your appointments and view your schedule</p>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <div class="user-avatar" data-toggle="modal" data-target="#editProfileModal" style="cursor: pointer;" title="Click to edit profile">
+                            <div class="user-profile-section">
+                                <div class="user-avatar">
                                     @if ($user->avatar_url)
                                         <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
-                                            class="rounded-circle" width="60" height="60">
+                                            class="rounded-circle" width="70" height="70">
                                     @else
                                         <div class="avatar-placeholder">
                                             {{ strtoupper(substr($user->name, 0, 2)) }}
                                         </div>
                                     @endif
                                 </div>
-                                <button class="btn btn-outline-primary btn-sm ml-3" data-toggle="modal" data-target="#editProfileModal">
-                                    <i class="flaticon-user mr-1"></i>Edit Profile
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -282,7 +277,7 @@
                                                                 <td>{{ $appointment->staff->name ?? 'N/A' }}</td>
                                                                 <td><span class="text-success font-weight-bold">₱{{ number_format($appointment->service->price ?? 0, 2) }}</span></td>
                                                                 <td>
-                                                                    <div class="btn-group" role="group">
+                                                                    <div class="btn-group action-buttons" role="group">
                                                                         <button type="button" class="btn btn-sm btn-outline-primary view-details"
                                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                                 data-service="{{ $appointment->service->service_name ?? 'N/A' }}"
@@ -292,20 +287,30 @@
                                                                                 data-price="₱{{ number_format($appointment->service->price ?? 0, 2) }}"
                                                                                 data-status="{{ $appointment->status }}"
                                                                                 title="View Details">
-                                                                            <i class="flaticon-view"></i>
+                                                                            <i class="fas fa-eye"></i>
                                                                         </button>
                                                                         @if($appointment->status === 'pending')
                                                                             <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
                                                                                     data-appointment-id="{{ $appointment->id }}"
-                                                                                    title="Cancel">
-                                                                                <i class="flaticon-cancel"></i>
+                                                                                    title="Cancel Appointment">
+                                                                                <i class="fas fa-ban"></i>
                                                                             </button>
                                                                         @elseif($appointment->status === 'scheduled')
                                                                             <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
                                                                                     data-appointment-id="{{ $appointment->id }}"
-                                                                                    title="Reschedule">
-                                                                                <i class="flaticon-calendar"></i>
+                                                                                    title="Reschedule Appointment">
+                                                                                <i class="fas fa-calendar-alt"></i>
                                                                             </button>
+                                                                        @endif
+                                                                        
+                                                                        @if(!$appointment->form_completed && $appointment->form_type && in_array($appointment->status, ['pending', 'scheduled']))
+                                                                            <a href="{{ route('appointments.form', $appointment->id) }}" class="btn btn-sm btn-outline-warning" title="Fill Medical Form">
+                                                                                <i class="fas fa-file-medical-alt"></i>
+                                                                            </a>
+                                                                        @elseif($appointment->form_completed)
+                                                                            <a href="{{ route('appointments.form.view', $appointment->id) }}" class="btn btn-sm btn-outline-info" title="View Completed Form">
+                                                                                <i class="fas fa-file-check"></i>
+                                                                            </a>
                                                                         @endif
                                                                     </div>
                                                                 </td>
@@ -397,7 +402,7 @@
                                                             <td>{{ $appointment->staff->name ?? 'N/A' }}</td>
                                                             <td><span class="text-success font-weight-bold">₱{{ number_format($appointment->service->price ?? 0, 2) }}</span></td>
                                                             <td>
-                                                                <div class="btn-group" role="group">
+                                                                <div class="btn-group action-buttons" role="group">
                                                                     <button type="button" class="btn btn-sm btn-outline-primary view-details"
                                                                             data-appointment-id="{{ $appointment->id }}"
                                                                             data-service="{{ $appointment->service->service_name ?? 'N/A' }}"
@@ -407,20 +412,30 @@
                                                                             data-price="₱{{ number_format($appointment->service->price ?? 0, 2) }}"
                                                                             data-status="{{ $appointment->status }}"
                                                                             title="View Details">
-                                                                        <i class="flaticon-view"></i>
+                                                                        <i class="fas fa-eye"></i>
                                                                     </button>
                                                                     @if($appointment->status === 'pending')
                                                                         <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
-                                                                                title="Cancel">
+                                                                                title="Cancel Appointment">
                                                                             <i class="fas fa-ban"></i>
                                                                         </button>
                                                                     @elseif($appointment->status === 'scheduled')
                                                                         <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
                                                                                 data-appointment-id="{{ $appointment->id }}"
-                                                                                title="Reschedule">
-                                                                            <i class="fas fa-calendar"></i>
+                                                                                title="Reschedule Appointment">
+                                                                            <i class="fas fa-calendar-alt"></i>
                                                                         </button>
+                                                                    @endif
+                                                                    
+                                                                    @if(!$appointment->form_completed && $appointment->form_type && in_array($appointment->status, ['pending', 'scheduled']))
+                                                                        <a href="{{ route('appointments.form', $appointment->id) }}" class="btn btn-sm btn-outline-warning" title="Fill Medical Form">
+                                                                            <i class="fas fa-file-medical-alt"></i>
+                                                                        </a>
+                                                                    @elseif($appointment->form_completed)
+                                                                        <a href="{{ route('appointments.form.view', $appointment->id) }}" class="btn btn-sm btn-outline-info" title="View Completed Form">
+                                                                            <i class="fas fa-file-check"></i>
+                                                                        </a>
                                                                     @endif
                                                                 </div>
                                                             </td>
@@ -649,27 +664,73 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css' rel='stylesheet' />
     <style>
         .dashboard-section {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             min-height: calc(100vh - 120px);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        .dashboard-header h2 {
-            color: #333;
+        .dashboard-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .welcome-content {
+            flex: 1;
+        }
+
+        .welcome-title {
+            color: #2c3e50;
             font-weight: 700;
-            margin-bottom: 5px;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .welcome-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .user-profile-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .user-avatar img {
+            border: 4px solid #fff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
         }
 
         .user-avatar .avatar-placeholder {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 20px;
+            font-size: 24px;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
         }
 
         .avatar-placeholder-small {
@@ -822,88 +883,114 @@
 
         .dashboard-tabs {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .nav-tabs {
             border-bottom: none;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             padding: 0;
+            margin: 0;
         }
 
         .nav-tabs .nav-link {
             border: none;
-            color: #666;
+            color: #6c757d;
             font-weight: 600;
             padding: 20px 25px;
             background: transparent;
             border-radius: 0;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 0.95rem;
         }
 
         .nav-tabs .nav-link:hover {
-            color: #007bff;
-            background: white;
+            color: #fbaaa9;
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
         }
 
         .nav-tabs .nav-link.active {
-            color: #007bff;
+            color: #fbaaa9;
             background: white;
-            border-bottom: 3px solid #007bff;
+            border-bottom: 3px solid #fbaaa9;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .nav-tabs .nav-link i {
             margin-right: 8px;
+            font-size: 1.1rem;
         }
 
         .nav-tabs .badge {
-            margin-left: 5px;
-            font-size: 12px;
+            margin-left: 8px;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
         }
 
         .tab-content {
-            padding: 30px;
+            padding: 35px;
+            background: white;
         }
 
         .stats-card {
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #fbaaa9, #ff9a9e);
         }
 
         .stats-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
 
         .stats-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
             color: white;
-            margin-right: 20px;
+            margin-right: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
         .stats-card.pending .stats-icon {
-            background: linear-gradient(135deg, #ffc107, #e0a800);
+            background: linear-gradient(135deg, #ffc107, #ff8f00);
         }
 
-        .stats-card.confirmed .stats-icon {
-            background: linear-gradient(135deg, #28a745, #1e7e34);
+        .stats-card.scheduled .stats-icon {
+            background: linear-gradient(135deg, #17a2b8, #138496);
         }
 
         .stats-card.completed .stats-icon {
-            background: linear-gradient(135deg, #17a2b8, #138496);
+            background: linear-gradient(135deg, #28a745, #1e7e34);
         }
 
         .stats-card.cancelled .stats-icon {
@@ -927,16 +1014,20 @@
         }
 
         .stats-content h3 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 36px;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1;
         }
 
         .stats-content p {
-            color: #666;
+            color: #6c757d;
             margin: 0;
             font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .appointment-card {
@@ -1216,16 +1307,93 @@
         }
 
         .action-buttons .btn {
-            border-radius: 20px;
-            font-weight: 500;
-            font-size: 12px;
-            padding: 6px 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 8px 12px;
             transition: all 0.3s ease;
+            border: 2px solid transparent;
+            margin: 0 2px;
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .action-buttons .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-buttons .btn-outline-primary {
+            color: #007bff;
+            border-color: #007bff;
+            background: rgba(0, 123, 255, 0.1);
+        }
+
+        .action-buttons .btn-outline-primary:hover {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .action-buttons .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .action-buttons .btn-outline-danger:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .action-buttons .btn-outline-warning {
+            color: #ffc107;
+            border-color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .action-buttons .btn-outline-warning:hover {
+            background: #ffc107;
+            color: #212529;
+            border-color: #ffc107;
+        }
+
+        .action-buttons .btn-outline-info {
+            color: #17a2b8;
+            border-color: #17a2b8;
+            background: rgba(23, 162, 184, 0.1);
+        }
+
+        .action-buttons .btn-outline-info:hover {
+            background: #17a2b8;
+            color: white;
+            border-color: #17a2b8;
+        }
+
+        .action-buttons .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #ff8f00);
+            border: none;
+            color: #212529;
+        }
+
+        .action-buttons .btn-warning:hover {
+            background: linear-gradient(135deg, #ff8f00, #ff6f00);
+            color: #212529;
+        }
+
+        .action-buttons .btn-info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            border: none;
+            color: white;
+        }
+
+        .action-buttons .btn-info:hover {
+            background: linear-gradient(135deg, #138496, #117a8b);
+            color: white;
         }
 
         .empty-state {
@@ -1323,14 +1491,219 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .table-responsive table {
-                font-size: 0.875rem;
-            }
+        /* Enhanced Table Styling */
+        .table-responsive {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-            .btn-group .btn {
-                padding: 4px 8px;
-                font-size: 0.75rem;
+        .table {
+            margin-bottom: 0;
+            background: white;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 20px 15px;
+            position: relative;
+        }
+
+        .table thead th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fbaaa9, #ff9a9e);
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, rgba(251, 170, 169, 0.05) 0%, rgba(255, 154, 158, 0.05) 100%);
+            transform: scale(1.01);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .table tbody td {
+            padding: 20px 15px;
+            vertical-align: middle;
+            border: none;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .table tbody td:first-child {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1200px) {
+            .welcome-title {
+                font-size: 1.8rem;
+            }
+            
+            .stats-content h3 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-header {
+                padding: 25px;
+                text-align: center;
+            }
+            
+            .welcome-content {
+                margin-bottom: 20px;
+            }
+            
+            .user-profile-section {
+                justify-content: center;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 15px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .tab-content {
+                padding: 25px;
+            }
+            
+            .stats-card {
+                padding: 25px;
+                margin-bottom: 20px;
+            }
+            
+            .stats-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+                margin-right: 20px;
+            }
+            
+            .stats-content h3 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-section {
+                padding: 20px 0;
+            }
+            
+            .welcome-title {
+                font-size: 1.6rem;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1rem;
+            }
+            
+            .user-avatar img,
+            .user-avatar .avatar-placeholder {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 12px 15px;
+                font-size: 0.85rem;
+                flex: 1;
+                min-width: 120px;
+            }
+            
+            .stats-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .stats-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .stats-content h3 {
+                font-size: 28px;
+            }
+            
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+                margin: 2px 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-header {
+                padding: 20px;
+            }
+            
+            .welcome-title {
+                font-size: 1.4rem;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .stats-card {
+                padding: 15px;
+            }
+            
+            .stats-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .stats-content h3 {
+                font-size: 24px;
+            }
+            
+            .table thead th {
+                padding: 15px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .table tbody td {
+                padding: 15px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .action-buttons .btn {
+                padding: 6px 10px;
+                font-size: 12px;
+                min-width: 35px;
+                height: 35px;
             }
         }
 
