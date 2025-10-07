@@ -116,7 +116,6 @@
                                     Our philosophy is to enhance your natural features, not alter them, achieving results that are both transformative and authentically you.</p>
                             </div>
                         </div>
-                        <a href="#" class="theme-btn style-two">Expert Team</a>
                     </div>
                 </div>
             </div>
@@ -153,7 +152,22 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="service-item" style="background: white; border-radius: 15px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; border: 1px solid rgba(251, 170, 169, 0.1); height: 100%; position: relative; overflow: hidden;">
                         <div class="service-icon" style="width: 80px; height: 80px; background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; position: relative; z-index: 2;">
-                            <i class="fas fa-spa" style="color: white; font-size: 2rem;"></i>
+                            @php
+                                $categoryIcons = [
+                                    'Dermatology' => 'fas fa-user-md',
+                                    'Cosmetic Surgery' => 'fas fa-cut',
+                                    'Laser Treatment' => 'fas fa-bolt',
+                                    'Skin Care' => 'fas fa-leaf',
+                                    'Anti-Aging' => 'fas fa-clock',
+                                    'Hair Treatment' => 'fas fa-cut',
+                                    'Body Contouring' => 'fas fa-dumbbell',
+                                    'Facial Treatment' => 'fas fa-smile',
+                                    'Wellness' => 'fas fa-heart',
+                                    'Consultation' => 'fas fa-comments'
+                                ];
+                                $icon = $categoryIcons[$category->category_name] ?? 'fas fa-spa';
+                            @endphp
+                            <i class="{{ $icon }}" style="color: white; font-size: 2rem;"></i>
                         </div>
                         
                         <div class="service-content" style="position: relative; z-index: 2;">
@@ -173,19 +187,7 @@
                                 @endif
                             </p>
                             
-                            <div class="service-price" style="margin-bottom: 20px;">
-                                <span style="color: #999; font-size: 0.9rem; display: block;">Starting from</span>
-                                <span class="price" style="color: #fbaaa9; font-size: 1.5rem; font-weight: 700;">
-                                    @php
-                                        $minPrice = $category->clinicServices()->where('status', 'active')->min('price');
-                                    @endphp
-                                    ₱{{ $minPrice ? number_format($minPrice, 0) : 'Contact Us' }}
-                                </span>
-                            </div>
                             
-                            <a href="{{ route('services') }}" class="read-more" style="background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: inline-block;">
-                                View Services <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
-                            </a>
                         </div>
                         
                         <!-- Hover Effect Background -->
@@ -336,10 +338,17 @@
             </div>
             
             <div class="text-center mt-5">
-                <a href="{{ route('contact') }}" class="theme-btn" style="background: white; color: #fbaaa9; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; position: relative; overflow: hidden;">
-                    <span style="position: relative; z-index: 2;">Share Your Experience</span>
-                    <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(251, 170, 169, 0.1), transparent); transition: left 0.5s;"></div>
-                </a>
+                @auth
+                    <a href="{{ route('feedback.create') }}" class="theme-btn" style="background: white; color: #fbaaa9; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; position: relative; overflow: hidden;">
+                        <span style="position: relative; z-index: 2;">Share Your Experience</span>
+                        <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(251, 170, 169, 0.1), transparent); transition: left 0.5s;"></div>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="theme-btn" style="background: white; color: #fbaaa9; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; position: relative; overflow: hidden;">
+                        <span style="position: relative; z-index: 2;">Share Your Experience</span>
+                        <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(251, 170, 169, 0.1), transparent); transition: left 0.5s;"></div>
+                    </a>
+                @endauth
             </div>
         </div>
     </section>

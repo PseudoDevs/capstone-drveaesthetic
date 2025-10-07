@@ -33,6 +33,18 @@
 
     <!-- Custom Logo Styles -->
     <style>
+        .logo-image {
+            height: 45px;
+            width: auto;
+            max-width: 60px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image:hover {
+            transform: scale(1.05);
+        }
+
         .text-logo {
             font-size: 24px;
             font-weight: 700;
@@ -40,6 +52,7 @@
             text-decoration: none;
             font-family: 'Roboto', sans-serif;
             letter-spacing: 1px;
+            transition: all 0.3s ease;
         }
 
         .text-logo:hover {
@@ -47,9 +60,29 @@
             text-decoration: none;
         }
 
+        .logo a:hover .text-logo {
+            color: #007bff;
+        }
+
         @media (max-width: 768px) {
+            .logo-image {
+                height: 35px;
+                max-width: 45px;
+            }
+            
             .text-logo {
-                font-size: 20px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-image {
+                height: 30px;
+                max-width: 40px;
+            }
+            
+            .text-logo {
+                font-size: 16px;
             }
         }
 
@@ -83,8 +116,19 @@
                     <div class="header-inner d-lg-flex align-items-center">
 
                         <div class="logo-outer d-flex align-items-center">
-                            <div class="logo"><a href="{{ url('/') }}"
-                                    class="text-logo">{{ setting('general.site_name', env('APP_NAME', 'Capstone Aesthetic')) }}</a>
+                            <div class="logo d-flex align-items-center">
+                                <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none">
+                                    @if(setting('general.site_logo'))
+                                        <img src="{{ Storage::url(setting('general.site_logo')) }}" 
+                                             alt="{{ setting('general.site_name', env('APP_NAME', 'Capstone Aesthetic')) }}" 
+                                             class="logo-image me-3">
+                                    @else
+                                        <img src="{{ asset('assets/images/new-logo.png') }}" 
+                                             alt="{{ setting('general.site_name', env('APP_NAME', 'Capstone Aesthetic')) }}" 
+                                             class="logo-image me-3">
+                                    @endif
+                                    <span class="text-logo">{{ setting('general.site_name', env('APP_NAME', 'Capstone Aesthetic')) }}</span>
+                                </a>
                             </div>
                         </div>
 

@@ -3,7 +3,28 @@
 @section('title', 'Notification Preferences | Dr. Ve Aesthetic')
 
 @section('content')
-<div class="container py-5">
+<style>
+    .notification-page-content {
+        margin-top: 120px;
+        padding-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .notification-page-content {
+            margin-top: 100px;
+            padding-top: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .notification-page-content {
+            margin-top: 80px;
+            padding-top: 1rem;
+        }
+    }
+</style>
+
+<div class="container py-5 notification-page-content">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">

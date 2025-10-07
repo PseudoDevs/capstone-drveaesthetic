@@ -3,7 +3,28 @@
 @section('title', 'View Medical Form | Dr. Ve Aesthetic')
 
 @section('content')
-<div class="container py-5">
+<style>
+    .medical-form-page-content {
+        margin-top: 120px;
+        padding-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .medical-form-page-content {
+            margin-top: 100px;
+            padding-top: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .medical-form-page-content {
+            margin-top: 80px;
+            padding-top: 1rem;
+        }
+    }
+</style>
+
+<div class="container py-5 medical-form-page-content">
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
@@ -19,6 +40,13 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <!-- Print Header (only visible when printing) -->
+                    <div class="print-header" style="display: none;">
+                        <h2 style="text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 10px;">MEDICAL FORM</h2>
+                        <p style="text-align: center; font-size: 14px; margin-bottom: 15px;">Dr. Ve Aesthetic Clinic and Wellness Center</p>
+                        <div style="border-bottom: 2px solid #000; margin-bottom: 15px;"></div>
+                    </div>
+                    
                     @php
                         $formData = $appointment->medical_form_data ?? [];
                     @endphp
@@ -149,7 +177,7 @@
 
                     <!-- Action Buttons -->
                     <div class="text-center mt-4">
-                        <a href="{{ route('users.dashboard') }}" class="btn btn-secondary me-3">
+                        <a href="{{ route('users.dashboard') }}" class="btn btn-primary me-3">
                             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
                         </a>
                         <button onclick="window.print()" class="btn btn-primary">
@@ -207,20 +235,6 @@
     box-shadow: 0 6px 12px rgba(251, 170, 169, 0.4);
 }
 
-.btn-secondary {
-    background: #6c757d;
-    border: none;
-    border-radius: 25px;
-    padding: 12px 30px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-    transform: translateY(-2px);
-}
-
 .form-control-plaintext {
     background: white;
     padding: 10px 15px;
@@ -242,13 +256,228 @@
 }
 
 @media print {
-    .btn {
+    /* Hide only website navigation and buttons */
+    .main-header,
+    .btn,
+    nav,
+    header,
+    footer,
+    .navbar,
+    .breadcrumb {
         display: none !important;
     }
     
-    .card-header {
-        background: #28a745 !important;
-        -webkit-print-color-adjust: exact;
+    /* Show print header */
+    .print-header {
+        display: block !important;
+        visibility: visible !important;
+        margin-bottom: 15px !important;
+        padding-bottom: 10px !important;
+        border-bottom: 2px solid #000 !important;
+    }
+    
+    .print-header h2 {
+        font-size: 18px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        margin-bottom: 5px !important;
+        color: #000 !important;
+    }
+    
+    .print-header p {
+        font-size: 14px !important;
+        text-align: center !important;
+        margin-bottom: 10px !important;
+        color: #000 !important;
+    }
+    
+    /* Keep form content visible */
+    .card,
+    .card-body,
+    .form-section,
+    .container,
+    .row,
+    .col-md-6,
+    .col-md-12 {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Reset margins and padding for print */
+    body {
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+        color: #000 !important;
+        background: white !important;
+        margin: 0 !important;
+        padding: 10px !important;
+    }
+    
+    /* Form container */
+    .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 10px !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .card-body {
+        padding: 10px !important;
+        margin: 0 !important;
+    }
+    
+    /* Form sections */
+    .form-section {
+        background: white !important;
+        border: 1px solid #000 !important;
+        border-radius: 0 !important;
+        padding: 10px !important;
+        margin-bottom: 10px !important;
+        page-break-inside: avoid;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    .section-title {
+        color: #000 !important;
+        font-size: 14px !important;
+        font-weight: bold !important;
+        margin-bottom: 8px !important;
+        padding-bottom: 5px !important;
+        border-bottom: 1px solid #000 !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Form fields */
+    .form-label {
+        font-weight: bold !important;
+        font-size: 12px !important;
+        margin-bottom: 3px !important;
+        display: block !important;
+        visibility: visible !important;
+        color: #000 !important;
+    }
+    
+    .form-control-plaintext {
+        background: white !important;
+        border: 1px solid #000 !important;
+        border-radius: 0 !important;
+        padding: 5px 8px !important;
+        min-height: 25px !important;
+        font-size: 12px !important;
+        margin-bottom: 5px !important;
+        display: block !important;
+        visibility: visible !important;
+        color: #000 !important;
+    }
+    
+    /* Badges for medical conditions */
+    .badge {
+        background: white !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        padding: 3px 6px !important;
+        margin: 2px !important;
+        font-size: 11px !important;
+        display: inline-block !important;
+        visibility: visible !important;
+    }
+    
+    /* Row layouts */
+    .row {
+        margin: 0 !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    .col-md-6,
+    .col-md-12 {
+        width: 100% !important;
+        float: left !important;
+        padding: 0 5px !important;
+        margin: 0 !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    .col-md-6 {
+        width: 48% !important;
+        margin-right: 2% !important;
+    }
+    
+    .col-md-6:nth-child(even) {
+        margin-right: 0 !important;
+    }
+    
+    /* Clear floats */
+    .row::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    
+    /* Page setup */
+    @page {
+        margin: 0.5in !important;
+        size: A4 !important;
+    }
+    
+    /* Ensure single page */
+    .form-section {
+        page-break-inside: avoid !important;
+    }
+    
+    /* Compact spacing */
+    .mb-3 {
+        margin-bottom: 5px !important;
+    }
+    
+    .mb-4 {
+        margin-bottom: 8px !important;
+    }
+    
+    .mt-4 {
+        margin-top: 8px !important;
+    }
+    
+    /* Hide icons in print */
+    i {
+        display: none !important;
+    }
+    
+    /* Text adjustments */
+    .text-muted {
+        color: #000 !important;
+    }
+    
+    /* Make sure all text is visible and readable */
+    * {
+        color: #000 !important;
+    }
+    
+    /* Ensure form content is visible */
+    .form-section * {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    .form-section .row {
+        display: block !important;
+    }
+    
+    .form-section .col-md-6,
+    .form-section .col-md-12 {
+        display: block !important;
+        visibility: visible !important;
     }
 }
 </style>

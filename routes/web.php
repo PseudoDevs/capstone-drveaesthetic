@@ -19,7 +19,16 @@ Route::get('/about', function () {
 })->name('about');
 
 Route::get('/services', function () {
-    $services = ClinicService::with('category', 'staff')->where('status', 'active')->paginate(6);
+    $categoryId = request('category');
+    
+    $query = ClinicService::with('category', 'staff')->where('status', 'active');
+    
+    // Filter by category if specified
+    if ($categoryId && $categoryId !== 'all') {
+        $query->where('category_id', $categoryId);
+    }
+    
+    $services = $query->paginate(6);
     return view('services', compact('services'));
 })->name('services');
 

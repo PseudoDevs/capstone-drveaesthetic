@@ -3,7 +3,28 @@
 @section('title', 'Complete Medical Form | Dr. Ve Aesthetic')
 
 @section('content')
-<div class="container py-5">
+<style>
+    .medical-form-create-page-content {
+        margin-top: 120px;
+        padding-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .medical-form-create-page-content {
+            margin-top: 100px;
+            padding-top: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .medical-form-create-page-content {
+            margin-top: 80px;
+            padding-top: 1rem;
+        }
+    }
+</style>
+
+<div class="container py-5 medical-form-create-page-content">
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
@@ -60,7 +81,7 @@
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label for="address" class="form-label">Address</label>
-                                    <textarea class="form-control" id="address" name="medical_form_data[address]" rows="2" required>{{ old('medical_form_data.address') }}</textarea>
+                                    <textarea class="form-control" id="address" name="medical_form_data[address]" rows="2" required>{{ old('medical_form_data.address', auth()->user()->address) }}</textarea>
                                 </div>
                             </div>
                             <div class="row">

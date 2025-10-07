@@ -294,23 +294,6 @@
             transition: all 0.3s ease;
         }
 
-        .service-card.hidden {
-            display: none !important;
-        }
-
-        .no-services-message {
-            display: none;
-            text-align: center;
-            padding: 60px 20px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-
-        .no-services-message.show {
-            display: block;
-        }
-
         @media (max-width: 768px) {
             .category-filter-btn {
                 padding: 10px 20px;
@@ -467,14 +450,6 @@
                 @endforelse
             </div>
 
-            <!-- No Services Message for Filtered Results -->
-            <div class="no-services-message" id="noServicesMessage">
-                <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                <h4 class="text-muted">No Services Found</h4>
-                <p class="text-muted">No services found in this category. Please try selecting a different category or <a
-                        href="{{ url('/contact') }}" class="text-primary">contact us</a> for more information.
-                </p>
-            </div>
 
             <!-- Pagination Links -->
             @if($services->hasPages())
@@ -722,55 +697,27 @@ $(document).ready(function() {
         $('.category-filter-btn').removeClass('active');
         $(this).addClass('active');
         
-        // Update URL without page reload
+        // Redirect to filtered URL to load all services from that category
         var url = new URL(window.location);
         if (selectedCategory === 'all') {
             url.searchParams.delete('category');
+            url.searchParams.delete('page'); // Reset to page 1
         } else {
             url.searchParams.set('category', selectedCategory);
+            url.searchParams.delete('page'); // Reset to page 1
         }
-        window.history.pushState({}, '', url);
         
-        // Filter services
-        filterServices(selectedCategory);
+        // Redirect to the new URL to load all services from the selected category
+        window.location.href = url.toString();
     });
     
-    function filterServices(categoryId) {
-        var visibleServices = 0;
-        
-        $('.service-card').each(function() {
-            var serviceCategory = $(this).data('category');
-            
-            if (categoryId === 'all' || serviceCategory == categoryId) {
-                $(this).removeClass('hidden').show();
-                visibleServices++;
-            } else {
-                $(this).addClass('hidden').hide();
-            }
-        });
-        
-        // Show/hide no services message
-        if (visibleServices === 0) {
-            $('#noServicesMessage').addClass('show');
-        } else {
-            $('#noServicesMessage').removeClass('show');
-        }
-        
-        // Smooth scroll to services section
-        $('html, body').animate({
-            scrollTop: $('.pricing-section').offset().top - 100
-        }, 500);
-    }
-    
-    // Initialize with all services visible or from URL parameter
+    // Initialize with active button based on URL parameter
     var urlParams = new URLSearchParams(window.location.search);
     var initialCategory = urlParams.get('category') || 'all';
     
     // Set initial active button
     $('.category-filter-btn').removeClass('active');
     $('.category-filter-btn[data-category="' + initialCategory + '"]').addClass('active');
-    
-    filterServices(initialCategory);
     // Handle appointment modal
     $('#appointmentModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);

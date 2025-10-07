@@ -494,9 +494,6 @@
                                                 </div>
                                                 <h4 class="mb-2">{{ $user->name }}</h4>
                                                 <p class="text-muted mb-3">{{ ucfirst($user->role) }}</p>
-                                                <button class="btn btn-primary" data-toggle="modal" data-target="#editProfileModal">
-                                                    <i class="flaticon-user mr-2"></i>Edit Profile
-                                                </button>
                                             </div>
                                         </div>
                                         <div class="col-md-8">
@@ -545,118 +542,6 @@
                                                 End Dashboard Section
                     =====================================================================-->
 
-    <!-- Edit Profile Modal -->
-    <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProfileModalLabel">
-                        <i class="flaticon-user mr-2"></i>Edit Profile
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="editProfileForm" action="{{ route('users.profile.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-body">
-                        <div class="row">
-                            <!-- Profile Picture Section -->
-                            <div class="col-md-4 text-center mb-4">
-                                <div class="profile-picture-container">
-                                    @if ($user->avatar_url)
-                                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
-                                            class="rounded-circle border" width="150" height="150" id="profilePreview">
-                                    @else
-                                        <div class="avatar-placeholder-large rounded-circle border" id="profilePreview">
-                                            {{ strtoupper(substr($user->name, 0, 2)) }}
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="upload-overlay">
-                                    <label for="avatar" class="btn btn-sm btn-outline-primary">
-                                        <i class="flaticon-camera mr-1"></i>Change Photo
-                                    </label>
-                                    <input type="file" id="avatar" name="avatar" class="d-none" accept="image/*">
-                                    <small class="form-text text-muted d-block mt-2">
-                                        JPG, PNG, GIF up to 2MB
-                                    </small>
-                                </div>
-                            </div>
-                            
-                            <!-- Profile Form -->
-                            <div class="col-md-8">
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label for="name" class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" id="name" name="name" 
-                                            value="{{ $user->name }}" required>
-                                    </div>
-                                    
-                                    <div class="col-md-12 mb-3">
-                                        <label for="email" class="form-label">Email Address</label>
-                                        <input type="email" class="form-control" id="email" name="email" 
-                                            value="{{ $user->email }}" required>
-                                    </div>
-                                    
-                                    <div class="col-md-6 mb-3">
-                                        <label for="phone" class="form-label">Phone Number</label>
-                                        <input type="text" class="form-control" id="phone" name="phone" 
-                                            value="{{ $user->phone }}" placeholder="+63 XXX XXX XXXX">
-                                    </div>
-                                    
-                                    <div class="col-md-6 mb-3">
-                                        <label for="date_of_birth" class="form-label">Date of Birth</label>
-                                        <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
-                                            value="{{ $user->date_of_birth }}">
-                                    </div>
-                                    
-                                    <div class="col-md-12 mb-3">
-                                        <label for="address" class="form-label">Address</label>
-                                        <textarea class="form-control" id="address" name="address" rows="3" 
-                                            placeholder="Complete address">{{ $user->address }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Password Change Section -->
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <h6 class="border-bottom pb-2 mb-3">
-                                    <i class="flaticon-lock mr-2"></i>Change Password (Optional)
-                                </h6>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="current_password" class="form-label">Current Password</label>
-                                <input type="password" class="form-control" id="current_password" name="current_password" 
-                                    placeholder="Enter current password">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="new_password" class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="new_password" name="new_password" 
-                                    placeholder="Enter new password">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="new_password_confirmation" class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" id="new_password_confirmation" 
-                                    name="new_password_confirmation" placeholder="Confirm new password">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            <i class="flaticon-cancel mr-1"></i>Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="flaticon-check mr-1"></i>Update Profile
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
 @endsection
 
