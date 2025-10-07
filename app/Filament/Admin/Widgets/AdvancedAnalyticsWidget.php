@@ -15,11 +15,11 @@ class AdvancedAnalyticsWidget extends BaseWidget
     protected function getStats(): array
     {
         // Revenue Analytics
-        $totalRevenue = Appointment::where('status', 'completed')
+        $totalRevenue = Appointment::where('appointments.status', 'completed')
             ->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')
             ->sum('clinic_services.price');
 
-        $monthlyRevenue = Appointment::where('status', 'completed')
+        $monthlyRevenue = Appointment::where('appointments.status', 'completed')
             ->whereMonth('appointment_date', now()->month)
             ->whereYear('appointment_date', now()->year)
             ->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')
@@ -97,13 +97,13 @@ class AdvancedAnalyticsWidget extends BaseWidget
 
     private function calculateRevenueGrowth(): float
     {
-        $currentMonth = Appointment::where('status', 'completed')
+        $currentMonth = Appointment::where('appointments.status', 'completed')
             ->whereMonth('appointment_date', now()->month)
             ->whereYear('appointment_date', now()->year)
             ->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')
             ->sum('clinic_services.price');
 
-        $lastMonth = Appointment::where('status', 'completed')
+        $lastMonth = Appointment::where('appointments.status', 'completed')
             ->whereMonth('appointment_date', now()->subMonth()->month)
             ->whereYear('appointment_date', now()->subMonth()->year)
             ->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')
