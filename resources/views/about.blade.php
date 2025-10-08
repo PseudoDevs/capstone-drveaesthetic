@@ -37,6 +37,87 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
             transform: translateY(-2px) !important;
         }
+        
+        /* Mobile Image Layout Adjustments */
+        @media (max-width: 768px) {
+            .about-images {
+                margin-bottom: 30px !important;
+                padding: 20px 0 !important;
+                text-align: center;
+            }
+            
+            .about-images img {
+                max-width: 100% !important;
+                height: auto !important;
+                margin-bottom: 20px !important;
+                display: block !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+            
+            .about-images img:last-child {
+                margin-bottom: 0 !important;
+            }
+            
+            /* Stack images vertically on mobile */
+            .about-images {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 20px !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .about-images {
+                padding: 15px 0 !important;
+                margin-bottom: 25px !important;
+            }
+            
+            .about-images img {
+                margin-bottom: 15px !important;
+                border-width: 2px !important;
+            }
+            
+            .about-images {
+                gap: 15px !important;
+            }
+        }
+        
+        /* Desktop layout improvements */
+        @media (min-width: 769px) {
+            .about-images {
+                position: relative;
+                padding: 30px 0 76px 0;
+            }
+            
+            .about-images img {
+                position: absolute;
+                transition: all 0.3s ease;
+            }
+            
+            .about-images img:nth-child(1) {
+                top: 0;
+                left: 0;
+                z-index: 3;
+                max-width: 60%;
+            }
+            
+            .about-images img:nth-child(2) {
+                bottom: 0;
+                right: 0;
+                z-index: 2;
+                max-width: 50%;
+            }
+            
+            .about-images img:nth-child(3) {
+                top: 50%;
+                left: 20%;
+                transform: translateY(-50%);
+                z-index: 1;
+                max-width: 40%;
+            }
+        }
     </style>
 
         <!--====================================================================
