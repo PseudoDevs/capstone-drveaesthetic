@@ -96,12 +96,12 @@ class AppointmentResource extends Resource
                 Tables\Columns\TextColumn::make('form_type')
                     ->label('Appointment Type')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string =>
-                        $state ? FormType::from($state)->getLabel() : 'No Form Type'
+                    ->formatStateUsing(fn (?FormType $state): string =>
+                        $state ? $state->getLabel() : 'No Form Type'
                     )
-                    ->color(fn (?string $state): string => match ($state) {
-                        'medical_information' => 'info',
-                        'consent_waiver' => 'warning',
+                    ->color(fn (?FormType $state): string => match ($state) {
+                        FormType::MEDICAL_INFORMATION => 'info',
+                        FormType::CONSULTATION_FORM => 'warning',
                         default => 'gray'
                     }),
                 Tables\Columns\IconColumn::make('form_completed')

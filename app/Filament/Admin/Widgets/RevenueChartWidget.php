@@ -23,7 +23,7 @@ class RevenueChartWidget extends ChartWidget
             $date = now()->subMonths($i);
             $monthName = $date->format('M Y');
             
-            $revenue = Appointment::where('status', 'completed')
+            $revenue = Appointment::where('appointments.status', 'completed')
                 ->whereMonth('appointment_date', $date->month)
                 ->whereYear('appointment_date', $date->year)
                 ->join('clinic_services', 'appointments.service_id', '=', 'clinic_services.id')
