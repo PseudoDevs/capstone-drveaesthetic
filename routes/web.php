@@ -125,9 +125,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/medical-certificate/{id}/download', function ($id) {
         $certificate = \App\Models\MedicalCertificate::with(['client', 'staff'])->findOrFail($id);
 
+        $clientName = $certificate->client ? $certificate->client->name : 'Unknown-Client';
+        
         return response()->streamDownload(function () use ($certificate) {
             echo \App\Filament\Resources\MedicalCertificateResource::generateCertificatePDF($certificate);
-        }, "medical-certificate-{$certificate->client->name}-" . now()->format('Y-m-d') . ".pdf", [
+        }, "medical-certificate-{$clientName}-" . now()->format('Y-m-d') . ".pdf", [
             'Content-Type' => 'application/pdf',
         ]);
     })->name('medical-certificate.download');
