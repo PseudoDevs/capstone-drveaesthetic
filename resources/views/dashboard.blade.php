@@ -2601,7 +2601,7 @@
                 Swal.fire({
                     icon: 'info',
                     title: 'Reschedule Appointment',
-                    text: 'Reschedule functionality will be implemented here.',
+                    text: 'Please contact the clinic to request a reschedule. You can message us through chat by going to My Account > Chat.',
                     confirmButtonColor: '#fbaaa9'
                 });
             });
