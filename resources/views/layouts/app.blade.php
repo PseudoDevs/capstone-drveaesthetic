@@ -761,35 +761,47 @@
             // Override navbar toggle behavior on mobile
             navbarToggle.on('click', function(e) {
                 if ($(window).width() <= 768) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Toggle mobile sidebar instead of default navbar
-                    if (sidebar.hasClass('show')) {
-                        closeSidebar();
-                    } else {
-                        openSidebar();
+                    // Check if user is authenticated and mobile sidebar exists
+                    if (sidebar.length > 0) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Toggle mobile sidebar instead of default navbar
+                        if (sidebar.hasClass('show')) {
+                            closeSidebar();
+                        } else {
+                            openSidebar();
+                        }
                     }
+                    // If not authenticated, let the default navbar behavior work
                 }
             });
             
             // Open sidebar
             function openSidebar() {
-                sidebar.addClass('show');
-                overlay.addClass('show');
-                $('body').addClass('sidebar-open').css('overflow', 'hidden');
+                if (sidebar.length > 0) {
+                    sidebar.addClass('show');
+                    overlay.addClass('show');
+                    $('body').addClass('sidebar-open').css('overflow', 'hidden');
+                }
             }
             
             // Close sidebar
             function closeSidebar() {
-                sidebar.removeClass('show');
-                overlay.removeClass('show');
-                $('body').removeClass('sidebar-open').css('overflow', '');
+                if (sidebar.length > 0) {
+                    sidebar.removeClass('show');
+                    overlay.removeClass('show');
+                    $('body').removeClass('sidebar-open').css('overflow', '');
+                }
             }
             
-            // Close sidebar handlers
-            closeBtn.on('click', closeSidebar);
-            overlay.on('click', closeSidebar);
+            // Close sidebar handlers (only if sidebar exists)
+            if (closeBtn.length > 0) {
+                closeBtn.on('click', closeSidebar);
+            }
+            if (overlay.length > 0) {
+                overlay.on('click', closeSidebar);
+            }
             
             // Handle window resize
             $(window).on('resize', function() {
