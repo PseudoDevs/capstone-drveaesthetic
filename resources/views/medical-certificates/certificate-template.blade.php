@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Certificate - {{ $client->name }}</title>
+    <title>Medical Certificate - {{ $client ? $client->name : 'Unknown Client' }}</title>
     <style>
         @page {
             margin: 1in;
@@ -177,6 +177,7 @@
 
         <!-- Certificate Body -->
         <div class="certificate-body">
+            @if($client)
             <div class="full-width">
                 <span class="field-label">Patient Name:</span>
                 <span class="field-value patient-name">{{ $client->name }}</span>
@@ -193,6 +194,12 @@
             <div class="full-width">
                 <span class="field-label">Address:</span>
                 <span class="field-value">{{ $client->address }}</span>
+            </div>
+            @endif
+            @else
+            <div class="full-width" style="color: red;">
+                <span class="field-label">Error:</span>
+                <span class="field-value">Client information not found for this medical certificate.</span>
             </div>
             @endif
 
@@ -240,7 +247,7 @@
                 <div class="signature-section">
                     <div class="signature-line"></div>
                     <div class="doctor-info">
-                        <strong>{{ $staff->name }}</strong><br>
+                        <strong>{{ $staff ? $staff->name : 'Dr. V Aesthetic Clinic' }}</strong><br>
                         Attending Physician<br>
                         License No: [Medical License]<br>
                         Dr. V Aesthetic Clinic

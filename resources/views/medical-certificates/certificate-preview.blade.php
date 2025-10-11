@@ -36,6 +36,7 @@
 
         <!-- Certificate Body -->
         <div style="margin: 30px 0; line-height: 2;">
+            @if($record->client)
             <div style="margin: 15px 0;">
                 <span style="font-weight: bold; display: inline-block; min-width: 120px;">Patient Name:</span>
                 <span style="border-bottom: 1px solid #000; display: inline-block; min-width: 200px; padding-bottom: 2px; font-weight: bold; text-transform: uppercase;">{{ $record->client->name ?? 'N/A' }}</span>
@@ -52,6 +53,11 @@
             <div style="margin: 15px 0;">
                 <span style="font-weight: bold; display: inline-block; min-width: 120px;">Address:</span>
                 <span style="border-bottom: 1px solid #000; display: inline-block; min-width: 200px; padding-bottom: 2px;">{{ $record->client->address }}</span>
+            </div>
+            @endif
+            @else
+            <div style="margin: 15px 0; color: red;">
+                <span style="font-weight: bold;">Error:</span> Client information not found for this medical certificate.
             </div>
             @endif
 
@@ -94,7 +100,11 @@
                 <div style="text-align: center; margin-top: 40px;">
                     <div style="border-bottom: 1px solid #000; width: 200px; height: 40px; margin: 0 auto 10px auto;"></div>
                     <div style="font-size: 11px; line-height: 1.3;">
+<<<<<<< HEAD
                         <strong>{{ $record->staff->name ?? 'N/A' }}</strong><br>
+=======
+                        <strong>{{ $record->staff ? $record->staff->name : 'Dr. V Aesthetic Clinic' }}</strong><br>
+>>>>>>> e42576bacc9a5ad291f2a3ae6b900c94e84a2509
                         Attending Physician<br>
                         License No: [Medical License]<br>
                         Dr. V Aesthetic Clinic

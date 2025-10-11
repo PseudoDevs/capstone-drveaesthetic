@@ -3,6 +3,8 @@
 @section('title', 'Dashboard - ' . config('app.name'))
 
 @section('content')
+
+
     <!--====================================================================
                                                 Start Dashboard Section
                     =====================================================================-->
@@ -37,6 +39,9 @@
                 <!-- Dashboard Tabs -->
                 <div class="col-lg-12">
                     <div class="dashboard-tabs">
+                        <div class="mobile-tabs-hint d-md-none">
+                            <i class="fas fa-arrows-alt-h"></i> Swipe to see more tabs
+                        </div>
                         <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="overview-tab" data-toggle="tab" data-target="#overview"
@@ -236,6 +241,9 @@
                                         <h4 class="mb-4">Recent Appointments</h4>
                                         @if ($appointmentsByStatus['pending']->concat($appointmentsByStatus['scheduled'])->take(5)->count() > 0)
                                             <div class="table-responsive">
+                                                <div class="mobile-scroll-hint d-md-none">
+                                                    <i class="fas fa-arrows-alt-h"></i> Swipe to see more columns
+                                                </div>
                                                 <table class="table table-striped table-hover">
                                                     <thead class="thead-light">
                                                         <tr>
@@ -277,41 +285,53 @@
                                                                 <td>{{ $appointment->staff->name ?? 'N/A' }}</td>
                                                                 <td><span class="text-success font-weight-bold">₱{{ number_format($appointment->service->price ?? 0, 2) }}</span></td>
                                                                 <td>
-                                                                    <div class="btn-group action-buttons" role="group">
-                                                                        <button type="button" class="btn btn-sm btn-outline-primary view-details"
-                                                                                data-appointment-id="{{ $appointment->id }}"
-                                                                                data-service="{{ $appointment->service->service_name ?? 'N/A' }}"
-                                                                                data-date="{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}"
-                                                                                data-time="{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}"
-                                                                                data-staff="{{ $appointment->staff->name ?? 'N/A' }}"
-                                                                                data-price="₱{{ number_format($appointment->service->price ?? 0, 2) }}"
-                                                                                data-status="{{ $appointment->status }}"
-                                                                                title="View Details">
-                                                                            <i class="fas fa-eye"></i>
-                                                                        </button>
-                                                                        @if($appointment->status === 'pending')
-                                                                            <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
-                                                                                    data-appointment-id="{{ $appointment->id }}"
-                                                                                    title="Cancel Appointment">
-                                                                                <i class="fas fa-ban"></i>
-                                                                            </button>
-                                                                        @elseif($appointment->status === 'scheduled')
-                                                                            <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
-                                                                                    data-appointment-id="{{ $appointment->id }}"
-                                                                                    title="Reschedule Appointment">
-                                                                                <i class="fas fa-calendar-alt"></i>
-                                                                            </button>
-                                                                        @endif
-                                                                        
-                                                                        @if(!$appointment->form_completed && $appointment->form_type && in_array($appointment->status, ['pending', 'scheduled']))
-                                                                            <a href="{{ route('appointments.form', $appointment->id) }}" class="btn btn-sm btn-outline-warning" title="Fill Medical Form">
-                                                                                <i class="fas fa-file-medical-alt"></i>
-                                                                            </a>
-                                                                        @elseif($appointment->form_completed)
-                                                                            <a href="{{ route('appointments.form.view', $appointment->id) }}" class="btn btn-sm btn-outline-info" title="View Completed Form">
-                                                                                <i class="fas fa-file-check"></i>
-                                                                            </a>
-                                                                        @endif
+                                                                    <div class="action-buttons-container">
+                                                                        <div class="action-buttons-scroll" data-appointment-id="{{ $appointment->id }}">
+                                                                            <div class="action-buttons" role="group">
+                                                                                <button type="button" class="btn btn-sm btn-outline-primary view-details"
+                                                                                        data-appointment-id="{{ $appointment->id }}"
+                                                                                        data-service="{{ $appointment->service->service_name ?? 'N/A' }}"
+                                                                                        data-date="{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}"
+                                                                                        data-time="{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}"
+                                                                                        data-staff="{{ $appointment->staff->name ?? 'N/A' }}"
+                                                                                        data-price="₱{{ number_format($appointment->service->price ?? 0, 2) }}"
+                                                                                        data-status="{{ $appointment->status }}"
+                                                                                        title="View Details">
+                                                                                    <i class="fas fa-eye"></i>
+                                                                                    <span class="btn-text">View</span>
+                                                                                </button>
+                                                                                @if($appointment->status === 'pending')
+                                                                                    <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
+                                                                                            data-appointment-id="{{ $appointment->id }}"
+                                                                                            title="Cancel Appointment">
+                                                                                        <i class="fas fa-ban"></i>
+                                                                                        <span class="btn-text">Cancel</span>
+                                                                                    </button>
+                                                                                @elseif($appointment->status === 'scheduled')
+                                                                                    <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
+                                                                                            data-appointment-id="{{ $appointment->id }}"
+                                                                                            title="Reschedule Appointment">
+                                                                                        <i class="fas fa-calendar-alt"></i>
+                                                                                        <span class="btn-text">Reschedule</span>
+                                                                                    </button>
+                                                                                @endif
+                                                                                
+                                                                                @if(!$appointment->form_completed && $appointment->form_type && in_array($appointment->status, ['pending', 'scheduled']))
+                                                                                    <a href="{{ route('appointments.form', $appointment->id) }}" class="btn btn-sm btn-outline-warning" title="Fill Medical Form">
+                                                                                        <i class="fas fa-file-medical-alt"></i>
+                                                                                        <span class="btn-text">Form</span>
+                                                                                    </a>
+                                                                                @elseif($appointment->form_completed)
+                                                                                    <a href="{{ route('appointments.form.view', $appointment->id) }}" class="btn btn-sm btn-outline-info" title="View Completed Form">
+                                                                                        <i class="fas fa-file-check"></i>
+                                                                                        <span class="btn-text">View Form</span>
+                                                                                    </a>
+                                                                                @endif
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="scroll-indicator">
+                                                                            <i class="fas fa-chevron-right"></i>
+                                                                        </div>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -361,6 +381,9 @@
 
                                         <!-- Bootstrap Table -->
                                         <div class="table-responsive">
+                                            <div class="mobile-scroll-hint d-md-none">
+                                                <i class="fas fa-arrows-alt-h"></i> Swipe to see more columns
+                                            </div>
                                             <table class="table table-striped table-hover">
                                                 <thead class="thead-light">
                                                     <tr>
@@ -402,41 +425,53 @@
                                                             <td>{{ $appointment->staff->name ?? 'N/A' }}</td>
                                                             <td><span class="text-success font-weight-bold">₱{{ number_format($appointment->service->price ?? 0, 2) }}</span></td>
                                                             <td>
-                                                                <div class="btn-group action-buttons" role="group">
-                                                                    <button type="button" class="btn btn-sm btn-outline-primary view-details"
-                                                                            data-appointment-id="{{ $appointment->id }}"
-                                                                            data-service="{{ $appointment->service->service_name ?? 'N/A' }}"
-                                                                            data-date="{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}"
-                                                                            data-time="{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}"
-                                                                            data-staff="{{ $appointment->staff->name ?? 'N/A' }}"
-                                                                            data-price="₱{{ number_format($appointment->service->price ?? 0, 2) }}"
-                                                                            data-status="{{ $appointment->status }}"
-                                                                            title="View Details">
-                                                                        <i class="fas fa-eye"></i>
-                                                                    </button>
-                                                                    @if($appointment->status === 'pending')
-                                                                        <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
-                                                                                data-appointment-id="{{ $appointment->id }}"
-                                                                                title="Cancel Appointment">
-                                                                            <i class="fas fa-ban"></i>
-                                                                        </button>
-                                                                    @elseif($appointment->status === 'scheduled')
-                                                                        <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
-                                                                                data-appointment-id="{{ $appointment->id }}"
-                                                                                title="Reschedule Appointment">
-                                                                            <i class="fas fa-calendar-alt"></i>
-                                                                        </button>
-                                                                    @endif
-                                                                    
-                                                                    @if(!$appointment->form_completed && $appointment->form_type && in_array($appointment->status, ['pending', 'scheduled']))
-                                                                        <a href="{{ route('appointments.form', $appointment->id) }}" class="btn btn-sm btn-outline-warning" title="Fill Medical Form">
-                                                                            <i class="fas fa-file-medical-alt"></i>
-                                                                        </a>
-                                                                    @elseif($appointment->form_completed)
-                                                                        <a href="{{ route('appointments.form.view', $appointment->id) }}" class="btn btn-sm btn-outline-info" title="View Completed Form">
-                                                                            <i class="fas fa-file-check"></i>
-                                                                        </a>
-                                                                    @endif
+                                                                <div class="action-buttons-container">
+                                                                    <div class="action-buttons-scroll" data-appointment-id="{{ $appointment->id }}">
+                                                                        <div class="action-buttons" role="group">
+                                                                            <button type="button" class="btn btn-sm btn-outline-primary view-details"
+                                                                                    data-appointment-id="{{ $appointment->id }}"
+                                                                                    data-service="{{ $appointment->service->service_name ?? 'N/A' }}"
+                                                                                    data-date="{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}"
+                                                                                    data-time="{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}"
+                                                                                    data-staff="{{ $appointment->staff->name ?? 'N/A' }}"
+                                                                                    data-price="₱{{ number_format($appointment->service->price ?? 0, 2) }}"
+                                                                                    data-status="{{ $appointment->status }}"
+                                                                                    title="View Details">
+                                                                                <i class="fas fa-eye"></i>
+                                                                                <span class="btn-text">View</span>
+                                                                            </button>
+                                                                            @if($appointment->status === 'pending')
+                                                                                <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment"
+                                                                                        data-appointment-id="{{ $appointment->id }}"
+                                                                                        title="Cancel Appointment">
+                                                                                    <i class="fas fa-ban"></i>
+                                                                                    <span class="btn-text">Cancel</span>
+                                                                                </button>
+                                                                            @elseif($appointment->status === 'scheduled')
+                                                                                <button type="button" class="btn btn-sm btn-outline-warning reschedule-appointment"
+                                                                                        data-appointment-id="{{ $appointment->id }}"
+                                                                                        title="Reschedule Appointment">
+                                                                                    <i class="fas fa-calendar-alt"></i>
+                                                                                    <span class="btn-text">Reschedule</span>
+                                                                                </button>
+                                                                            @endif
+                                                                            
+                                                                            @if(!$appointment->form_completed && $appointment->form_type && in_array($appointment->status, ['pending', 'scheduled']))
+                                                                                <a href="{{ route('appointments.form', $appointment->id) }}" class="btn btn-sm btn-outline-warning" title="Fill Medical Form">
+                                                                                    <i class="fas fa-file-medical-alt"></i>
+                                                                                    <span class="btn-text">Form</span>
+                                                                                </a>
+                                                                            @elseif($appointment->form_completed)
+                                                                                <a href="{{ route('appointments.form.view', $appointment->id) }}" class="btn btn-sm btn-outline-info" title="View Completed Form">
+                                                                                    <i class="fas fa-file-check"></i>
+                                                                                    <span class="btn-text">View Form</span>
+                                                                                </a>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="scroll-indicator">
+                                                                        <i class="fas fa-chevron-right"></i>
+                                                                    </div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -557,7 +592,7 @@
         .dashboard-header {
             background: white;
             border-radius: 20px;
-            padding: 30px;
+            padding: 40px 30px 30px 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1281,6 +1316,70 @@
             color: white;
         }
 
+        /* Horizontal Scrolling Action Buttons */
+        .action-buttons-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .action-buttons-scroll {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            gap: 8px;
+            padding: 5px 0;
+            scroll-behavior: smooth;
+        }
+
+        .action-buttons-scroll::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            min-width: max-content;
+        }
+
+        .action-buttons .btn {
+            flex-shrink: 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-buttons .btn-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9));
+            padding: 5px 10px;
+            color: #6c757d;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-buttons-container:hover .scroll-indicator {
+            opacity: 1;
+        }
+
+        /* Hide scroll indicator when scrolled to end */
+        .action-buttons-scroll.scrolled-to-end + .scroll-indicator {
+            opacity: 0;
+        }
+
         .empty-state {
             background: #f8f9fa;
             border-radius: 12px;
@@ -1328,8 +1427,123 @@
             color: #495057;
         }
 
-        /* Responsive Design */
+        
+        /* Mobile Dashboard Layout Fixes */
         @media (max-width: 768px) {
+            /* Dashboard Header Mobile Fixes */
+            .dashboard-header {
+                padding: 30px 20px 20px 20px;
+                margin-bottom: 20px;
+            }
+            
+            .dashboard-header .d-flex {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .welcome-title {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1rem;
+            }
+            
+            .user-profile-section {
+                order: -1;
+            }
+            
+            /* Navigation Tabs Mobile Fixes */
+            .dashboard-tabs {
+                margin-bottom: 20px;
+            }
+            
+            /* Mobile tabs hint */
+            .mobile-tabs-hint {
+                background: linear-gradient(135deg, #fbaaa9, #ff9a9e);
+                color: white;
+                padding: 8px 15px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                text-align: center;
+                margin-bottom: 10px;
+                box-shadow: 0 2px 8px rgba(251, 170, 169, 0.3);
+                animation: pulse 2s infinite;
+            }
+            
+            .mobile-tabs-hint i {
+                margin-right: 5px;
+            }
+            
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                padding: 0 10px;
+            }
+            
+            .nav-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .nav-tabs .nav-link {
+                flex-shrink: 0;
+                padding: 15px 20px;
+                font-size: 0.85rem;
+                white-space: nowrap;
+                min-width: max-content;
+            }
+            
+            .nav-tabs .nav-link i {
+                margin-right: 6px;
+                font-size: 1rem;
+            }
+            
+            .nav-tabs .badge {
+                font-size: 10px;
+                padding: 3px 6px;
+                margin-left: 6px;
+            }
+            
+            /* Tab Content Mobile Fixes */
+            .tab-content {
+                padding: 20px 15px;
+            }
+            
+            /* Stats Cards Mobile Layout */
+            .stats-card {
+                padding: 20px;
+                margin-bottom: 15px;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stats-icon {
+                width: 60px;
+                height: 60px;
+                margin-right: 0;
+                margin-bottom: 15px;
+                font-size: 24px;
+            }
+            
+            .stats-content h3 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+            
+            .stats-content p {
+                font-size: 0.9rem;
+                margin: 0;
+            }
+            
+            /* Appointments Container Mobile */
             .appointments-container {
                 grid-template-columns: 1fr;
                 gap: 15px;
@@ -1351,17 +1565,23 @@
                 font-size: 16px;
             }
 
-            /* Mobile table styling handled by Bootstrap responsive classes */
-
-
+            /* Action Buttons Mobile */
             .action-buttons {
                 justify-content: center;
+                flex-wrap: wrap;
+                gap: 6px;
             }
 
             .action-buttons .btn {
-                flex: 1;
-                font-size: 11px;
-                padding: 5px 10px;
+                flex: 0 0 auto;
+                font-size: 12px;
+                padding: 8px 12px;
+                min-width: 38px;
+                height: 38px;
+            }
+            
+            .action-buttons .btn i {
+                font-size: 13px;
             }
 
             .search-box input {
@@ -1374,6 +1594,61 @@
                 margin-top: 10px;
                 font-size: 13px;
             }
+            
+            /* Info Cards Mobile */
+            .info-card {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .info-card h5 {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            
+            .appointment-preview h6 {
+                font-size: 1rem;
+                margin-bottom: 8px;
+            }
+            
+            .appointment-preview p {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+            }
+        }
+        
+        /* Extra Small Mobile Devices */
+        @media (max-width: 576px) {
+            .dashboard-header {
+                padding: 25px 15px 15px 15px;
+            }
+            
+            .welcome-title {
+                font-size: 1.5rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 12px 15px;
+                font-size: 0.8rem;
+            }
+            
+            .tab-content {
+                padding: 15px 10px;
+            }
+            
+            .stats-card {
+                padding: 15px;
+            }
+            
+            .stats-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .stats-content h3 {
+                font-size: 1.5rem;
+            }
         }
 
         /* Enhanced Table Styling */
@@ -1382,6 +1657,110 @@
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Mobile Table Horizontal Scrolling */
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                scrollbar-color: #fbaaa9 #f8f9fa;
+            }
+            
+            .table-responsive::-webkit-scrollbar {
+                height: 6px;
+            }
+            
+            .table-responsive::-webkit-scrollbar-track {
+                background: #f8f9fa;
+                border-radius: 3px;
+            }
+            
+            .table-responsive::-webkit-scrollbar-thumb {
+                background: #fbaaa9;
+                border-radius: 3px;
+            }
+            
+            .table-responsive::-webkit-scrollbar-thumb:hover {
+                background: #ff9a9e;
+            }
+            
+            /* Ensure table has minimum width for proper scrolling */
+            .table {
+                min-width: 600px;
+            }
+            
+            /* Style table cells for mobile */
+            .table th,
+            .table td {
+                white-space: nowrap;
+                padding: 12px 8px;
+                font-size: 14px;
+            }
+            
+            /* Make action buttons more compact on mobile */
+            .action-buttons-container {
+                min-width: 200px;
+            }
+            
+            .action-buttons-scroll {
+                gap: 4px;
+            }
+            
+            .action-buttons .btn {
+                padding: 6px 8px;
+                font-size: 11px;
+                min-width: 35px;
+                height: 35px;
+            }
+            
+            .action-buttons .btn-text {
+                display: none; /* Hide text on mobile, show only icons */
+            }
+            
+            /* Mobile scroll hint */
+            .mobile-scroll-hint {
+                background: linear-gradient(135deg, #fbaaa9, #ff9a9e);
+                color: white;
+                padding: 8px 15px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                text-align: center;
+                margin-bottom: 10px;
+                box-shadow: 0 2px 8px rgba(251, 170, 169, 0.3);
+                animation: pulse 2s infinite;
+            }
+            
+            .mobile-scroll-hint i {
+                margin-right: 5px;
+            }
+            
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table {
+                min-width: 500px;
+            }
+            
+            .table th,
+            .table td {
+                padding: 10px 6px;
+                font-size: 13px;
+            }
+            
+            .action-buttons .btn {
+                padding: 5px 6px;
+                font-size: 10px;
+                min-width: 30px;
+                height: 30px;
+            }
         }
 
         .table {
@@ -1585,10 +1964,16 @@
             }
             
             .action-buttons .btn {
-                padding: 6px 10px;
-                font-size: 12px;
-                min-width: 35px;
-                height: 35px;
+                padding: 10px 12px;
+                font-size: 14px;
+                min-width: 44px;
+                height: 44px;
+                flex: 0 0 auto;
+                margin: 2px;
+            }
+            
+            .action-buttons .btn i {
+                font-size: 16px;
             }
         }
 
@@ -2216,7 +2601,7 @@
                 Swal.fire({
                     icon: 'info',
                     title: 'Reschedule Appointment',
-                    text: 'Reschedule functionality will be implemented here.',
+                    text: 'Please contact the clinic to request a reschedule. You can message us through chat by going to My Account > Chat.',
                     confirmButtonColor: '#fbaaa9'
                 });
             });
@@ -2290,6 +2675,68 @@
                         });
                     }
                 });
+            });
+
+            // Horizontal Scrolling Action Buttons
+            function initializeActionButtonScrolling() {
+                $('.action-buttons-scroll').each(function() {
+                    const scrollContainer = $(this);
+                    const scrollIndicator = scrollContainer.siblings('.scroll-indicator');
+                    
+                    // Check if scrolling is needed
+                    function checkScrollability() {
+                        const containerWidth = scrollContainer.width();
+                        const contentWidth = scrollContainer[0].scrollWidth;
+                        
+                        if (contentWidth > containerWidth) {
+                            scrollIndicator.show();
+                        } else {
+                            scrollIndicator.hide();
+                        }
+                    }
+                    
+                    // Handle scroll events
+                    scrollContainer.on('scroll', function() {
+                        const scrollLeft = $(this).scrollLeft();
+                        const maxScroll = $(this)[0].scrollWidth - $(this).width();
+                        
+                        if (scrollLeft >= maxScroll - 5) {
+                            $(this).addClass('scrolled-to-end');
+                        } else {
+                            $(this).removeClass('scrolled-to-end');
+                        }
+                    });
+                    
+                    // Touch/swipe support for mobile
+                    let startX = 0;
+                    let scrollLeft = 0;
+                    
+                    scrollContainer.on('touchstart', function(e) {
+                        startX = e.touches[0].pageX - scrollContainer.offset().left;
+                        scrollLeft = scrollContainer.scrollLeft();
+                    });
+                    
+                    scrollContainer.on('touchmove', function(e) {
+                        e.preventDefault();
+                        const x = e.touches[0].pageX - scrollContainer.offset().left;
+                        const walk = (x - startX) * 2;
+                        scrollContainer.scrollLeft(scrollLeft - walk);
+                    });
+                    
+                    // Initialize
+                    checkScrollability();
+                    
+                    // Recheck on window resize
+                    $(window).on('resize', checkScrollability);
+                });
+            }
+            
+            // Initialize scrolling when document is ready
+            initializeActionButtonScrolling();
+            
+            // Reinitialize after tab switches
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function() {
+                setTimeout(initializeActionButtonScrolling, 100);
             });
         });
     </script>

@@ -33,57 +33,374 @@
 
     <!-- Custom Logo Styles -->
     <style>
-        .logo-image {
-            height: 45px;
-            width: auto;
-            max-width: 60px;
-            object-fit: contain;
-            transition: all 0.3s ease;
-        }
-
-        .logo-image:hover {
-            transform: scale(1.05);
-        }
-
         .text-logo {
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .clinic-name {
             font-size: 24px;
             font-weight: 700;
             color: #333;
-            text-decoration: none;
-            font-family: 'Roboto', sans-serif;
-            letter-spacing: 1px;
+            margin: 0 0 2px 0;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
             transition: all 0.3s ease;
         }
 
-        .text-logo:hover {
-            color: #007bff;
-            text-decoration: none;
+        .clinic-subtitle {
+            font-size: 14px;
+            font-weight: 400;
+            color: #666;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            transition: all 0.3s ease;
         }
 
-        .logo a:hover .text-logo {
-            color: #007bff;
+        .text-logo:hover .clinic-name {
+            color: #fbaaa9;
+            transform: scale(1.02);
+        }
+
+        .text-logo:hover .clinic-subtitle {
+            color: #fbaaa9;
         }
 
         @media (max-width: 768px) {
-            .logo-image {
-                height: 35px;
-                max-width: 45px;
+            .clinic-name {
+                font-size: 20px;
             }
             
-            .text-logo {
-                font-size: 18px;
+            .clinic-subtitle {
+                font-size: 12px;
             }
         }
 
         @media (max-width: 480px) {
-            .logo-image {
-                height: 30px;
-                max-width: 40px;
+            .clinic-name {
+                font-size: 18px;
             }
             
-            .text-logo {
-                font-size: 16px;
+            .clinic-subtitle {
+                font-size: 11px;
             }
+        }
+
+        /* Mobile Navigation Positioning */
+        @media (max-width: 768px) {
+            .header-inner {
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .nav-outer {
+                margin-left: 0 !important;
+                order: 2;
+            }
+            
+            .logo-outer {
+                order: 1;
+                flex: 1;
+            }
+            
+            /* Position navbar toggle to the right */
+            .navbar-header {
+                float: right;
+                margin-left: auto;
+            }
+            
+            .navbar-toggle {
+                float: right;
+                margin-left: auto;
+                padding: 8px 12px;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+            }
+            
+            /* Mobile menu positioning */
+            .navbar-collapse {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                left: auto;
+                width: 280px;
+                background: white;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                border-radius: 8px;
+                z-index: 1000;
+                padding: 15px 0;
+            }
+            
+            .navbar-collapse .navigation {
+                flex-direction: column;
+                width: 100%;
+                padding: 0 15px;
+            }
+            
+            .navbar-collapse .navigation li {
+                width: 100%;
+                margin: 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            
+            .navbar-collapse .navigation li:last-child {
+                border-bottom: none;
+            }
+            
+            .navbar-collapse .navigation li a {
+                display: block;
+                padding: 12px 15px;
+                color: #333;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-radius: 6px;
+                margin: 2px 0;
+            }
+            
+            .navbar-collapse .navigation li a:hover {
+                background: #f8f9fa;
+                color: #007bff;
+                transform: translateX(5px);
+            }
+            
+            /* Dropdown positioning for mobile */
+            .navbar-collapse .dropdown-menu {
+                position: static;
+                float: none;
+                width: 100%;
+                margin-top: 0;
+                background-color: #f8f9fa;
+                border: none;
+                box-shadow: none;
+                border-radius: 6px;
+                margin: 5px 0;
+            }
+            
+            .navbar-collapse .dropdown-menu .dropdown-item {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .navbar-collapse {
+                width: 260px;
+            }
+            
+            .navbar-toggle {
+                padding: 6px 10px;
+            }
+        }
+
+        /* Mobile Sidebar Styles */
+        .mobile-sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100vh;
+            background: white;
+            z-index: 1050;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mobile-sidebar.show {
+            left: 0;
+        }
+        
+        .mobile-sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #fbaaa9, #ff9a9e);
+            color: white;
+        }
+        
+        .mobile-sidebar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .mobile-sidebar-logo .text-logo {
+            text-align: center;
+            width: 100%;
+        }
+        
+        .mobile-sidebar-logo .clinic-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 2px 0;
+            line-height: 1.1;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+        
+        .mobile-sidebar-logo .clinic-subtitle {
+            font-size: 12px;
+            font-weight: 400;
+            color: white;
+            margin: 0;
+            line-height: 1.2;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .mobile-sidebar-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-sidebar-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .mobile-sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        
+        .mobile-sidebar-section {
+            margin-bottom: 30px;
+        }
+        
+        .mobile-sidebar-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 15px 20px;
+            padding: 0;
+        }
+        
+        .mobile-sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .mobile-sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+        
+        .mobile-sidebar-item:hover {
+            background: #f8f9fa;
+            border-left-color: #fbaaa9;
+        }
+        
+        .mobile-sidebar-item.active {
+            background: #e3f2fd;
+            border-left-color: #0088cc;
+            color: #0088cc;
+        }
+        
+        .mobile-sidebar-item i {
+            width: 20px;
+            font-size: 16px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        
+        .mobile-sidebar-item span {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .mobile-sidebar-link {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .mobile-sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid #e5e5e5;
+            background: #f8f9fa;
+        }
+        
+        .mobile-sidebar-user {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .mobile-sidebar-avatar {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+        }
+        
+        .mobile-sidebar-avatar img,
+        .mobile-sidebar-avatar .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        
+        .mobile-sidebar-avatar .avatar-placeholder {
+            background: linear-gradient(135deg, #fbaaa9, #ff9a9e);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .mobile-sidebar-user-info h5 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 2px 0;
+            color: #333;
+        }
+        
+        .mobile-sidebar-user-info p {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
         }
 
         .avatar-placeholder-small {
@@ -118,16 +435,10 @@
                         <div class="logo-outer d-flex align-items-center">
                             <div class="logo d-flex align-items-center">
                                 <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none">
-                                    @if(setting('general.site_logo'))
-                                        <img src="{{ Storage::url(setting('general.site_logo')) }}" 
-                                             alt="{{ setting('general.site_name', env('APP_NAME', 'Capstone Aesthetic')) }}" 
-                                             class="logo-image me-3">
-                                    @else
-                                        <img src="{{ asset('assets/images/new-logo.png') }}" 
-                                             alt="{{ setting('general.site_name', env('APP_NAME', 'Capstone Aesthetic')) }}" 
-                                             class="logo-image me-3">
-                                    @endif
-                                    <span class="text-logo">{{ setting('general.site_name', env('APP_NAME', 'Capstone Aesthetic')) }}</span>
+                                    <div class="text-logo">
+                                        <h2 class="clinic-name">Dr. Ve Aesthetic Clinic</h2>
+                                        <p class="clinic-subtitle">and Wellness Center</p>
+                                    </div>
                                 </a>
                             </div>
                         </div>
@@ -219,6 +530,116 @@
         <!--====================================================================
                                 End Header area
         =====================================================================-->
+
+        <!-- Mobile Sidebar Navigation -->
+        @auth
+        <div class="mobile-sidebar-overlay d-md-none" id="mobileSidebarOverlay"></div>
+        <div class="mobile-sidebar d-md-none" id="mobileSidebar">
+            <div class="mobile-sidebar-header">
+                <div class="mobile-sidebar-logo">
+                    <div class="text-logo">
+                        <h2 class="clinic-name">Dr. Ve Aesthetic Clinic</h2>
+                        <p class="clinic-subtitle">and Wellness Center</p>
+                    </div>
+                </div>
+                <button class="mobile-sidebar-close" id="mobileSidebarClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mobile-sidebar-content">
+                <div class="mobile-sidebar-section">
+                    <h4 class="mobile-sidebar-section-title">Navigation</h4>
+                    <ul class="mobile-sidebar-nav">
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ url('/') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-home"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ url('/about') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-info-circle"></i>
+                                <span>About</span>
+                            </a>
+                        </li>
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ url('/services') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-spa"></i>
+                                <span>Services</span>
+                            </a>
+                        </li>
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ url('/contact') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-envelope"></i>
+                                <span>Contact</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="mobile-sidebar-section">
+                    <h4 class="mobile-sidebar-section-title">My Account</h4>
+                    <ul class="mobile-sidebar-nav">
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ url('/users/dashboard') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ route('users.profile.edit') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-user-edit"></i>
+                                <span>Edit Profile</span>
+                            </a>
+                        </li>
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ route('chat.index') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-comments"></i>
+                                <span>Chat</span>
+                            </a>
+                        </li>
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ route('notification-preferences') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-bell"></i>
+                                <span>Notifications</span>
+                            </a>
+                        </li>
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ route('feedback.create') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-star"></i>
+                                <span>Feedback</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mobile-sidebar-footer">
+                <div class="mobile-sidebar-user">
+                    <div class="mobile-sidebar-avatar">
+                        @if (auth()->user()->avatar_url)
+                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle">
+                        @else
+                            <div class="avatar-placeholder">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                            </div>
+                        @endif
+                    </div>
+                    <div class="mobile-sidebar-user-info">
+                        <h5>{{ auth()->user()->name }}</h5>
+                        <p>{{ auth()->user()->email }}</p>
+                    </div>
+                </div>
+                <form method="POST" action="{{ route('logout') }}" class="mobile-sidebar-logout">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+        @endauth
 
         @yield('content')
 
@@ -328,7 +749,68 @@
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
+    <!-- Mobile Sidebar JavaScript -->
+    <script>
+        $(document).ready(function() {
+            // Mobile Sidebar Functions
+            const sidebar = $('#mobileSidebar');
+            const overlay = $('#mobileSidebarOverlay');
+            const navbarToggle = $('.navbar-toggle');
+            const closeBtn = $('#mobileSidebarClose');
+            
+            // Override navbar toggle behavior on mobile
+            navbarToggle.on('click', function(e) {
+                if ($(window).width() <= 768) {
+                    // Check if user is authenticated and mobile sidebar exists
+                    if (sidebar.length > 0) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Toggle mobile sidebar instead of default navbar
+                        if (sidebar.hasClass('show')) {
+                            closeSidebar();
+                        } else {
+                            openSidebar();
+                        }
+                    }
+                    // If not authenticated, let the default navbar behavior work
+                }
+            });
+            
+            // Open sidebar
+            function openSidebar() {
+                if (sidebar.length > 0) {
+                    sidebar.addClass('show');
+                    overlay.addClass('show');
+                    $('body').addClass('sidebar-open').css('overflow', 'hidden');
+                }
+            }
+            
+            // Close sidebar
+            function closeSidebar() {
+                if (sidebar.length > 0) {
+                    sidebar.removeClass('show');
+                    overlay.removeClass('show');
+                    $('body').removeClass('sidebar-open').css('overflow', '');
+                }
+            }
+            
+            // Close sidebar handlers (only if sidebar exists)
+            if (closeBtn.length > 0) {
+                closeBtn.on('click', closeSidebar);
+            }
+            if (overlay.length > 0) {
+                overlay.on('click', closeSidebar);
+            }
+            
+            // Handle window resize
+            $(window).on('resize', function() {
+                if ($(window).width() > 768) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
 
     @stack('scripts')
 
