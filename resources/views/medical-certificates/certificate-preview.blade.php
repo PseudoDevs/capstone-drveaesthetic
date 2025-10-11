@@ -38,17 +38,17 @@
         <div style="margin: 30px 0; line-height: 2;">
             <div style="margin: 15px 0;">
                 <span style="font-weight: bold; display: inline-block; min-width: 120px;">Patient Name:</span>
-                <span style="border-bottom: 1px solid #000; display: inline-block; min-width: 200px; padding-bottom: 2px; font-weight: bold; text-transform: uppercase;">{{ $record->client->name }}</span>
+                <span style="border-bottom: 1px solid #000; display: inline-block; min-width: 200px; padding-bottom: 2px; font-weight: bold; text-transform: uppercase;">{{ $record->client->name ?? 'N/A' }}</span>
             </div>
 
-            @if($record->client->date_of_birth)
+            @if($record->client && $record->client->date_of_birth)
             <div style="margin: 15px 0;">
                 <span style="font-weight: bold; display: inline-block; min-width: 120px;">Date of Birth:</span>
                 <span style="border-bottom: 1px solid #000; display: inline-block; min-width: 200px; padding-bottom: 2px;">{{ \Carbon\Carbon::parse($record->client->date_of_birth)->format('F d, Y') }}</span>
             </div>
             @endif
 
-            @if($record->client->address)
+            @if($record->client && $record->client->address)
             <div style="margin: 15px 0;">
                 <span style="font-weight: bold; display: inline-block; min-width: 120px;">Address:</span>
                 <span style="border-bottom: 1px solid #000; display: inline-block; min-width: 200px; padding-bottom: 2px;">{{ $record->client->address }}</span>
@@ -94,7 +94,7 @@
                 <div style="text-align: center; margin-top: 40px;">
                     <div style="border-bottom: 1px solid #000; width: 200px; height: 40px; margin: 0 auto 10px auto;"></div>
                     <div style="font-size: 11px; line-height: 1.3;">
-                        <strong>{{ $record->staff->name }}</strong><br>
+                        <strong>{{ $record->staff->name ?? 'N/A' }}</strong><br>
                         Attending Physician<br>
                         License No: [Medical License]<br>
                         Dr. V Aesthetic Clinic
