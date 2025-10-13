@@ -9,7 +9,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Capstone Aesthetic - Dermatology and Skin Care')</title>
     <!-- Fav Icons -->
-    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="https://scontent.fmnl4-7.fna.fbcdn.net/v/t39.30808-6/418729090_122097326798182940_868500779979598848_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeExtMuvkhE4ITBCXKkbJRRmnZbZoGt7CtWdltmga3sK1V49cOQhA3jFasNBp_355lXq9Z0SxpMfYO43nSvwjgEr&_nc_ohc=La3mCVpYfvoQ7kNvwHBYzhO&_nc_oc=Adnnq_zkxQC7XdIas186Yx9ZgMLxcI1XeTJYpdgKK4mhe7N5JfS-nAYShGVX5jKZxfipaj9oPf8OcvMoWsUBWgXb&_nc_zt=23&_nc_ht=scontent.fmnl4-7.fna&_nc_gid=BRpEQPw1c2GJuhnccL-_dQ&oh=00_AfcL8Mtx-BdH9ttmonHPkj0ErnW758ryC_w_EGRL27wU8Q&oe=68F2EE14" type="image/x-icon">
+    <link rel="icon" href="https://scontent.fmnl4-7.fna.fbcdn.net/v/t39.30808-6/418729090_122097326798182940_868500779979598848_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeExtMuvkhE4ITBCXKkbJRRmnZbZoGt7CtWdltmga3sK1V49cOQhA3jFasNBp_355lXq9Z0SxpMfYO43nSvwjgEr&_nc_ohc=La3mCVpYfvoQ7kNvwHBYzhO&_nc_oc=Adnnq_zkxQC7XdIas186Yx9ZgMLxcI1XeTJYpdgKK4mhe7N5JfS-nAYShGVX5jKZxfipaj9oPf8OcvMoWsUBWgXb&_nc_zt=23&_nc_ht=scontent.fmnl4-7.fna&_nc_gid=BRpEQPw1c2GJuhnccL-_dQ&oh=00_AfcL8Mtx-BdH9ttmonHPkj0ErnW758ryC_w_EGRL27wU8Q&oe=68F2EE14" type="image/x-icon">
+    <link rel="apple-touch-icon" href="https://scontent.fmnl4-7.fna.fbcdn.net/v/t39.30808-6/418729090_122097326798182940_868500779979598848_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeExtMuvkhE4ITBCXKkbJRRmnZbZoGt7CtWdltmga3sK1V49cOQhA3jFasNBp_355lXq9Z0SxpMfYO43nSvwjgEr&_nc_ohc=La3mCVpYfvoQ7kNvwHBYzhO&_nc_oc=Adnnq_zkxQC7XdIas186Yx9ZgMLxcI1XeTJYpdgKK4mhe7N5JfS-nAYShGVX5jKZxfipaj9oPf8OcvMoWsUBWgXb&_nc_zt=23&_nc_ht=scontent.fmnl4-7.fna&_nc_gid=BRpEQPw1c2GJuhnccL-_dQ&oh=00_AfcL8Mtx-BdH9ttmonHPkj0ErnW758ryC_w_EGRL27wU8Q&oe=68F2EE14">
 
     <!-- Stylesheets -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -413,6 +415,98 @@
             height: 150px;
             font-size: 3rem;
         }
+
+        /* Clinic Logo Styles - Mobile App Style Integration */
+        .clinic-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clinic-logo-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .clinic-logo-img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Clean, minimal logo container */
+        .logo {
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Mobile responsive adjustments - Clean mobile app style */
+        @media (max-width: 768px) {
+            .clinic-logo-img {
+                width: 40px;
+                height: 40px;
+                border-radius: 6px;
+            }
+            
+            .clinic-logo {
+                margin-right: 10px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .clinic-logo-img {
+                width: 35px;
+                height: 35px;
+                border-radius: 5px;
+            }
+            
+            .clinic-logo {
+                margin-right: 8px !important;
+            }
+        }
+
+        /* Mobile Sidebar Logo Styles - Clean Mobile App Style */
+        .mobile-clinic-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-clinic-logo-img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-sidebar-logo .text-logo {
+            text-align: left;
+            flex: 1;
+        }
+
+        .mobile-sidebar-logo .clinic-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 2px 0;
+            line-height: 1.1;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+
+        .mobile-sidebar-logo .clinic-subtitle {
+            font-size: 9px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            line-height: 1.2;
+            font-family: 'Roboto', sans-serif;
+        }
     </style>
 </head>
 
@@ -435,6 +529,11 @@
                         <div class="logo-outer d-flex align-items-center">
                             <div class="logo d-flex align-items-center">
                                 <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none">
+                                    <div class="clinic-logo me-2">
+                                        <img src="https://scontent.fmnl4-7.fna.fbcdn.net/v/t39.30808-6/418729090_122097326798182940_868500779979598848_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeExtMuvkhE4ITBCXKkbJRRmnZbZoGt7CtWdltmga3sK1V49cOQhA3jFasNBp_355lXq9Z0SxpMfYO43nSvwjgEr&_nc_ohc=La3mCVpYfvoQ7kNvwHBYzhO&_nc_oc=Adnnq_zkxQC7XdIas186Yx9ZgMLxcI1XeTJYpdgKK4mhe7N5JfS-nAYShGVX5jKZxfipaj9oPf8OcvMoWsUBWgXb&_nc_zt=23&_nc_ht=scontent.fmnl4-7.fna&_nc_gid=BRpEQPw1c2GJuhnccL-_dQ&oh=00_AfcL8Mtx-BdH9ttmonHPkj0ErnW758ryC_w_EGRL27wU8Q&oe=68F2EE14" 
+                                             alt="Dr. Ve Aesthetic Clinic Logo" 
+                                             class="clinic-logo-img">
+                                    </div>
                                     <div class="text-logo">
                                         <h2 class="clinic-name">Dr. Ve Aesthetic Clinic</h2>
                                         <p class="clinic-subtitle">and Wellness Center</p>
@@ -537,9 +636,16 @@
         <div class="mobile-sidebar d-md-none" id="mobileSidebar">
             <div class="mobile-sidebar-header">
                 <div class="mobile-sidebar-logo">
-                    <div class="text-logo">
-                        <h2 class="clinic-name">Dr. Ve Aesthetic Clinic</h2>
-                        <p class="clinic-subtitle">and Wellness Center</p>
+                    <div class="d-flex align-items-center">
+                        <div class="mobile-clinic-logo me-2">
+                            <img src="https://scontent.fmnl4-7.fna.fbcdn.net/v/t39.30808-6/418729090_122097326798182940_868500779979598848_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeExtMuvkhE4ITBCXKkbJRRmnZbZoGt7CtWdltmga3sK1V49cOQhA3jFasNBp_355lXq9Z0SxpMfYO43nSvwjgEr&_nc_ohc=La3mCVpYfvoQ7kNvwHBYzhO&_nc_oc=Adnnq_zkxQC7XdIas186Yx9ZgMLxcI1XeTJYpdgKK4mhe7N5JfS-nAYShGVX5jKZxfipaj9oPf8OcvMoWsUBWgXb&_nc_zt=23&_nc_ht=scontent.fmnl4-7.fna&_nc_gid=BRpEQPw1c2GJuhnccL-_dQ&oh=00_AfcL8Mtx-BdH9ttmonHPkj0ErnW758ryC_w_EGRL27wU8Q&oe=68F2EE14" 
+                             alt="Dr. Ve Aesthetic Clinic Logo" 
+                             class="mobile-clinic-logo-img">
+                        </div>
+                        <div class="text-logo">
+                            <h2 class="clinic-name">Dr. Ve Aesthetic Clinic</h2>
+                            <p class="clinic-subtitle">and Wellness Center</p>
+                        </div>
                     </div>
                 </div>
                 <button class="mobile-sidebar-close" id="mobileSidebarClose">
