@@ -103,7 +103,7 @@ class ClinicServiceResource extends Resource
                 Tables\Columns\TextColumn::make('staff.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->money()
+                    ->money('PHP')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('created_at')

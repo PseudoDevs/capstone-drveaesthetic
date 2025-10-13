@@ -3,7 +3,7 @@
         <!-- Header Section -->
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white">
             <h1 class="text-2xl font-bold mb-2">Training & Guidelines</h1>
-            <p class="text-blue-100">Access comprehensive training materials and guidelines to enhance your skills and
+            <p class="text-black">Access comprehensive training materials and guidelines to enhance your skills and
                 knowledge.</p>
         </div>
 

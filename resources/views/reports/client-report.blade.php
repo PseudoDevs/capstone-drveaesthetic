@@ -282,7 +282,7 @@
         @if($totalRevenue > 0)
         <div class="revenue-box">
             <div class="revenue-label">Total Revenue Generated</div>
-            <div class="revenue-amount">${{ number_format($totalRevenue, 2) }}</div>
+            <div class="revenue-amount">₱{{ number_format($totalRevenue, 2) }}</div>
         </div>
         @endif
 
@@ -303,7 +303,7 @@
                     <tr>
                         <td>{{ $service['service'] }}</td>
                         <td>{{ $service['count'] }}x</td>
-                        <td>${{ number_format($service['total_paid'], 2) }}</td>
+                        <td>₱{{ number_format($service['total_paid'], 2) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -338,7 +338,7 @@
                                 {{ $appointment->status }}
                             </span>
                         </td>
-                        <td>${{ number_format($appointment->service->price ?? 0, 2) }}</td>
+                        <td>₱{{ number_format($appointment->service->price ?? 0, 2) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
