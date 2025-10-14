@@ -36,9 +36,8 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
-Route::get('/notification-preferences', function () {
-    return view('notification-preferences');
-})->name('notification-preferences')->middleware('auth');
+Route::get('/notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index'])->name('notification-preferences')->middleware('auth');
+Route::put('/notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('notification-preferences.update')->middleware('auth');
 
 Route::get('/feedback', [\App\Http\Controllers\FeedbackController::class, 'create'])->name('feedback.create')->middleware('auth');
 Route::post('/feedback', [\App\Http\Controllers\FeedbackController::class, 'store'])->name('feedback.submit')->middleware('auth');

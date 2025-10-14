@@ -35,8 +35,9 @@
                     <p class="text-muted mb-0">Manage how you receive notifications from Dr. Ve Aesthetic</p>
                 </div>
                 <div class="card-body">
-                    <form id="notificationPreferencesForm">
+                    <form id="notificationPreferencesForm" action="{{ route('notification-preferences.update') }}" method="POST">
                         @csrf
+                        @method('PUT')
                         
                         <div class="row">
                             <div class="col-12">
@@ -196,55 +197,30 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadNotificationPreferences() {
-    fetch('/api/client/mobile/notification-preferences', {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + getAuthToken(),
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const preferences = data.data;
-            
-            // Set form values
-            document.getElementById('email_notifications').checked = preferences.email_notifications;
-            document.getElementById('appointment_confirmations').checked = preferences.appointment_confirmations;
-            document.getElementById('appointment_reminders_24h').checked = preferences.appointment_reminders_24h;
-            document.getElementById('appointment_reminders_2h').checked = preferences.appointment_reminders_2h;
-            document.getElementById('appointment_cancellations').checked = preferences.appointment_cancellations;
-            document.getElementById('feedback_requests').checked = preferences.feedback_requests;
-            document.getElementById('service_updates').checked = preferences.service_updates;
-            document.getElementById('promotional_offers').checked = preferences.promotional_offers;
-            document.getElementById('newsletter').checked = preferences.newsletter;
-        }
-    })
-    .catch(error => {
-        console.error('Error loading preferences:', error);
-        showAlert('Error loading notification preferences', 'error');
-    });
+    // Set form values from server-side data
+    @if(isset($preferences))
+        document.getElementById('email_notifications').checked = {{ $preferences->email_notifications ? 'true' : 'false' }};
+        document.getElementById('appointment_confirmations').checked = {{ $preferences->appointment_confirmations ? 'true' : 'false' }};
+        document.getElementById('appointment_reminders_24h').checked = {{ $preferences->appointment_reminders_24h ? 'true' : 'false' }};
+        document.getElementById('appointment_reminders_2h').checked = {{ $preferences->appointment_reminders_2h ? 'true' : 'false' }};
+        document.getElementById('appointment_cancellations').checked = {{ $preferences->appointment_cancellations ? 'true' : 'false' }};
+        document.getElementById('feedback_requests').checked = {{ $preferences->feedback_requests ? 'true' : 'false' }};
+        document.getElementById('service_updates').checked = {{ $preferences->service_updates ? 'true' : 'false' }};
+        document.getElementById('promotional_offers').checked = {{ $preferences->promotional_offers ? 'true' : 'false' }};
+        document.getElementById('newsletter').checked = {{ $preferences->newsletter ? 'true' : 'false' }};
+    @endif
 }
 
 function saveNotificationPreferences() {
     const formData = new FormData(document.getElementById('notificationPreferencesForm'));
-    const preferences = {};
     
-    // Convert form data to object
-    for (let [key, value] of formData.entries()) {
-        preferences[key] = value === 'on';
-    }
-    
-    fetch('/api/client/mobile/notification-preferences', {
-        method: 'PUT',
+    fetch('{{ route("notification-preferences.update") }}', {
+        method: 'POST',
         headers: {
-            'Authorization': 'Bearer ' + getAuthToken(),
-            'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify(preferences)
+        body: formData
     })
     .then(response => response.json())
     .then(data => {
@@ -273,11 +249,6 @@ function resetForm() {
     document.getElementById('newsletter').checked = false;
 }
 
-function getAuthToken() {
-    // This should return the user's auth token
-    // You might need to implement this based on your auth system
-    return localStorage.getItem('auth_token') || '';
-}
 
 function showAlert(message, type) {
     // Use SweetAlert2 if available, otherwise use basic alert

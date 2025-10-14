@@ -32,7 +32,7 @@ class AppointmentStatusNotification extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Appointment Status Update - ' . $this->appointment->service->service_name,
+            subject: 'Appointment Status Update - ' . ($this->appointment->service->service_name ?? 'Appointment'),
         );
     }
 
@@ -46,9 +46,9 @@ class AppointmentStatusNotification extends Mailable implements ShouldQueue
             with: [
                 'appointment' => $this->appointment,
                 'oldStatus' => $this->oldStatus,
-                'clientName' => $this->appointment->client->name,
-                'serviceName' => $this->appointment->service->service_name,
-                'staffName' => $this->appointment->staff->name,
+                'clientName' => $this->appointment->client->name ?? 'Client',
+                'serviceName' => $this->appointment->service->service_name ?? 'Service',
+                'staffName' => $this->appointment->staff->name ?? 'Staff Member',
                 'appointmentDate' => $this->appointment->appointment_date,
                 'appointmentTime' => $this->appointment->appointment_time,
                 'status' => $this->appointment->status,

@@ -40,11 +40,11 @@ class AppointmentReminderNotification extends Notification implements ShouldQueu
             ->subject($subject . ' - Dr. Ve Aesthetic')
             ->greeting($greeting)
             ->line('**Appointment Details:**')
-            ->line('Service: ' . $this->appointment->service->service_name)
+            ->line('Service: ' . ($this->appointment->service->service_name ?? 'Service'))
             ->line('Date: ' . $this->appointment->appointment_date->format('F d, Y'))
             ->line('Time: ' . $this->appointment->appointment_time)
-            ->line('Staff: ' . $this->appointment->staff->name)
-            ->line('Duration: ' . $this->appointment->service->duration . ' minutes')
+            ->line('Staff: ' . ($this->appointment->staff->name ?? 'Staff Member'))
+            ->line('Duration: ' . ($this->appointment->service->duration ?? 60) . ' minutes')
             ->action('View Appointment', url('/users/dashboard'))
             ->line('**Important Reminders:**')
             ->line('• Please arrive 15 minutes before your scheduled time')
@@ -61,7 +61,7 @@ class AppointmentReminderNotification extends Notification implements ShouldQueu
             'type' => 'appointment_reminder',
             'reminder_type' => $this->reminderType,
             'title' => 'Appointment Reminder',
-            'message' => 'Reminder: You have an appointment for ' . $this->appointment->service->service_name . ' ' . 
+            'message' => 'Reminder: You have an appointment for ' . ($this->appointment->service->service_name ?? 'Service') . ' ' . 
                         ($this->reminderType === '24h' ? 'tomorrow' : 'today') . '.',
             'appointment_date' => $this->appointment->appointment_date->format('Y-m-d'),
             'appointment_time' => $this->appointment->appointment_time,
