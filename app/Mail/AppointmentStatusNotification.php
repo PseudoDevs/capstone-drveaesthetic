@@ -57,6 +57,15 @@ class AppointmentStatusNotification extends Mailable implements ShouldQueue
     }
 
     /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        // Log the failure but don't crash the system
+        \Log::warning('AppointmentStatusNotification failed: ' . $exception->getMessage());
+    }
+
+    /**
      * Get the attachments for the message.
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
