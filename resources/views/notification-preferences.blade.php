@@ -35,6 +35,13 @@
                     <p class="text-muted mb-0">Manage how you receive notifications from Dr. Ve Aesthetic</p>
                 </div>
                 <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+                    
                     <form id="notificationPreferencesForm" action="{{ route('notification-preferences.update') }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -212,28 +219,8 @@ function loadNotificationPreferences() {
 }
 
 function saveNotificationPreferences() {
-    const formData = new FormData(document.getElementById('notificationPreferencesForm'));
-    
-    fetch('{{ route("notification-preferences.update") }}', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showAlert('Notification preferences saved successfully!', 'success');
-        } else {
-            showAlert('Error saving preferences: ' + (data.message || 'Unknown error'), 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error saving preferences:', error);
-        showAlert('Error saving notification preferences', 'error');
-    });
+    // Use regular form submission to avoid CSRF issues
+    document.getElementById('notificationPreferencesForm').submit();
 }
 
 function resetForm() {

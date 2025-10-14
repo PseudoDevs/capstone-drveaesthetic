@@ -20,27 +20,21 @@ class NotificationPreferenceController extends Controller
     {
         $user = Auth::user();
         
-        $validated = $request->validate([
-            'email_notifications' => 'boolean',
-            'appointment_confirmations' => 'boolean',
-            'appointment_reminders_24h' => 'boolean',
-            'appointment_reminders_2h' => 'boolean',
-            'appointment_cancellations' => 'boolean',
-            'feedback_requests' => 'boolean',
-            'service_updates' => 'boolean',
-            'promotional_offers' => 'boolean',
-            'newsletter' => 'boolean',
-        ]);
+        // Handle checkbox values - unchecked checkboxes don't send values
+        $data = [
+            'email_notifications' => $request->has('email_notifications'),
+            'appointment_confirmations' => $request->has('appointment_confirmations'),
+            'appointment_reminders_24h' => $request->has('appointment_reminders_24h'),
+            'appointment_reminders_2h' => $request->has('appointment_reminders_2h'),
+            'appointment_cancellations' => $request->has('appointment_cancellations'),
+            'feedback_requests' => $request->has('feedback_requests'),
+            'service_updates' => $request->has('service_updates'),
+            'promotional_offers' => $request->has('promotional_offers'),
+            'newsletter' => $request->has('newsletter'),
+        ];
         
         $preferences = $user->getNotificationPreferences();
-        $preferences->update($validated);
-        
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Notification preferences updated successfully!'
-            ]);
-        }
+        $preferences->update($data);
         
         return redirect()->back()->with('success', 'Notification preferences updated successfully!');
     }
