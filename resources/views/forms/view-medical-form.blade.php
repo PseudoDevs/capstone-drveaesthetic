@@ -58,18 +58,38 @@
                         </h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Name</label>
+                                <label class="form-label fw-bold">Full Name</label>
                                 <p class="form-control-plaintext">{{ $formData['patient_name'] ?? 'N/A' }}</p>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Date</label>
-                                <p class="form-control-plaintext">{{ $formData['date'] ?? 'N/A' }}</p>
+                                <label class="form-label fw-bold">Date of Birth</label>
+                                <p class="form-control-plaintext">{{ $formData['date_of_birth'] ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Phone Number</label>
+                                <p class="form-control-plaintext">{{ $formData['phone'] ?? 'N/A' }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Email Address</label>
+                                <p class="form-control-plaintext">{{ $formData['email'] ?? 'N/A' }}</p>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12 mb-3">
-                                <label class="form-label fw-bold">Address</label>
+                                <label class="form-label fw-bold">Complete Address</label>
                                 <p class="form-control-plaintext">{{ $formData['address'] ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Form Date</label>
+                                <p class="form-control-plaintext">{{ $formData['date'] ?? 'N/A' }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Age</label>
+                                <p class="form-control-plaintext">{{ $formData['age'] ?? 'N/A' }}</p>
                             </div>
                         </div>
                         <div class="row">
@@ -152,28 +172,6 @@
                         </div>
                     </div>
 
-                    <!-- Digital Signature -->
-                    <div class="form-section mb-4">
-                        <h5 class="section-title">
-                            <i class="fas fa-signature me-2"></i>Digital Signature
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Signature Date</label>
-                                <p class="form-control-plaintext">{{ $formData['signature_date'] ?? 'N/A' }}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Location</label>
-                                <p class="form-control-plaintext">{{ $formData['signature_location'] ?? 'N/A' }}</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label fw-bold">Digital Signature</label>
-                                <p class="form-control-plaintext">{{ $formData['signature_data'] ?? 'N/A' }}</p>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Action Buttons -->
                     <div class="text-center mt-4">

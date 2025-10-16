@@ -68,20 +68,46 @@
                             </h5>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="patient_name" class="form-label">Name</label>
+                                    <label for="patient_name" class="form-label">Full Name</label>
                                     <input type="text" class="form-control" id="patient_name" name="medical_form_data[patient_name]" 
                                            value="{{ old('medical_form_data.patient_name', auth()->user()->name) }}" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="date" class="form-label">Date</label>
-                                    <input type="date" class="form-control" id="date" name="medical_form_data[date]" 
-                                           value="{{ old('medical_form_data.date', now()->format('Y-m-d')) }}" required>
+                                    <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="medical_form_data[date_of_birth]" 
+                                           value="{{ old('medical_form_data.date_of_birth', auth()->user()->date_of_birth) }}" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="medical_form_data[phone]" 
+                                           value="{{ old('medical_form_data.phone', auth()->user()->phone) }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="medical_form_data[email]" 
+                                           value="{{ old('medical_form_data.email', auth()->user()->email) }}" required>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12 mb-3">
-                                    <label for="address" class="form-label">Address</label>
+                                    <label for="address" class="form-label">Complete Address</label>
                                     <textarea class="form-control" id="address" name="medical_form_data[address]" rows="2" required>{{ old('medical_form_data.address', auth()->user()->address) }}</textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="date" class="form-label">Form Date</label>
+                                    <input type="date" class="form-control" id="date" name="medical_form_data[date]" 
+                                           value="{{ old('medical_form_data.date', now()->format('Y-m-d')) }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="age" class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="age" name="medical_form_data[age]" 
+                                           value="{{ old('medical_form_data.age', auth()->user()->date_of_birth ? \Carbon\Carbon::parse(auth()->user()->date_of_birth)->age : '') }}" 
+                                           min="1" max="120">
+                                    <div class="form-text">Auto-calculated from date of birth (can be edited)</div>
                                 </div>
                             </div>
                             <div class="row">
@@ -199,32 +225,6 @@
                             </div>
                         </div>
 
-                        <!-- Digital Signature -->
-                        <div class="form-section mb-4">
-                            <h5 class="section-title">
-                                <i class="fas fa-signature me-2"></i>Digital Signature
-                            </h5>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="signature_date" class="form-label">Signature Date</label>
-                                    <input type="date" class="form-control" id="signature_date" name="medical_form_data[signature_date]" 
-                                           value="{{ old('medical_form_data.signature_date', now()->format('Y-m-d')) }}" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="signature_location" class="form-label">Location</label>
-                                    <input type="text" class="form-control" id="signature_location" name="medical_form_data[signature_location]" 
-                                           value="{{ old('medical_form_data.signature_location', 'Iriga City, Camarines Sur') }}" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label for="signature_data" class="form-label">Digital Signature</label>
-                                    <input type="text" class="form-control" id="signature_data" name="medical_form_data[signature_data]" 
-                                           value="{{ old('medical_form_data.signature_data', auth()->user()->name) }}" required>
-                                    <div class="form-text">By typing your name above, you are providing your digital signature.</div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Submit Button -->
                         <div class="text-center mt-4">
@@ -306,3 +306,55 @@
 }
 </style>
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-calculate age when date of birth changes
+    const dateOfBirthInput = document.getElementById('date_of_birth');
+    const ageInput = document.getElementById('age');
+    
+    function calculateAge() {
+        if (dateOfBirthInput.value) {
+            const birthDate = new Date(dateOfBirthInput.value);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            ageInput.value = age;
+        }
+    }
+    
+    // Calculate age on page load
+    calculateAge();
+    
+    // Calculate age when date of birth changes
+    dateOfBirthInput.addEventListener('change', calculateAge);
+    
+    // Auto-populate form with user data
+    const userData = {
+        name: '{{ auth()->user()->name }}',
+        email: '{{ auth()->user()->email }}',
+        phone: '{{ auth()->user()->phone ?? "" }}',
+        address: '{{ auth()->user()->address ?? "" }}',
+        dateOfBirth: '{{ auth()->user()->date_of_birth ?? "" }}'
+    };
+    
+    // Show a notification that form is auto-populated and editable
+    if (userData.name && userData.email) {
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-info alert-dismissible fade show';
+        notification.innerHTML = `
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Form Auto-Populated!</strong> Your account information has been automatically filled in. All fields are editable - please review and update as needed.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const cardBody = document.querySelector('.card-body');
+        cardBody.insertBefore(notification, cardBody.firstChild);
+    }
+});
+</script>

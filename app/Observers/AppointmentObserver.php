@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Appointment;
 use App\Notifications\AppointmentConfirmationNotification;
+use App\Notifications\AppointmentStatusNotification as StatusNotification;
 use App\Notifications\FeedbackRequestNotification;
 use App\Events\AppointmentStatusUpdated;
 use App\Mail\AppointmentStatusNotification;
@@ -38,10 +39,24 @@ class AppointmentObserver
                     // Load necessary relationships if not already loaded
                     $appointment->load(['client', 'service', 'staff']);
 
-                    // Send email notification to the client
-                    if ($appointment->client && $appointment->client->email) {
-                        Mail::to($appointment->client->email)
-                            ->send(new AppointmentStatusNotification($appointment, $oldStatus));
+                    // Honor user's notification preferences
+                    $client = $appointment->client;
+                    if ($client && $client->email) {
+                        $shouldSend = true;
+
+                        // Map specific statuses to preference keys
+                        $preferenceKey = match (strtolower($newStatus)) {
+                            'scheduled', 'confirmed' => 'appointment_confirmation',
+                            'cancelled', 'declined' => 'appointment_cancellation',
+                            default => 'email_notifications',
+                        };
+
+                        $shouldSend = $client->wantsNotification($preferenceKey);
+
+                        if ($shouldSend) {
+                            // Use Notification (queued) rather than direct Mailable
+                            $client->notify(new StatusNotification($appointment, $oldStatus));
+                        }
 
                         // Show notification in Filament (if available)
                         if (class_exists(\Filament\Notifications\Notification::class)) {

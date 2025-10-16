@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\AppointmentResource\Pages;
 use App\Filament\Resources\AppointmentResource\RelationManagers;
+use Illuminate\Support\Facades\Mail;
+use Filament\Notifications\Notification;
 
 class AppointmentResource extends Resource
 {
@@ -31,7 +33,8 @@ class AppointmentResource extends Resource
                 Forms\Components\Select::make('client_id')
                     ->relationship('client', 'name')
                     ->native(false)
-                    ->required(),
+                    ->required()
+                    ->disabledOn('edit'),
                 Forms\Components\Select::make('service_id')
                     ->relationship('service', 'service_name')
                     ->native(false)
@@ -123,6 +126,25 @@ class AppointmentResource extends Resource
             ])
             ->headerActions([
                 // Tables\Actions\CreateAction::make()->slideOver(),
+                Tables\Actions\Action::make('send_test_email')
+                    ->label('Send Test Email')
+                    ->icon('heroicon-o-paper-airplane')
+                    ->form([
+                        Forms\Components\TextInput::make('to')
+                            ->label('Recipient Email')
+                            ->email()
+                            ->required(),
+                    ])
+                    ->action(function (array $data): void {
+                        Mail::raw('Test email from Dr. Ve Aesthetic Clinic system.', function ($message) use ($data) {
+                            $message->to($data['to'])->subject('SMTP Test');
+                        });
+
+                        Notification::make()
+                            ->title('Test email sent')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
