@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Bill;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -96,6 +98,62 @@ class DashboardController extends Controller
             'nextAppointment',
             'popularService'
         ));
+    }
+
+    public function billingDashboard()
+    {
+        $user = Auth::user();
+
+        // Get all bills for the user
+        $bills = Bill::where('client_id', $user->id)
+            ->with(['appointment.service', 'payments'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Calculate billing statistics
+        $totalBills = $bills->count();
+        $totalAmount = $bills->sum('total_amount');
+        $paidAmount = $bills->sum('paid_amount');
+        $remainingBalance = $bills->sum('remaining_balance');
+
+        // Get bills by status
+        $paidBills = $bills->where('remaining_balance', 0);
+        $unpaidBills = $bills->where('remaining_balance', '>', 0);
+        $partialBills = $bills->where('paid_amount', '>', 0)->where('remaining_balance', '>', 0);
+        $overdueBills = $bills->where('due_date', '<', now())->where('remaining_balance', '>', 0);
+
+        // Calculate payment progress
+        $paymentProgress = $totalAmount > 0 ? ($paidAmount / $totalAmount) * 100 : 0;
+
+        // Get recent payments
+        $recentPayments = Payment::whereHas('bill', function ($query) use ($user) {
+            $query->where('client_id', $user->id);
+        })
+        ->with(['bill.appointment.service'])
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get();
+
+        // Get staggered bills
+        $staggeredBills = $bills->where('payment_type', 'staggered');
+        $activeInstallments = $staggeredBills->where('remaining_balance', '>', 0);
+
+        return view('billing-dashboard', compact(
+            'user',
+            'bills',
+            'totalBills',
+            'totalAmount',
+            'paidAmount',
+            'remainingBalance',
+            'paidBills',
+            'unpaidBills',
+            'partialBills',
+            'overdueBills',
+            'paymentProgress',
+            'recentPayments',
+            'staggeredBills',
+            'activeInstallments'
+        ))->with('pendingBills', $unpaidBills);
     }
 
     public function getAppointments(Request $request)

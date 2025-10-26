@@ -91,8 +91,9 @@ class TrainingResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-                Tables\Columns\BadgeColumn::make('type')
+                Tables\Columns\TextColumn::make('type')
                     ->label('Type')
+                    ->badge()
                     ->colors([
                         'danger' => 'Safety Protocol',
                         'success' => 'Customer Service',
@@ -132,7 +133,11 @@ class TrainingResource extends Resource
                     ]),
                 Tables\Filters\Filter::make('is_published')
                     ->label('Published Only')
-                    ->query(fn (Builder $query): Builder => $query->where('is_published', true))
+                    ->query(fn (Builder $query): Builder => $query->published())
+                    ->toggle(),
+                Tables\Filters\Filter::make('is_unpublished')
+                    ->label('Unpublished Only')
+                    ->query(fn (Builder $query): Builder => $query->unpublished())
                     ->toggle(),
             ])
             ->actions([
@@ -161,6 +166,8 @@ class TrainingResource extends Resource
     {
         return [
             'index' => Pages\ListTrainings::route('/'),
+            'create' => Pages\CreateTraining::route('/create'),
+            'edit' => Pages\EditTraining::route('/{record}/edit'),
         ];
     }
 }

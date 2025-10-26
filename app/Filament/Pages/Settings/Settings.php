@@ -182,6 +182,11 @@ class Settings extends BaseSettings
                                         ->label('Secondary Email')
                                         ->email()
                                         ->default('gilkan4@gmail.com'),
+
+                                    TextInput::make('contact.facebook')
+                                        ->label('Facebook Page')
+                                        ->default('Dr. Ve Aesthetic Clinic')
+                                        ->helperText('Enter your Facebook page name or URL'),
                                 ]),
                         ]),
 

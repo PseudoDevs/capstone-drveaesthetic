@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     // Dashboard Routes
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/billing-dashboard', [DashboardController::class, 'billingDashboard'])->name('billing-dashboard');
         Route::get('/dashboard/appointments', [DashboardController::class, 'getAppointments'])->name('dashboard.appointments');
 
         // Profile Routes
@@ -132,4 +133,20 @@ Route::middleware(['auth'])->group(function () {
             'Content-Type' => 'application/pdf',
         ]);
     })->name('medical-certificate.download');
+    
+    // Prescription Print Route (protected)
+    Route::get('/staff/prescriptions/{prescription}/print', [\App\Http\Controllers\PrescriptionController::class, 'print'])
+        ->name('staff.prescription.print');
+    
+    // Medical Certificate Print Route (protected)
+    Route::get('/staff/medical-certificates/{medical_certificate}/print', [\App\Http\Controllers\MedicalCertificateController::class, 'print'])
+        ->name('staff.medical-certificate.print');
+    
+    // Bill Print Route (protected)
+    Route::get('/staff/bills/{bill}/print', [\App\Http\Controllers\BillController::class, 'print'])
+        ->name('staff.bill.print');
+    
+    // Payment Print Route (protected)
+    Route::get('/staff/payments/{payment}/print', [\App\Http\Controllers\PaymentController::class, 'print'])
+        ->name('staff.payment.print');
 });

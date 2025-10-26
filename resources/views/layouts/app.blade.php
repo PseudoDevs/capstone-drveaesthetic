@@ -588,6 +588,8 @@
                                                     <div class="dropdown-divider"></div>
                                                     <li><a class="dropdown-item" href="{{ url('/users/dashboard') }}"><i
                                                                 class="fas fa-dice-d6 mr-2"></i>Dashboard</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('users.billing-dashboard') }}"><i
+                                                                class="fas fa-credit-card mr-2"></i>Billing Dashboard</a></li>
                                                     <li><a class="dropdown-item"
                                                             href="{{ route('users.profile.edit') }}"><i
                                                                 class="fas fa-user mr-2"></i>Edit Profile</a></li>
@@ -691,6 +693,12 @@
                             <a href="{{ url('/users/dashboard') }}" class="mobile-sidebar-link">
                                 <i class="fas fa-tachometer-alt"></i>
                                 <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="mobile-sidebar-item">
+                            <a href="{{ route('users.billing-dashboard') }}" class="mobile-sidebar-link">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Billing Dashboard</span>
                             </a>
                         </li>
                         <li class="mobile-sidebar-item">

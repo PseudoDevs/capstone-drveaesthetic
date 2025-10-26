@@ -73,6 +73,65 @@
             display: block;
         }
 
+        /* Staggered Payment Styling */
+        .staggered-payment-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .staggered-payment-badge i {
+            font-size: 14px;
+        }
+
+        .staggered-payment-info {
+            background: #f8f9ff;
+            border: 1px solid #e1e5ff;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .payment-option i {
+            color: #667eea;
+            width: 16px;
+            text-align: center;
+        }
+
+        .payment-option span {
+            font-weight: 500;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+            }
+            100% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+        }
+
         .price-circle {
             margin-bottom: 0px;
         }
@@ -417,11 +476,35 @@
                                     @if ($service->category)
                                         <p class="category">{{ $service->category->category_name }}</p>
                                     @endif
+                                    
+                                    <!-- Staggered Payment Badge -->
+                                    @if($service->allows_staggered_payment)
+                                        <div class="staggered-payment-badge">
+                                            <i class="fas fa-credit-card"></i>
+                                            <span>Flexible Payment Available</span>
+                                        </div>
+                                    @endif
+                                    
                                     @if ($service->description)
                                         <p class="description">{{ $service->description }}</p>
                                     @endif
                                     <p class="duration"><i class="far fa-clock"></i> Duration: {{ $service->duration }}
                                         minutes</p>
+                                    
+                                    <!-- Staggered Payment Details -->
+                                    @if($service->allows_staggered_payment)
+                                        <div class="staggered-payment-info">
+                                            <div class="payment-option">
+                                                <i class="fas fa-hand-holding-usd"></i>
+                                                <span>Down Payment: ₱{{ number_format($service->calculateDownPayment(), 2) }}</span>
+                                            </div>
+                                            <div class="payment-option">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                <span>{{ $service->min_installments ?? 2 }} - {{ $service->max_installments ?? 6 }} installments</span>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    
                                     <!--@if ($service->staff)
                                         <p class="staff"><i class="far fa-user"></i> By: {{ $service->staff->name }}</p>
                                     @endif-->

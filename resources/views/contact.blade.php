@@ -69,11 +69,11 @@
                 <div class="col-xl-4 col-lg-6">
                     <div class="contact-info-item">
                         <div class="contact-info-icon">
-                            <i class="flaticon-location"></i>
+                            <i class="fab fa-facebook"></i>
                         </div>
                         <div class="info-content">
-                            <span>{{ setting('contact.address_line_1', 'San Jose,') }}</span>
-                            <span>{{ setting('contact.address_line_2', 'Iriga City, Philippines, 4431') }}</span>
+                            <span>Follow us on Facebook</span>
+                            <span>{{ setting('contact.facebook', 'Dr. Ve Aesthetic Clinic') }}</span>
                         </div>
                     </div>
                 </div>

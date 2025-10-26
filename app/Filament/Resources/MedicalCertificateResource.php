@@ -31,7 +31,7 @@ class MedicalCertificateResource extends Resource
             ->schema([
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Forms\Components\Select::make('staff_id')
+                        Forms\Components\Select::make('issued_by')
                             ->label('Attending Medical Officer')
                             ->relationship('staff', 'name', fn (Builder $query) => $query->whereIn('role', ['Staff', 'Doctor', 'Admin']))
                             ->searchable()
@@ -54,17 +54,30 @@ class MedicalCertificateResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Forms\Components\TextInput::make('amount')
-                            ->label('Certificate Fee')
-                            ->required()
-                            ->numeric()
-                            ->prefix('₱')
-                            ->default(0)
+                        Forms\Components\TextInput::make('certificate_number')
+                            ->label('Certificate Number')
+                            ->default(fn () => MedicalCertificate::generateCertificateNumber())
+                            ->disabled()
                             ->columnSpan(1),
-                        Forms\Components\Toggle::make('is_issued')
-                            ->label('Mark as Issued')
-                            ->helperText('Toggle this when the certificate is officially issued to the patient')
-                            ->default(false)
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'active' => 'Active',
+                                'expired' => 'Expired',
+                                'cancelled' => 'Cancelled',
+                            ])
+                            ->default('active')
+                            ->columnSpan(1),
+                    ]),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Forms\Components\DatePicker::make('valid_from')
+                            ->label('Valid From')
+                            ->default(now())
+                            ->columnSpan(1),
+                        Forms\Components\DatePicker::make('valid_until')
+                            ->label('Valid Until')
+                            ->default(now()->addDays(30))
                             ->columnSpan(1),
                     ]),
             ]);
@@ -90,14 +103,19 @@ class MedicalCertificateResource extends Resource
                     ->label('Medical Officer')
                     ->sortable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('amount')
-                    ->label('Fee')
-                    ->money('PHP')
+                Tables\Columns\TextColumn::make('certificate_number')
+                    ->label('Certificate #')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('is_issued')
+                Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
-                    ->formatStateUsing(fn ($state): string => $state ? 'Issued' : 'Pending')
-                    ->color(fn ($state): string => $state ? 'success' : 'warning'),
+                    ->formatStateUsing(fn ($state): string => ucfirst($state))
+                    ->color(fn ($state): string => match($state) {
+                        'active' => 'success',
+                        'expired' => 'danger',
+                        'cancelled' => 'warning',
+                        default => 'gray'
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Certificate Date')
                     ->dateTime('M d, Y')
@@ -109,13 +127,14 @@ class MedicalCertificateResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('is_issued')
+                Tables\Filters\SelectFilter::make('status')
                     ->label('Certificate Status')
                     ->options([
-                        '1' => 'Issued',
-                        '0' => 'Pending',
+                        'active' => 'Active',
+                        'expired' => 'Expired',
+                        'cancelled' => 'Cancelled',
                     ]),
-                Tables\Filters\SelectFilter::make('staff_id')
+                Tables\Filters\SelectFilter::make('issued_by')
                     ->label('Medical Officer')
                     ->relationship('staff', 'name'),
                 Tables\Filters\Filter::make('created_at')

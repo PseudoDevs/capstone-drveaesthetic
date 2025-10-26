@@ -511,6 +511,7 @@
                                 </div>
                             @endforeach
                             
+                            
                             <!-- Profile Tab -->
                             <div class="tab-pane fade" id="profile" role="tabpanel">
                                 <div class="profile-content mt-4">
@@ -579,6 +580,7 @@
 
 
 @endsection
+
 
 @push('styles')
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css' rel='stylesheet' />

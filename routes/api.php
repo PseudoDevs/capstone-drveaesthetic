@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\Client\MedicalCertificateController;
 use App\Http\Controllers\Api\Client\TimeLogsController;
 use App\Http\Controllers\Api\Client\TrainingController;
 use App\Http\Controllers\Api\Client\AuthController;
+use App\Http\Controllers\Api\Client\BillingController;
+use App\Http\Controllers\Api\Client\PrescriptionController;
 use App\Http\Controllers\Api\Mobile\GoogleAuthController as MobileGoogleAuthController;
 use App\Http\Controllers\Api\Web\GoogleAuthController as WebGoogleAuthController;
 
@@ -107,6 +109,22 @@ Route::prefix('client')->name('client.')->group(function () {
     
     // Medical Certificates API
     Route::apiResource('medical-certificates', MedicalCertificateController::class);
+    
+    // Billing API
+    Route::prefix('billing')->name('billing.')->middleware('auth:sanctum')->group(function () {
+        Route::get('dashboard', [BillingController::class, 'dashboard'])->name('dashboard');
+        Route::get('history', [BillingController::class, 'paymentHistory'])->name('history');
+        Route::get('outstanding', [BillingController::class, 'outstandingBalance'])->name('outstanding');
+        Route::post('pay', [BillingController::class, 'processPayment'])->name('pay');
+    });
+    
+    // Prescriptions API
+    Route::prefix('prescriptions')->name('prescriptions.')->middleware('auth:sanctum')->group(function () {
+        Route::get('/', [PrescriptionController::class, 'index'])->name('index');
+        Route::get('statistics', [PrescriptionController::class, 'statistics'])->name('statistics');
+        Route::get('{id}', [PrescriptionController::class, 'show'])->name('show');
+        Route::get('{id}/download', [PrescriptionController::class, 'download'])->name('download');
+    });
     
     // Time Logs API
     Route::apiResource('time-logs', TimeLogsController::class);

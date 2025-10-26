@@ -40,7 +40,8 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->hiddenOn('edit'),
                 Forms\Components\Select::make('role')
                     ->options([
                         'Admin' => 'Admin',
@@ -58,10 +59,12 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\BadgeColumn::make('email')
+                Tables\Columns\TextColumn::make('email')
                     ->searchable()
+                    ->badge()
                     ->color('gray'),
-                Tables\Columns\BadgeColumn::make('role')
+                Tables\Columns\TextColumn::make('role')
+                    ->badge()
                     ->colors([
                         'danger' => 'Admin',
                         'success' => 'Doctor',
@@ -69,6 +72,13 @@ class UserResource extends Resource
                         'primary' => 'Client',
                     ])
                     ->searchable(),
+                Tables\Columns\IconColumn::make('email_verified_at')
+                    ->label('Email Verified')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -79,7 +89,17 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('role')
+                    ->options([
+                        'Admin' => 'Admin',
+                        'Staff' => 'Staff',
+                        'Doctor' => 'Doctor',
+                        'Client' => 'Client',
+                    ]),
+                Tables\Filters\Filter::make('email_verified')
+                    ->label('Email Verified')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('email_verified_at'))
+                    ->toggle(),
             ])
             ->actions([
                 Tables\Actions\Action::make('generateReport')
@@ -95,6 +115,7 @@ class UserResource extends Resource
                         ]);
                     }),
                 Tables\Actions\EditAction::make()->slideOver(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
@@ -108,7 +129,7 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    // Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

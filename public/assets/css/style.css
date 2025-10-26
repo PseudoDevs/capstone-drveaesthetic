@@ -1673,3 +1673,1043 @@ img.mfp-img {
     right: 0;
     bottom: 0;
 }
+
+/* ===========================================
+   STAGGERED PAYMENT DASHBOARD STYLES
+   =========================================== */
+
+/* Payment Statistics Cards */
+.stats-card.payments {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.stats-card.active {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.stats-card.completed {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.stats-card.total {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: white;
+}
+
+/* Payment Progress Card */
+.payment-progress-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+.payment-progress-card .card-title {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.progress-overview {
+    text-align: center;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.paid-amount {
+    color: #28a745;
+}
+
+.total-amount {
+    color: #6c757d;
+}
+
+.progress-bar-container {
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 20px;
+    margin: 15px 0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.progress-percentage {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 10px;
+}
+
+/* Installments Card */
+.installments-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+.installments-card .card-title {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.installments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.installment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #007bff;
+    transition: all 0.3s ease;
+}
+
+.installment-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.installment-info .service-name {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.installment-details {
+    display: flex;
+    gap: 20px;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.installment-number {
+    background: #007bff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.installment-amount {
+    font-weight: 600;
+    color: #28a745;
+}
+
+.installment-status {
+    text-align: right;
+}
+
+.remaining-balance {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #dc3545;
+    margin-bottom: 5px;
+}
+
+.next-payment-badge {
+    background: #ffc107;
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Recent Payments Card */
+.recent-payments-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+.recent-payments-card .card-title {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.payments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #28a745;
+    transition: all 0.3s ease;
+}
+
+.payment-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.payment-info .service-name {
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.payment-date {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 0;
+}
+
+.payment-amount {
+    text-align: center;
+}
+
+.payment-amount .amount {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    color: #28a745;
+    margin-bottom: 3px;
+}
+
+.payment-amount .method {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* No Payments Message */
+.no-payments-message {
+    background: #fff;
+    border-radius: 15px;
+    padding: 60px 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+.no-payments-icon {
+    font-size: 64px;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+.no-payments-message h4 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.no-payments-message p {
+    color: #6c757d;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* Staggered Services Card */
+.staggered-services-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+    margin-bottom: 30px;
+}
+
+.staggered-services-card .card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.staggered-services-card .card-subtitle {
+    color: #6c757d;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.service-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #007bff;
+}
+
+.service-info .service-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.service-info .service-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #28a745;
+    margin-bottom: 15px;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.down-payment, .installment-range {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.down-payment .label, .installment-range .label {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.down-payment .amount {
+    font-size: 16px;
+    font-weight: 600;
+    color: #007bff;
+}
+
+.installment-range .range {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.service-actions .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .installment-item,
+    .payment-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    
+    .installment-status,
+    .payment-amount {
+        text-align: center;
+    }
+    
+    .progress-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .payment-progress-card,
+    .installments-card,
+    .recent-payments-card {
+        padding: 20px;
+    }
+}
+
+/* ===========================================
+   BILLING DASHBOARD STYLES
+   =========================================== */
+
+/* Billing Dashboard Section */
+.billing-dashboard-section {
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Header Styles */
+.billing-header {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.billing-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.billing-subtitle {
+    font-size: 18px;
+    color: #6c757d;
+    margin: 0;
+}
+
+.back-to-dashboard .btn {
+    background: #007bff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.back-to-dashboard .btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* Billing Stats Cards */
+.billing-stats-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.billing-stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.billing-stats-card .stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #fff;
+}
+
+.billing-stats-card.total-bills .stats-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.billing-stats-card.amount-paid .stats-icon {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.billing-stats-card.remaining-balance .stats-icon {
+    background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
+}
+
+.billing-stats-card.payment-progress .stats-icon {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.billing-stats-card .stats-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.billing-stats-card .stats-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+/* Billing Tabs */
+.billing-tabs {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.billing-tabs .nav-tabs {
+    border-bottom: 1px solid #e9ecef;
+    margin: 0;
+    padding: 0 30px;
+}
+
+.billing-tabs .nav-tabs .nav-link {
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    font-weight: 600;
+    padding: 20px 30px;
+    margin-right: 20px;
+    border-radius: 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.billing-tabs .nav-tabs .nav-link:hover {
+    color: #007bff;
+    background: transparent;
+}
+
+.billing-tabs .nav-tabs .nav-link.active {
+    color: #007bff;
+    background: transparent;
+    border-bottom: 3px solid #007bff;
+}
+
+.billing-tabs .tab-content {
+    padding: 30px;
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.bills-count, .payments-count {
+    background: #007bff;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Bills Table */
+.bills-table-container {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bills-table {
+    margin: 0;
+    width: 100%;
+}
+
+.bills-table thead {
+    background: #f8f9fa;
+}
+
+.bills-table thead th {
+    border: none;
+    padding: 20px 15px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.bills-table tbody td {
+    border: none;
+    padding: 20px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.bill-number {
+    font-weight: 600;
+    color: #333;
+}
+
+.installment-badge {
+    display: inline-block;
+    background: #007bff;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+.balance-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.balance-badge.paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.balance-badge.outstanding {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.status-paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.status-partial {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-badge.status-overdue {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.view-bill-btn {
+    background: #007bff;
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.view-bill-btn:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+/* Payment History Table */
+.payments-table-container {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.payments-table {
+    margin: 0;
+    width: 100%;
+}
+
+.payments-table thead {
+    background: #f8f9fa;
+}
+
+.payments-table thead th {
+    border: none;
+    padding: 20px 15px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.payments-table tbody td {
+    border: none;
+    padding: 20px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.payment-number {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.service-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.payment-date {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.payment-time {
+    color: #6c757d;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.payment-amount {
+    font-weight: 600;
+    color: #28a745;
+    font-size: 16px;
+}
+
+.payment-method-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.payment-method-badge.cash {
+    background: #d4edda;
+    color: #155724;
+}
+
+.payment-method-badge.check {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.payment-method-badge.bank-transfer {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.payment-method-badge.card {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.payment-method-badge.other {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.payment-reference {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.view-payment-btn {
+    background: #007bff;
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.view-payment-btn:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+/* Billing Overview */
+.billing-overview-content {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+.overview-section {
+    margin-bottom: 40px;
+}
+
+.overview-section:last-child {
+    margin-bottom: 0;
+}
+
+.overview-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* Overview Tables */
+.overview-table-container {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+}
+
+.overview-table {
+    margin: 0;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.overview-table thead {
+    background: #f8f9fa;
+}
+
+.overview-table thead th {
+    border: none;
+    padding: 12px 15px;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    text-align: left;
+}
+
+.overview-table thead th.text-right {
+    text-align: right;
+}
+
+.overview-table tbody td {
+    border: none;
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f4;
+    font-size: 14px;
+}
+
+.overview-table tbody td.text-right {
+    text-align: right;
+    font-weight: 500;
+}
+
+.overview-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.status-indicator.paid {
+    background: #28a745;
+}
+
+.status-indicator.pending {
+    background: #ffc107;
+}
+
+.status-indicator.partial {
+    background: #17a2b8;
+}
+
+.status-indicator.overdue {
+    background: #dc3545;
+}
+
+/* Method Indicators */
+.method-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.method-indicator.cash {
+    background: #28a745;
+}
+
+.method-indicator.check {
+    background: #17a2b8;
+}
+
+.method-indicator.bank-transfer {
+    background: #007bff;
+}
+
+.method-indicator.card {
+    background: #ffc107;
+}
+
+.method-indicator.other {
+    background: #6c757d;
+}
+
+/* Stat Indicators */
+.stat-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.stat-indicator.total {
+    background: #6f42c1;
+}
+
+.stat-indicator.active {
+    background: #fd7e14;
+}
+
+.stat-indicator.completed {
+    background: #28a745;
+}
+
+/* No Data Messages */
+.no-bills-message, .no-payments-message {
+    background: #fff;
+    border-radius: 15px;
+    padding: 60px 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+.no-bills-icon, .no-payments-icon {
+    font-size: 64px;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+.no-bills-message h4, .no-payments-message h4 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.no-bills-message p, .no-payments-message p {
+    color: #6c757d;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .billing-title {
+        font-size: 28px;
+    }
+    
+    .billing-header {
+        padding: 20px;
+    }
+    
+    .billing-stats-card {
+        padding: 20px;
+    }
+    
+    .billing-tabs .tab-content {
+        padding: 20px;
+    }
+    
+    .bills-table-container,
+    .payments-table-container {
+        overflow-x: auto;
+    }
+    
+    .payment-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .payments-table thead th,
+    .payments-table tbody td {
+        padding: 15px 10px;
+        font-size: 12px;
+    }
+    
+    .payment-method-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+    
+    .view-payment-btn {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    .back-to-dashboard {
+        margin-top: 20px;
+    }
+}

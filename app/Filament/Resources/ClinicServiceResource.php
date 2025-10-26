@@ -64,6 +64,34 @@ class ClinicServiceResource extends Resource
                     ->required()
                     ->numeric()
                     ->prefix('₱'),
+                Forms\Components\Toggle::make('allows_staggered_payment')
+                    ->label('Allow Staggered Payments')
+                    ->helperText('Enable this to allow clients to pay for this service in installments')
+                    ->default(false)
+                    ->live(),
+                Forms\Components\TextInput::make('min_installments')
+                    ->label('Minimum Installments')
+                    ->numeric()
+                    ->default(2)
+                    ->minValue(2)
+                    ->visible(fn (Forms\Get $get): bool => (bool) $get('allows_staggered_payment'))
+                    ->helperText('Minimum number of installments allowed'),
+                Forms\Components\TextInput::make('max_installments')
+                    ->label('Maximum Installments')
+                    ->numeric()
+                    ->default(6)
+                    ->minValue(2)
+                    ->visible(fn (Forms\Get $get): bool => (bool) $get('allows_staggered_payment'))
+                    ->helperText('Maximum number of installments allowed'),
+                Forms\Components\TextInput::make('down_payment_percentage')
+                    ->label('Down Payment Percentage')
+                    ->numeric()
+                    ->default(30.00)
+                    ->minValue(10)
+                    ->maxValue(90)
+                    ->suffix('%')
+                    ->visible(fn (Forms\Get $get): bool => (bool) $get('allows_staggered_payment'))
+                    ->helperText('Percentage of total price required as down payment'),
                 Forms\Components\Select::make('status')
                     ->native(false)
                     ->options([
@@ -105,6 +133,13 @@ class ClinicServiceResource extends Resource
                 Tables\Columns\TextColumn::make('price')
                     ->money('PHP')
                     ->sortable(),
+                Tables\Columns\IconColumn::make('allows_staggered_payment')
+                    ->label('Staggered Payment')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -120,6 +155,7 @@ class ClinicServiceResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->slideOver(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()->slideOver(),
