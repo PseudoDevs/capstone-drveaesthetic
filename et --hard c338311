@@ -1,0 +1,81 @@
+[33m50e87dc[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m try
+[33m436927b[m latest
+[33mc338311[m Minor Changes
+[33mf7a24e5[m Minor Changes
+[33mb731e39[m Minor Changes
+[33meec0daa[m Minor Changes
+[33m50f42e4[m Minor Changes
+[33ma31c179[m Minor Changes
+[33m4928a71[m Minor Changes
+[33ma1e2103[m [FIXED] Certificate Name on null
+[33m7eda535[m [FIXED] Certificate Name on null
+[33me42576b[m Minor Changes
+[33m5f16c84[m Minor Changes
+[33mdb6e004[m Minor Changes
+[33m1322ee3[m Minor Changes
+[33mfd138a5[m Merge branch 'main' of https://github.com/PseudoDevs/capstone-drveaesthetic
+[33m6d9c7f2[m Minor Changes
+[33m3fea118[m [FIXED] Status in Appointments Widget
+[33me22f6ef[m [FIXED] Appointments FormType Enum
+[33m6a70251[m [FIXED] Status in Appointments
+[33m79e08ac[m Minor Changes
+[33m8b3d608[m Merge branch 'main' of https://github.com/PseudoDevs/capstone-drveaesthetic
+[33m2b164ed[m [FIXED] New Logo, Admin and Appointment Resource Errors
+[33m6b1ace8[m Minor Changes
+[33m57c5f27[m :bug: [FIXED] Admin and Staff Logo Login
+[33ma4c54d4[m :bug: [FIXED] Admin Access v1
+[33me96609a[m :bug: [FIXED] Admin Access
+[33m8903066[m :bug: [FIXED] Pre-Assessment Infolist
+[33mc262bf4[m :bug: [FIXED] App FormType Enums
+[33m511ec19[m :bug: [FIXED] App FormType
+[33m2b65131[m :bug: [FIXED] Fix Feedback Client name
+[33mfbc209e[m :bug: [FIXED] Null Property
+[33ma400c5f[m :bug: [FIXED] Get In Touch
+[33mfbf3835[m :bug: [FIXED] Settings for Pages
+[33mc1011e3[m Minor Changes
+[33m41377c6[m :sparkles: [ADDED] Remove Filament API Override
+[33m7cd68be[m :sparkles: [ADDED] Fix Staff Chat
+[33m5f5f2ba[m :sparkles: [ADDED] Fix Staff Chat Page
+[33m407ad50[m :sparkles: [ADDED] Push Notification API for React Native
+[33mca83efa[m :sparkles: [ADDED] Action Buttons and View Details for Appointments
+[33m7ee77ec[m Minor Changes
+[33m0107628[m Minor Changes
+[33mcff9250[m :sparkles: [ADDED] Staff Add Walkin Appointment
+[33me0683ba[m :sparkles: [ADDED] Admin and Staff Panel Dashboard
+[33m688c541[m :sparkles: [ADDED] Mobile App Google Login API for React Native and Web
+[33m968bc4b[m :sparkles: [ADDED] Mobile App Google Login API for RN
+[33m85c8ed4[m :sparkles: [ADDED] Avatar Upload and Remove API
+[33m33e6b4f[m :sparkles: [ADDED] Avatar Upload and Remove API
+[33md0f50b6[m :sparkles: [ADDED] Chat API Converted to Ajax Polling
+[33m21aa7ab[m :sparkles: [ADDED] Chat API with Intro Message
+[33m0ec9060[m :sparkles: [ADDED] Api Sanctum
+[33m6198996[m :sparkles: [ADDED] SSE for Chat v2.2
+[33m8e8be6d[m :sparkles: [ADDED] Deployment Checker
+[33m63dca05[m :sparkles: [ADDED] SSE for Chat v2
+[33mc701106[m :sparkles: [ADDED] Update Profile
+[33m1552051[m :sparkles: [ADDED] Add SSE for Mobile Chat via Bearer Token
+[33m40b8f6d[m :sparkles: [ADDED] Add SSE for Mobile Chat
+[33mebe43c3[m :sparkles: [ADDED] Add SSE for Chat
+[33mee18b04[m :sparkles: [ADDED] Add Pusher and Fix Loading body message v1
+[33m8310530[m :sparkles: [ADDED] Add Pusher and Fix Loading body message
+[33mb06caf1[m :sparkles: [ADDED] Single Staff Chat to Cient Channels for Realtime
+[33m8cb744d[m :sparkles: [ADDED] Single Staff Chat to Cient
+[33m5af69eb[m :sparkles: [ADDED] Mobile Chat API for both Sanctum and Web Request
+[33m3613626[m :sparkles: [ADDED] Mobile Chat API to Sanctum
+[33m12e3206[m :sparkles: [ADDED] Mobile Chat API Search - Removed the Doctor and Admin roles in Search
+[33m4cad75b[m :sparkles: [ADDED] Mobile Chat API Search
+[33m398b934[m :sparkles: [ADDED] Mobile Chat API
+[33m55df363[m :sparkles: [ADDED] Mail Status Class
+[33m7580b02[m :sparkles: [ADDED] Client User Appointments API
+[33mf94cb9c[m :sparkles: [ADDED] Client User Appointments API
+[33m95ba204[m :sparkles: [ADDED] Google Auth API
+[33ma100859[m :sparkles: [ADDED] Auth API
+[33m6b57631[m Merge branch 'main' of https://github.com/PseudoDevs/capstone-drveaesthetic
+[33m5155709[m :sparkles: [ADDED] API Documentation
+[33m90fce98[m Create main.yml
+[33m8520a50[m :sparkles: [ADDED] jAX
+[33m933055c[m :sparkles: [ADDED] Appointments Functional
+[33m9475029[m :sparkles: [ADDED] Appointments functionality and Pages
+[33m8306666[m :sparkles: [ADDED] Appointments functionality
+[33ma9bb966[m :sparkles: [ADDED] Chat functionality
+[33m918b45d[m :tada: [DEPLOYMENT] Dr. Ve Aesthetic Clinic Capstone Project

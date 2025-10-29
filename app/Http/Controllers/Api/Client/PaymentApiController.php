@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Bill;
 use App\Models\Payment;
+use App\Models\Bill;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -15,11 +16,12 @@ class PaymentApiController extends Controller
     /**
      * Get all payments for a specific client
      */
-    public function getClientPayments($clientId): JsonResponse
+    public function getUserPayments($clientId): JsonResponse
     {
-        // Verify the authenticated user can access this client's payments
         $user = Auth::user();
-        if ($user->id != $clientId && !in_array($user->role, ['Admin', 'Staff', 'Doctor'])) {
+        
+        // Check if user can access this client's payments
+        if ($user->id != $clientId && !in_array($user->role, ['Staff', 'Doctor', 'Admin'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access to client payments'
@@ -29,164 +31,125 @@ class PaymentApiController extends Controller
         $payments = Payment::whereHas('bill', function($query) use ($clientId) {
             $query->where('client_id', $clientId);
         })
-        ->with(['bill.appointment.service', 'receivedBy'])
-        ->orderBy('payment_date', 'desc')
+        ->with(['bill.appointment.service', 'client'])
+        ->orderBy('created_at', 'desc')
         ->get();
+
+        $paymentsData = $payments->map(function($payment) {
+            return [
+                'id' => $payment->id,
+                'payment_number' => $payment->payment_number,
+                'bill_id' => $payment->bill_id,
+                'amount' => $payment->amount,
+                'payment_method' => $payment->payment_method,
+                'status' => $payment->status,
+                'payment_date' => $payment->payment_date,
+                'is_completed' => $payment->status === 'completed',
+                'bill' => [
+                    'id' => $payment->bill->id,
+                    'bill_number' => $payment->bill->bill_number,
+                    'total_amount' => $payment->bill->total_amount,
+                    'remaining_balance' => $payment->bill->remaining_balance,
+                    'status' => $payment->bill->status
+                ]
+            ];
+        });
 
         return response()->json([
             'success' => true,
-            'data' => $payments->map(function($payment) {
-                return [
-                    'id' => $payment->id,
-                    'payment_number' => $payment->payment_number,
-                    'bill_id' => $payment->bill_id,
-                    'client_id' => $payment->client_id,
-                    'appointment_id' => $payment->appointment_id,
-                    'received_by' => $payment->received_by,
-                    'amount' => $payment->amount,
-                    'payment_method' => $payment->payment_method,
-                    'payment_reference' => $payment->payment_reference,
-                    'notes' => $payment->notes,
-                    'status' => $payment->status,
-                    'payment_date' => $payment->payment_date?->format('Y-m-d'),
-                    'processed_at' => $payment->processed_at?->toISOString(),
-                    'bank_name' => $payment->bank_name,
-                    'check_number' => $payment->check_number,
-                    'check_date' => $payment->check_date?->format('Y-m-d'),
-                    'transaction_details' => $payment->transaction_details,
-                    'is_completed' => $payment->isCompleted(),
-                    'created_at' => $payment->created_at?->toISOString(),
-                    'updated_at' => $payment->updated_at?->toISOString(),
-                    'bill' => $payment->bill ? [
-                        'id' => $payment->bill->id,
-                        'bill_number' => $payment->bill->bill_number,
-                        'total_amount' => $payment->bill->total_amount,
-                        'remaining_balance' => $payment->bill->remaining_balance,
-                        'status' => $payment->bill->status,
-                        'appointment' => $payment->bill->appointment ? [
-                            'id' => $payment->bill->appointment->id,
-                            'appointment_date' => $payment->bill->appointment->appointment_date?->format('Y-m-d'),
-                            'service' => $payment->bill->appointment->service ? [
-                                'id' => $payment->bill->appointment->service->id,
-                                'service_name' => $payment->bill->appointment->service->service_name,
-                            ] : null,
-                        ] : null,
-                    ] : null,
-                    'received_by_user' => $payment->receivedBy ? [
-                        'id' => $payment->receivedBy->id,
-                        'name' => $payment->receivedBy->name,
-                        'role' => $payment->receivedBy->role,
-                    ] : null,
-                ];
-            })
+            'data' => $paymentsData
         ]);
     }
 
     /**
-     * Get a specific payment by ID
+     * Get specific payment details
      */
-    public function getPayment($paymentId): JsonResponse
+    public function show($paymentId): JsonResponse
     {
         $user = Auth::user();
         
-        $payment = Payment::with(['bill.appointment.service', 'receivedBy', 'client'])
-            ->findOrFail($paymentId);
+        $payment = Payment::with(['bill.appointment.service', 'client'])->find($paymentId);
 
-        // Verify the authenticated user can access this payment
-        if ($user->id != $payment->client_id && !in_array($user->role, ['Admin', 'Staff', 'Doctor'])) {
+        if (!$payment) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized access to payment'
+                'message' => 'Payment not found'
+            ], 404);
+        }
+
+        // Check if user can access this payment
+        if ($payment->bill->client_id != $user->id && !in_array($user->role, ['Staff', 'Doctor', 'Admin'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access to this payment'
             ], 403);
         }
 
+        $paymentData = [
+            'id' => $payment->id,
+            'payment_number' => $payment->payment_number,
+            'bill_id' => $payment->bill_id,
+            'amount' => $payment->amount,
+            'payment_method' => $payment->payment_method,
+            'payment_reference' => $payment->payment_reference,
+            'status' => $payment->status,
+            'payment_date' => $payment->payment_date,
+            'notes' => $payment->notes,
+            'bill' => [
+                'id' => $payment->bill->id,
+                'bill_number' => $payment->bill->bill_number,
+                'total_amount' => $payment->bill->total_amount,
+                'paid_amount' => $payment->bill->paid_amount,
+                'remaining_balance' => $payment->bill->remaining_balance,
+                'status' => $payment->bill->status
+            ],
+            'client' => [
+                'id' => $payment->client->id,
+                'name' => $payment->client->name,
+                'email' => $payment->client->email
+            ]
+        ];
+
         return response()->json([
             'success' => true,
-            'data' => [
-                'id' => $payment->id,
-                'payment_number' => $payment->payment_number,
-                'bill_id' => $payment->bill_id,
-                'client_id' => $payment->client_id,
-                'appointment_id' => $payment->appointment_id,
-                'received_by' => $payment->received_by,
-                'amount' => $payment->amount,
-                'payment_method' => $payment->payment_method,
-                'payment_reference' => $payment->payment_reference,
-                'notes' => $payment->notes,
-                'status' => $payment->status,
-                'payment_date' => $payment->payment_date?->format('Y-m-d'),
-                'processed_at' => $payment->processed_at?->toISOString(),
-                'bank_name' => $payment->bank_name,
-                'check_number' => $payment->check_number,
-                'check_date' => $payment->check_date?->format('Y-m-d'),
-                'transaction_details' => $payment->transaction_details,
-                'is_completed' => $payment->isCompleted(),
-                'created_at' => $payment->created_at?->toISOString(),
-                'updated_at' => $payment->updated_at?->toISOString(),
-                'bill' => $payment->bill ? [
-                    'id' => $payment->bill->id,
-                    'bill_number' => $payment->bill->bill_number,
-                    'total_amount' => $payment->bill->total_amount,
-                    'paid_amount' => $payment->bill->paid_amount,
-                    'remaining_balance' => $payment->bill->remaining_balance,
-                    'status' => $payment->bill->status,
-                    'appointment' => $payment->bill->appointment ? [
-                        'id' => $payment->bill->appointment->id,
-                        'appointment_date' => $payment->bill->appointment->appointment_date?->format('Y-m-d'),
-                        'appointment_time' => $payment->bill->appointment->appointment_time,
-                        'service' => $payment->bill->appointment->service ? [
-                            'id' => $payment->bill->appointment->service->id,
-                            'service_name' => $payment->bill->appointment->service->service_name,
-                            'price' => $payment->bill->appointment->service->price,
-                        ] : null,
-                    ] : null,
-                ] : null,
-                'client' => $payment->client ? [
-                    'id' => $payment->client->id,
-                    'name' => $payment->client->name,
-                    'email' => $payment->client->email,
-                    'phone' => $payment->client->phone,
-                ] : null,
-                'received_by_user' => $payment->receivedBy ? [
-                    'id' => $payment->receivedBy->id,
-                    'name' => $payment->receivedBy->name,
-                    'role' => $payment->receivedBy->role,
-                ] : null,
-            ]
+            'data' => $paymentData
         ]);
     }
 
     /**
      * Process a new payment
      */
-    public function processPayment(Request $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
+        $user = Auth::user();
+        
         $validated = $request->validate([
             'bill_id' => 'required|exists:bills,id',
             'amount' => 'required|numeric|min:0.01',
             'payment_method' => 'required|string|in:cash,credit_card,debit_card,bank_transfer,check,gcash,maya,paymaya',
             'payment_reference' => 'nullable|string|max:255',
-            'notes' => 'nullable|string|max:1000',
-            'bank_name' => 'nullable|string|max:255',
-            'check_number' => 'nullable|string|max:255',
-            'check_date' => 'nullable|date',
-            'transaction_details' => 'nullable|string|max:1000',
+            'notes' => 'nullable|string|max:1000'
         ]);
 
-        $user = Auth::user();
-        
-        // Get the bill and verify access
-        $bill = Bill::findOrFail($validated['bill_id']);
-        
-        // Verify the authenticated user can make payments for this bill
-        if ($user->id != $bill->client_id && !in_array($user->role, ['Admin', 'Staff', 'Doctor'])) {
+        $bill = Bill::find($validated['bill_id']);
+
+        // Check if user can make payment for this bill
+        if ($bill->client_id != $user->id && !in_array($user->role, ['Staff', 'Doctor', 'Admin'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized to make payments for this bill'
+                'message' => 'Unauthorized to make payment for this bill'
             ], 403);
         }
 
-        // Check if payment amount is valid
+        // Check if bill is already fully paid
+        if ($bill->remaining_balance <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This bill is already fully paid'
+            ], 400);
+        }
+
+        // Check if payment amount exceeds remaining balance
         if ($validated['amount'] > $bill->remaining_balance) {
             return response()->json([
                 'success' => false,
@@ -194,44 +157,39 @@ class PaymentApiController extends Controller
             ], 400);
         }
 
-        // Check if bill is already fully paid
-        if ($bill->isFullyPaid()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'This bill is already fully paid'
-            ], 400);
-        }
-
         try {
             DB::beginTransaction();
 
-            // Create the payment
+            // Generate payment number
+            $paymentNumber = 'PAY-' . now()->format('Y') . '-' . str_pad(Payment::count() + 1, 4, '0', STR_PAD_LEFT);
+
+            // Create payment
             $payment = Payment::create([
-                'payment_number' => Payment::generatePaymentNumber(),
-                'bill_id' => $validated['bill_id'],
+                'payment_number' => $paymentNumber,
+                'bill_id' => $bill->id,
                 'client_id' => $bill->client_id,
-                'appointment_id' => $bill->appointment_id,
-                'received_by' => $user->id,
                 'amount' => $validated['amount'],
                 'payment_method' => $validated['payment_method'],
                 'payment_reference' => $validated['payment_reference'],
-                'notes' => $validated['notes'],
-                'status' => 'completed', // Auto-complete for now
-                'payment_date' => now()->toDateString(),
-                'processed_at' => now(),
-                'bank_name' => $validated['bank_name'],
-                'check_number' => $validated['check_number'],
-                'check_date' => $validated['check_date'],
-                'transaction_details' => $validated['transaction_details'],
+                'status' => 'completed', // For now, auto-complete. In production, integrate with payment gateway
+                'payment_date' => now()->format('Y-m-d'),
+                'notes' => $validated['notes']
             ]);
 
-            // Update bill balance
-            $bill->updateBalance();
+            // Update bill
+            $bill->paid_amount += $validated['amount'];
+            $bill->remaining_balance = $bill->total_amount - $bill->paid_amount;
+            
+            // Update bill status
+            if ($bill->remaining_balance <= 0) {
+                $bill->status = 'paid';
+            } elseif ($bill->paid_amount > 0) {
+                $bill->status = 'partial';
+            }
+            
+            $bill->save();
 
             DB::commit();
-
-            // Load relationships for response
-            $payment->load(['bill.appointment.service', 'receivedBy']);
 
             return response()->json([
                 'success' => true,
@@ -243,22 +201,16 @@ class PaymentApiController extends Controller
                     'payment_method' => $payment->payment_method,
                     'payment_reference' => $payment->payment_reference,
                     'status' => $payment->status,
-                    'payment_date' => $payment->payment_date?->format('Y-m-d'),
-                    'processed_at' => $payment->processed_at?->toISOString(),
-                    'notes' => $payment->notes,
+                    'payment_date' => $payment->payment_date,
                     'bill' => [
-                        'id' => $payment->bill->id,
-                        'bill_number' => $payment->bill->bill_number,
-                        'total_amount' => $payment->bill->total_amount,
-                        'paid_amount' => $payment->bill->paid_amount,
-                        'remaining_balance' => $payment->bill->remaining_balance,
-                        'status' => $payment->bill->status,
-                        'is_fully_paid' => $payment->bill->isFullyPaid(),
-                    ],
-                    'received_by' => $payment->receivedBy ? [
-                        'id' => $payment->receivedBy->id,
-                        'name' => $payment->receivedBy->name,
-                    ] : null,
+                        'id' => $bill->id,
+                        'bill_number' => $bill->bill_number,
+                        'total_amount' => $bill->total_amount,
+                        'paid_amount' => $bill->paid_amount,
+                        'remaining_balance' => $bill->remaining_balance,
+                        'status' => $bill->status,
+                        'is_fully_paid' => $bill->remaining_balance <= 0
+                    ]
                 ],
                 'message' => 'Payment processed successfully'
             ], 201);
@@ -278,12 +230,13 @@ class PaymentApiController extends Controller
      */
     public function getPaymentSummary($clientId): JsonResponse
     {
-        // Verify the authenticated user can access this client's payment summary
         $user = Auth::user();
-        if ($user->id != $clientId && !in_array($user->role, ['Admin', 'Staff', 'Doctor'])) {
+        
+        // Check if user can access this client's data
+        if ($user->id != $clientId && !in_array($user->role, ['Staff', 'Doctor', 'Admin'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized access to client payment summary'
+                'message' => 'Unauthorized access to client data'
             ], 403);
         }
 
@@ -292,24 +245,26 @@ class PaymentApiController extends Controller
         })->get();
 
         $totalPaid = $payments->where('status', 'completed')->sum('amount');
+        $totalPayments = $payments->count();
         $completedPayments = $payments->where('status', 'completed')->count();
         $pendingPayments = $payments->where('status', 'pending')->count();
         $failedPayments = $payments->where('status', 'failed')->count();
+        $averagePayment = $completedPayments > 0 ? $totalPaid / $completedPayments : 0;
 
-        // Get payment methods breakdown
+        // Group by payment method
         $paymentMethods = $payments->where('status', 'completed')
             ->groupBy('payment_method')
             ->map(function($group) {
                 return [
                     'method' => $group->first()->payment_method,
                     'count' => $group->count(),
-                    'total_amount' => $group->sum('amount'),
+                    'total_amount' => $group->sum('amount')
                 ];
             })->values();
 
-        // Get recent payments (last 5)
+        // Recent payments (last 5)
         $recentPayments = $payments->where('status', 'completed')
-            ->sortByDesc('payment_date')
+            ->sortByDesc('created_at')
             ->take(5)
             ->map(function($payment) {
                 return [
@@ -317,8 +272,8 @@ class PaymentApiController extends Controller
                     'payment_number' => $payment->payment_number,
                     'amount' => $payment->amount,
                     'payment_method' => $payment->payment_method,
-                    'payment_date' => $payment->payment_date?->format('Y-m-d'),
-                    'bill_number' => $payment->bill->bill_number ?? 'N/A',
+                    'payment_date' => $payment->payment_date,
+                    'bill_number' => $payment->bill->bill_number
                 ];
             });
 
@@ -326,41 +281,45 @@ class PaymentApiController extends Controller
             'success' => true,
             'data' => [
                 'total_paid' => $totalPaid,
-                'total_payments' => $payments->count(),
+                'total_payments' => $totalPayments,
                 'completed_payments' => $completedPayments,
                 'pending_payments' => $pendingPayments,
                 'failed_payments' => $failedPayments,
+                'average_payment' => $averagePayment,
                 'payment_methods' => $paymentMethods,
-                'recent_payments' => $recentPayments,
-                'average_payment' => $completedPayments > 0 ? round($totalPaid / $completedPayments, 2) : 0,
+                'recent_payments' => $recentPayments
             ]
         ]);
     }
 
     /**
-     * Download payment receipt
+     * Get payment receipt URL
      */
-    public function downloadReceipt($paymentId): JsonResponse
+    public function getReceipt($paymentId): JsonResponse
     {
         $user = Auth::user();
         
-        $payment = Payment::findOrFail($paymentId);
+        $payment = Payment::with('bill')->find($paymentId);
 
-        // Verify the authenticated user can access this payment receipt
-        if ($user->id != $payment->client_id && !in_array($user->role, ['Admin', 'Staff', 'Doctor'])) {
+        if (!$payment) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized access to payment receipt'
-            ], 403);
+                'message' => 'Payment not found'
+            ], 404);
         }
 
-        // Generate the PDF URL (using existing PaymentController logic)
-        $receiptUrl = route('payments.print', $payment);
+        // Check if user can access this payment
+        if ($payment->bill->client_id != $user->id && !in_array($user->role, ['Staff', 'Doctor', 'Admin'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access to this payment'
+            ], 403);
+        }
 
         return response()->json([
             'success' => true,
             'data' => [
-                'receipt_url' => $receiptUrl,
+                'receipt_url' => route('staff.payment.print', $payment->id),
                 'payment_number' => $payment->payment_number,
                 'download_message' => 'Payment receipt generated successfully'
             ]

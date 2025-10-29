@@ -118,6 +118,24 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::post('pay', [BillingController::class, 'processPayment'])->name('pay');
     });
     
+    // Bills API
+    Route::prefix('bills')->name('bills.')->middleware('auth:sanctum')->group(function () {
+        Route::get('users/{clientId}', [\App\Http\Controllers\Api\Client\BillApiController::class, 'getUserBills'])->name('user-bills');
+        Route::get('{billId}', [\App\Http\Controllers\Api\Client\BillApiController::class, 'show'])->name('show');
+        Route::get('users/{clientId}/outstanding-balance', [\App\Http\Controllers\Api\Client\BillApiController::class, 'getOutstandingBalance'])->name('outstanding-balance');
+        Route::get('{billId}/payment-history', [\App\Http\Controllers\Api\Client\BillApiController::class, 'getPaymentHistory'])->name('payment-history');
+        Route::get('{billId}/receipt', [\App\Http\Controllers\Api\Client\BillApiController::class, 'getReceipt'])->name('receipt');
+    });
+    
+    // Payments API
+    Route::prefix('payments')->name('payments.')->middleware('auth:sanctum')->group(function () {
+        Route::get('users/{clientId}', [\App\Http\Controllers\Api\Client\PaymentApiController::class, 'getUserPayments'])->name('user-payments');
+        Route::get('{paymentId}', [\App\Http\Controllers\Api\Client\PaymentApiController::class, 'show'])->name('show');
+        Route::post('/', [\App\Http\Controllers\Api\Client\PaymentApiController::class, 'store'])->name('store');
+        Route::get('users/{clientId}/summary', [\App\Http\Controllers\Api\Client\PaymentApiController::class, 'getPaymentSummary'])->name('summary');
+        Route::get('{paymentId}/receipt', [\App\Http\Controllers\Api\Client\PaymentApiController::class, 'getReceipt'])->name('receipt');
+    });
+    
     // Prescriptions API
     Route::prefix('prescriptions')->name('prescriptions.')->middleware('auth:sanctum')->group(function () {
         Route::get('/', [PrescriptionController::class, 'index'])->name('index');
