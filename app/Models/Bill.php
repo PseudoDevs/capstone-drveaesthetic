@@ -86,8 +86,12 @@ class Bill extends Model
     // Calculate remaining balance
     public function updateBalance(): void
     {
-        $this->paid_amount = $this->payments()->where('status', 'completed')->sum('amount');
-        $this->remaining_balance = $this->total_amount - $this->paid_amount;
+        $totalPaid = $this->payments()->where('status', 'completed')->sum('amount');
+        
+        // Cap paid_amount at total_amount to prevent negative balances
+        // If overpaid, paid_amount = total_amount, remaining_balance = 0
+        $this->paid_amount = min($totalPaid, $this->total_amount);
+        $this->remaining_balance = max(0, $this->total_amount - $this->paid_amount);
         
         // Update status based on balance
         if ($this->remaining_balance <= 0) {

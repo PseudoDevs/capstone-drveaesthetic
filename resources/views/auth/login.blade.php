@@ -204,6 +204,10 @@
         .clinic-logo {
             text-align: center;
             margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
         }
 
         .clinic-logo h1 {
@@ -217,8 +221,9 @@
         .clinic-logo .tagline {
             color: #666;
             font-size: 14px;
-            margin-top: 5px;
+            margin-top: 0;
             font-style: italic;
+            display: block;
         }
 
         .section-title .sub-title {

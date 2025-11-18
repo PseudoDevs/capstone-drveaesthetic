@@ -16,4 +16,14 @@ class EditPayment extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        // Update the bill balance after payment is updated
+        $payment = $this->record;
+        
+        if ($payment->bill) {
+            $payment->bill->updateBalance();
+        }
+    }
 }

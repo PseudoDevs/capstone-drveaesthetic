@@ -13,7 +13,7 @@ export let options = {
   },
 };
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'https://drveaestheticclinic.online';
 
 export default function() {
   // Test staff panel access without authentication

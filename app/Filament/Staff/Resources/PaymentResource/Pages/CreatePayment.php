@@ -17,7 +17,38 @@ class CreatePayment extends CreateRecord
             $data['payment_number'] = \App\Models\Payment::generatePaymentNumber();
         }
 
+        // Set status to completed by default if not set
+        if (empty($data['status'])) {
+            $data['status'] = 'completed';
+        }
+
+        // Ensure client_id is set from bill if not already set
+        if (empty($data['client_id']) && !empty($data['bill_id'])) {
+            $bill = Bill::find($data['bill_id']);
+            if ($bill) {
+                $data['client_id'] = $bill->client_id;
+            }
+        }
+
+        // Ensure appointment_id is set from bill if not already set
+        if (empty($data['appointment_id']) && !empty($data['bill_id'])) {
+            $bill = Bill::find($data['bill_id']);
+            if ($bill) {
+                $data['appointment_id'] = $bill->appointment_id;
+            }
+        }
+
         return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        // Update the bill balance after payment is created
+        $payment = $this->record;
+        
+        if ($payment->bill) {
+            $payment->bill->updateBalance();
+        }
     }
 
     protected function getRedirectUrl(): string

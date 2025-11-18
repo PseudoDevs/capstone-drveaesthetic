@@ -11,6 +11,19 @@
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-8">
                     <div class="login-form-wrapper">
+                        <!-- Floating Elements -->
+                        <div class="floating-elements">
+                            <div class="floating-element"></div>
+                            <div class="floating-element"></div>
+                            <div class="floating-element"></div>
+                        </div>
+
+                        <!-- Clinic Logo -->
+                        <div class="clinic-logo">
+                            <h1>Dr. Ve Aesthetic</h1>
+                            <div class="tagline">Where Beauty Meets Excellence</div>
+                        </div>
+
                         <div class="section-title text-center mb-50">
                             <span class="sub-title mb-15">Join Us</span>
                             <h2>Create Your Account</h2>
@@ -126,21 +139,79 @@
 @push('styles')
     <style>
         .login-section {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 25%, #fecfef 50%, #fecfef 75%, #fbaaa9 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .login-form-wrapper {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
             padding: 60px;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .login-form-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .clinic-logo {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .clinic-logo h1 {
+            color: #fbaaa9;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .clinic-logo .tagline {
+            color: #666;
+            font-size: 14px;
+            margin-top: 0;
+            font-style: italic;
+            display: block;
         }
 
         .section-title .sub-title {
-            color: #007bff;
+            color: #fbaaa9;
             font-size: 14px;
             font-weight: 600;
             text-transform: uppercase;
@@ -152,6 +223,10 @@
             font-size: 32px;
             font-weight: 700;
             margin-bottom: 15px;
+            background: linear-gradient(135deg, #333 0%, #fbaaa9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .section-title p {
@@ -167,18 +242,27 @@
         }
 
         .form-control {
-            height: 50px;
-            padding: 12px 15px;
+            height: 55px;
+            padding: 15px 20px;
             border: 2px solid #e1e8ed;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
         }
 
         .form-control:focus {
-            border-color: #007bff;
+            border-color: #fbaaa9;
             outline: none;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+            box-shadow: 0 0 0 0.2rem rgba(251, 170, 169, 0.25);
+            transform: translateY(-2px);
+            background: white;
+        }
+
+        .form-control:hover {
+            border-color: #fbaaa9;
+            transform: translateY(-1px);
         }
 
         .form-control.is-invalid {
@@ -201,36 +285,49 @@
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
-            border: 1px solid #f5c6cb;
         }
 
-        .alert-danger strong {
-            font-weight: 600;
-        }
-
-        .alert-danger ul {
-            margin-top: 8px;
-            padding-left: 20px;
-        }
-
-        .alert-danger li {
-            margin-bottom: 4px;
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
         }
 
         .theme-btn {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            background: linear-gradient(135deg, #fbaaa9 0%, #ff9a9e 100%);
             color: white;
             border: none;
-            height: 50px;
-            border-radius: 8px;
+            height: 55px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .theme-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        .theme-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .theme-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(251, 170, 169, 0.4);
+        }
+
+        .theme-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .theme-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
         .divider {
@@ -261,21 +358,24 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 50px;
+            height: 55px;
             border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            background: white;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             color: #333;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
         .google-login-btn:hover {
-            border-color: #007bff;
-            background: #f8f9fa;
+            border-color: #fbaaa9;
+            background: white;
             color: #333;
             text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .google-login-btn svg {
@@ -290,6 +390,52 @@
 
         .register-link:hover {
             text-decoration: underline;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            top: 30%;
+            right: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
         }
 
         @media (max-width: 768px) {

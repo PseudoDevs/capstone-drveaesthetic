@@ -25,26 +25,39 @@ class PrescriptionResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Prescription Details')
                     ->schema([
-                        Forms\Components\Grid::make(2)
-                            ->schema([
-                                Forms\Components\Select::make('appointment_id')
-                                    ->label('Appointment')
-                                    ->relationship('appointment', 'id')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
-                                
-                                Forms\Components\Select::make('client_id')
-                                    ->label('Client')
-                                    ->relationship('client', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
-                            ]),
+                        Forms\Components\Select::make('appointment_id')
+                            ->label('Appointment')
+                            ->options(function () {
+                                return \App\Models\Appointment::query()
+                                    ->with(['client', 'service'])
+                                    ->latest()
+                                    ->get()
+                                    ->mapWithKeys(fn ($appointment) => [
+                                        $appointment->id => "{$appointment->client->name} - {$appointment->service->service_name} ({$appointment->appointment_date->format('M d, Y')} at {$appointment->appointment_time})"
+                                    ]);
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                if ($state) {
+                                    $appointment = \App\Models\Appointment::find($state);
+                                    if ($appointment) {
+                                        $set('client_id', $appointment->client_id);
+                                    }
+                                }
+                            }),
+                        
+                        Forms\Components\Hidden::make('client_id'),
                         
                         Forms\Components\Select::make('prescribed_by')
                             ->label('Prescribed By')
-                            ->relationship('prescribedBy', 'name')
+                            ->options(function () {
+                                return \App\Models\User::query()
+                                    ->whereIn('role', ['Doctor', 'Staff'])
+                                    ->pluck('name', 'id');
+                            })
                             ->searchable()
                             ->preload()
                             ->required(),

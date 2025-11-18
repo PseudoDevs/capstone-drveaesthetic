@@ -203,9 +203,6 @@ class AppointmentResource extends Resource
 
                         return $data;
                     }),
-                Tables\Actions\ViewAction::make()
-                    ->slideOver()
-                    ->modalWidth('4xl'),
             ])
             ->bulkActions([
                 // Remove bulk actions for clients

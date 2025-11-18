@@ -437,6 +437,100 @@ class AppointmentResource extends Resource
                         ->modalHeading('Decline Appointment')
                         ->modalDescription('Are you sure you want to decline this appointment?')
                         ->action(fn ($record) => $record->update(['status' => 'declined'])),
+
+                    Tables\Actions\Action::make('edit_medical_form')
+                        ->label('Edit Medical Form')
+                        ->icon('heroicon-o-document-text')
+                        ->color('info')
+                        ->visible(fn ($record) => !empty($record->medical_form_data))
+                        ->slideOver()
+                        ->modalWidth('5xl')
+                        ->form(function (Appointment $record) {
+                            return static::getMedicalFormSchema($record);
+                        })
+                        ->fillForm(function (Appointment $record) {
+                            $existingForm = $record->medical_form_data ?? [];
+                            
+                            return [
+                                'medical_form_data' => [
+                                    'patient_name' => $existingForm['patient_name'] ?? $record->client->name ?? '',
+                                    'date' => $existingForm['date'] ?? $record->appointment_date?->format('Y-m-d') ?? now()->format('Y-m-d'),
+                                    'address' => $existingForm['address'] ?? $record->client->address ?? '',
+                                    'procedure' => $existingForm['procedure'] ?? $record->service->service_name ?? '',
+                                    'allergy' => $existingForm['allergy'] ?? false,
+                                    'diabetes' => $existingForm['diabetes'] ?? false,
+                                    'thyroid_diseases' => $existingForm['thyroid_diseases'] ?? false,
+                                    'stroke' => $existingForm['stroke'] ?? false,
+                                    'heart_diseases' => $existingForm['heart_diseases'] ?? false,
+                                    'kidney_diseases' => $existingForm['kidney_diseases'] ?? false,
+                                    'hypertension' => $existingForm['hypertension'] ?? false,
+                                    'asthma' => $existingForm['asthma'] ?? false,
+                                    'medical_history_others' => $existingForm['medical_history_others'] ?? '',
+                                    'pregnant' => $existingForm['pregnant'] ?? false,
+                                    'lactating' => $existingForm['lactating'] ?? false,
+                                    'smoker' => $existingForm['smoker'] ?? false,
+                                    'alcoholic_drinker' => $existingForm['alcoholic_drinker'] ?? false,
+                                    'maintenance_medications' => $existingForm['maintenance_medications'] ?? '',
+                                ],
+                            ];
+                        })
+                        ->action(function (Appointment $record, array $data) {
+                            // Handle nested data structure from statePath
+                            $medicalFormData = $data['medical_form_data'] ?? $data;
+                            
+                            $record->update([
+                                'medical_form_data' => $medicalFormData,
+                            ]);
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Medical form updated successfully')
+                                ->success()
+                                ->send();
+                        }),
+
+                    Tables\Actions\Action::make('edit_consent_form')
+                        ->label('Edit Consent Form')
+                        ->icon('heroicon-o-document-check')
+                        ->color('info')
+                        ->visible(fn ($record) => !empty($record->consent_waiver_form_data))
+                        ->slideOver()
+                        ->modalWidth('5xl')
+                        ->form(function (Appointment $record) {
+                            return static::getConsentWaiverFormSchema($record);
+                        })
+                        ->fillForm(function (Appointment $record) {
+                            $existingForm = $record->consent_waiver_form_data ?? [];
+                            
+                            return [
+                                'consent_waiver_form_data' => [
+                                    'patient_name' => $existingForm['patient_name'] ?? $record->client->name ?? '',
+                                    'age' => $existingForm['age'] ?? ($record->client->date_of_birth ? \Carbon\Carbon::parse($record->client->date_of_birth)->age : ''),
+                                    'civil_status' => $existingForm['civil_status'] ?? '',
+                                    'residence' => $existingForm['residence'] ?? $record->client->address ?? '',
+                                    'interviewed_advised_counselled' => $existingForm['interviewed_advised_counselled'] ?? false,
+                                    'services_availed' => $existingForm['services_availed'] ?? $record->service->service_name ?? '',
+                                    'hold_clinic_free_from_liabilities' => $existingForm['hold_clinic_free_from_liabilities'] ?? false,
+                                    'read_understood_consent' => $existingForm['read_understood_consent'] ?? false,
+                                    'acknowledge_right_to_record' => $existingForm['acknowledge_right_to_record'] ?? false,
+                                    'signature_date' => $existingForm['signature_date'] ?? $record->appointment_date?->format('Y-m-d') ?? now()->format('Y-m-d'),
+                                    'signature_location' => $existingForm['signature_location'] ?? 'Zone 1, San Jose, Iriga City',
+                                    'signature_data' => $existingForm['signature_data'] ?? '',
+                                ],
+                            ];
+                        })
+                        ->action(function (Appointment $record, array $data) {
+                            // Handle nested data structure from statePath
+                            $consentFormData = $data['consent_waiver_form_data'] ?? $data;
+                            
+                            $record->update([
+                                'consent_waiver_form_data' => $consentFormData,
+                            ]);
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Consent form updated successfully')
+                                ->success()
+                                ->send();
+                        }),
                 ])
                     ->label('More Actions')
                     ->icon('heroicon-o-ellipsis-vertical')
@@ -463,6 +557,229 @@ class AppointmentResource extends Resource
             'index' => Pages\ListAppointments::route('/'),
             // 'create' => Pages\CreateAppointment::route('/create'),
             // 'edit' => Pages\EditAppointment::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getMedicalFormSchema(Appointment $appointment): array
+    {
+        $existingForm = $appointment->medical_form_data ?? [];
+
+        return [
+            Forms\Components\Section::make('Dr. Ve Aesthetic Clinic and Wellness Center')
+                ->description('Zone 1, San Jose, Iriga City, Camarines Sur')
+                ->schema([
+                    Forms\Components\Grid::make(2)
+                        ->schema([
+                            Forms\Components\TextInput::make('patient_name')
+                                ->label('Name:')
+                                ->statePath('medical_form_data.patient_name')
+                                ->default($existingForm['patient_name'] ?? $appointment->client->name)
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\DatePicker::make('date')
+                                ->label('Date:')
+                                ->statePath('medical_form_data.date')
+                                ->default($existingForm['date'] ?? now())
+                                ->required()
+                                ->native(false),
+                        ]),
+                    Forms\Components\Textarea::make('address')
+                        ->label('Address:')
+                        ->statePath('medical_form_data.address')
+                        ->default($existingForm['address'] ?? $appointment->client->address ?? '')
+                        ->required()
+                        ->rows(2),
+                    Forms\Components\TextInput::make('procedure')
+                        ->label('Procedure:')
+                        ->statePath('medical_form_data.procedure')
+                        ->default($existingForm['procedure'] ?? $appointment->service->service_name)
+                        ->required()
+                        ->maxLength(255),
+
+                    Forms\Components\Section::make('Past Medical History:')
+                        ->schema([
+                            Forms\Components\Grid::make(3)
+                                ->schema([
+                                    Forms\Components\Checkbox::make('allergy')
+                                        ->label('Allergy')
+                                        ->statePath('medical_form_data.allergy')
+                                        ->default($existingForm['allergy'] ?? false),
+                                    Forms\Components\Checkbox::make('diabetes')
+                                        ->label('Diabetes')
+                                        ->statePath('medical_form_data.diabetes')
+                                        ->default($existingForm['diabetes'] ?? false),
+                                    Forms\Components\Checkbox::make('thyroid_diseases')
+                                        ->label('Thyroid diseases')
+                                        ->statePath('medical_form_data.thyroid_diseases')
+                                        ->default($existingForm['thyroid_diseases'] ?? false),
+                                    Forms\Components\Checkbox::make('stroke')
+                                        ->label('Stroke')
+                                        ->statePath('medical_form_data.stroke')
+                                        ->default($existingForm['stroke'] ?? false),
+                                    Forms\Components\Checkbox::make('heart_diseases')
+                                        ->label('Heart Diseases')
+                                        ->statePath('medical_form_data.heart_diseases')
+                                        ->default($existingForm['heart_diseases'] ?? false),
+                                    Forms\Components\Checkbox::make('kidney_diseases')
+                                        ->label('Kidney Diseases')
+                                        ->statePath('medical_form_data.kidney_diseases')
+                                        ->default($existingForm['kidney_diseases'] ?? false),
+                                    Forms\Components\Checkbox::make('hypertension')
+                                        ->label('Hypertension')
+                                        ->statePath('medical_form_data.hypertension')
+                                        ->default($existingForm['hypertension'] ?? false),
+                                    Forms\Components\Checkbox::make('asthma')
+                                        ->label('Asthma')
+                                        ->statePath('medical_form_data.asthma')
+                                        ->default($existingForm['asthma'] ?? false),
+                                ]),
+                            Forms\Components\Textarea::make('medical_history_others')
+                                ->label('Others:')
+                                ->statePath('medical_form_data.medical_history_others')
+                                ->default($existingForm['medical_history_others'] ?? '')
+                                ->rows(3)
+                                ->columnSpanFull(),
+                        ]),
+
+                    Forms\Components\Section::make('Are you?')
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\Checkbox::make('pregnant')
+                                        ->label('Pregnant')
+                                        ->statePath('medical_form_data.pregnant')
+                                        ->default($existingForm['pregnant'] ?? false),
+                                    Forms\Components\Checkbox::make('lactating')
+                                        ->label('Lactating')
+                                        ->statePath('medical_form_data.lactating')
+                                        ->default($existingForm['lactating'] ?? false),
+                                    Forms\Components\Checkbox::make('smoker')
+                                        ->label('Smoker')
+                                        ->statePath('medical_form_data.smoker')
+                                        ->default($existingForm['smoker'] ?? false),
+                                    Forms\Components\Checkbox::make('alcoholic_drinker')
+                                        ->label('Alcoholic Drinker')
+                                        ->statePath('medical_form_data.alcoholic_drinker')
+                                        ->default($existingForm['alcoholic_drinker'] ?? false),
+                                ]),
+                        ]),
+
+                    Forms\Components\Section::make('Maintenance Medications:')
+                        ->schema([
+                            Forms\Components\Textarea::make('maintenance_medications')
+                                ->label('')
+                                ->statePath('medical_form_data.maintenance_medications')
+                                ->default($existingForm['maintenance_medications'] ?? '')
+                                ->rows(4)
+                                ->columnSpanFull(),
+                        ]),
+                ])
+                ->columnSpanFull(),
+        ];
+    }
+
+    public static function getConsentWaiverFormSchema(Appointment $appointment): array
+    {
+        $existingForm = $appointment->consent_waiver_form_data ?? [];
+
+        return [
+            Forms\Components\Section::make('Dr. Ve Aesthetic Clinic and Wellness Center')
+                ->description('Zone 1, San Jose, Iriga City, Camarines Sur')
+                ->schema([
+                    Forms\Components\Grid::make(2)
+                        ->schema([
+                            Forms\Components\TextInput::make('patient_name')
+                                ->label('Name:')
+                                ->statePath('consent_waiver_form_data.patient_name')
+                                ->default($existingForm['patient_name'] ?? $appointment->client->name)
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('age')
+                                ->label('Age:')
+                                ->statePath('consent_waiver_form_data.age')
+                                ->default($existingForm['age'] ?? ($appointment->client->date_of_birth ? \Carbon\Carbon::parse($appointment->client->date_of_birth)->age : ''))
+                                ->required()
+                                ->numeric()
+                                ->minValue(1)
+                                ->maxValue(150),
+                        ]),
+                    Forms\Components\Grid::make(2)
+                        ->schema([
+                            Forms\Components\Select::make('civil_status')
+                                ->label('Civil Status:')
+                                ->statePath('consent_waiver_form_data.civil_status')
+                                ->options([
+                                    'single' => 'Single',
+                                    'married' => 'Married',
+                                ])
+                                ->default($existingForm['civil_status'] ?? '')
+                                ->required()
+                                ->native(false),
+                            Forms\Components\Textarea::make('residence')
+                                ->label('Residence:')
+                                ->statePath('consent_waiver_form_data.residence')
+                                ->default($existingForm['residence'] ?? $appointment->client->address ?? '')
+                                ->required()
+                                ->rows(2),
+                        ]),
+
+                    Forms\Components\Section::make('Agreement and Consent')
+                        ->description('Please read each statement carefully and check all that apply')
+                        ->schema([
+                            Forms\Components\Checkbox::make('interviewed_advised_counselled')
+                                ->label('I have been interviewed, advised and counselled regarding my medical history and health status.')
+                                ->statePath('consent_waiver_form_data.interviewed_advised_counselled')
+                                ->default($existingForm['interviewed_advised_counselled'] ?? false)
+                                ->required(),
+                            Forms\Components\Textarea::make('services_availed')
+                                ->label('I availed the service/s of:')
+                                ->statePath('consent_waiver_form_data.services_availed')
+                                ->default($existingForm['services_availed'] ?? $appointment->service->service_name)
+                                ->required()
+                                ->rows(2),
+                            Forms\Components\Checkbox::make('hold_clinic_free_from_liabilities')
+                                ->label('I hold Dr. Ve Aesthetic Clinic and Wellness Center and its employees, officers, medical practitioner / nurse/aesthetician free from all liabilities and damages resulting to claims, suits and action for injuries, caused by or arising out from any untoward events, intentional/ unintentional acts regarding my procedure/s.')
+                                ->statePath('consent_waiver_form_data.hold_clinic_free_from_liabilities')
+                                ->default($existingForm['hold_clinic_free_from_liabilities'] ?? false)
+                                ->required(),
+                            Forms\Components\Checkbox::make('read_understood_consent')
+                                ->label('I have read and understood the foregoing and acknowledge my consent to this waiver by signing hereof.')
+                                ->statePath('consent_waiver_form_data.read_understood_consent')
+                                ->default($existingForm['read_understood_consent'] ?? false)
+                                ->required(),
+                            Forms\Components\Checkbox::make('acknowledge_right_to_record')
+                                ->label('I acknowledge that Dr. Ve Aesthetic Clinic and Wellness Center has the right to take photos/ videos before, during and after treatment. These may be used for promotion purposes across all social media platforms.')
+                                ->statePath('consent_waiver_form_data.acknowledge_right_to_record')
+                                ->default($existingForm['acknowledge_right_to_record'] ?? false)
+                                ->required(),
+                        ]),
+
+                    Forms\Components\Section::make('Signature')
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('signature_date')
+                                        ->label('Date:')
+                                        ->statePath('consent_waiver_form_data.signature_date')
+                                        ->default($existingForm['signature_date'] ?? now())
+                                        ->required()
+                                        ->native(false),
+                                    Forms\Components\TextInput::make('signature_location')
+                                        ->label('Location:')
+                                        ->statePath('consent_waiver_form_data.signature_location')
+                                        ->default($existingForm['signature_location'] ?? 'Zone 1, San Jose, Iriga City')
+                                        ->required(),
+                                ]),
+                            Forms\Components\Textarea::make('signature_data')
+                                ->label('Digital Signature (Type your full name):')
+                                ->statePath('consent_waiver_form_data.signature_data')
+                                ->default($existingForm['signature_data'] ?? '')
+                                ->required()
+                                ->placeholder('Type your full name as digital signature')
+                                ->rows(2),
+                        ]),
+                ])
+                ->columnSpanFull(),
         ];
     }
 }

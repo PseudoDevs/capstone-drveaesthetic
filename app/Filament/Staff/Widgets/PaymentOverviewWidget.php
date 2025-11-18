@@ -54,7 +54,7 @@ class PaymentOverviewWidget extends Widget
         // Get overdue payments
         $overduePayments = Bill::where('payment_type', 'staggered')
             ->where('remaining_balance', '>', 0)
-            ->where('next_due_date', '<', now())
+            ->where('due_date', '<', now())
             ->with(['client', 'appointment.service'])
             ->get();
 

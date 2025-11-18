@@ -321,11 +321,6 @@
                                                                                         <i class="fas fa-file-medical-alt"></i>
                                                                                         <span class="btn-text">Form</span>
                                                                                     </a>
-                                                                                @elseif($appointment->form_completed)
-                                                                                    <a href="{{ route('appointments.form.view', $appointment->id) }}" class="btn btn-sm btn-outline-info" title="View Completed Form">
-                                                                                        <i class="fas fa-file-check"></i>
-                                                                                        <span class="btn-text">View Form</span>
-                                                                                    </a>
                                                                                 @endif
                                                                             </div>
                                                                         </div>
@@ -460,11 +455,6 @@
                                                                                 <a href="{{ route('appointments.form', $appointment->id) }}" class="btn btn-sm btn-outline-warning" title="Fill Medical Form">
                                                                                     <i class="fas fa-file-medical-alt"></i>
                                                                                     <span class="btn-text">Form</span>
-                                                                                </a>
-                                                                            @elseif($appointment->form_completed)
-                                                                                <a href="{{ route('appointments.form.view', $appointment->id) }}" class="btn btn-sm btn-outline-info" title="View Completed Form">
-                                                                                    <i class="fas fa-file-check"></i>
-                                                                                    <span class="btn-text">View Form</span>
                                                                                 </a>
                                                                             @endif
                                                                         </div>

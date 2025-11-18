@@ -530,8 +530,8 @@
                             <div class="logo d-flex align-items-center">
                                 <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none">
                                     <div class="clinic-logo me-2">
-                                        <img src="https://scontent.fmnl4-7.fna.fbcdn.net/v/t39.30808-6/418729090_122097326798182940_868500779979598848_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeExtMuvkhE4ITBCXKkbJRRmnZbZoGt7CtWdltmga3sK1V49cOQhA3jFasNBp_355lXq9Z0SxpMfYO43nSvwjgEr&_nc_ohc=La3mCVpYfvoQ7kNvwHBYzhO&_nc_oc=Adnnq_zkxQC7XdIas186Yx9ZgMLxcI1XeTJYpdgKK4mhe7N5JfS-nAYShGVX5jKZxfipaj9oPf8OcvMoWsUBWgXb&_nc_zt=23&_nc_ht=scontent.fmnl4-7.fna&_nc_gid=BRpEQPw1c2GJuhnccL-_dQ&oh=00_AfcL8Mtx-BdH9ttmonHPkj0ErnW758ryC_w_EGRL27wU8Q&oe=68F2EE14" 
-                                             alt="Dr. Ve Aesthetic Clinic Logo" 
+                                        <img src="{{ asset('assets/images/new-logo-bk.png') }}"
+                                             alt="Dr. Ve Aesthetic Clinic Logo"
                                              class="clinic-logo-img">
                                     </div>
                                     <div class="text-logo">
@@ -595,8 +595,6 @@
                                                                 class="fas fa-user mr-2"></i>Edit Profile</a></li>
                                                     <li><a class="dropdown-item" href="{{ route('chat.index') }}"><i
                                                                 class="fas fa-comments mr-2"></i>Chat</a></li>
-                                                    <li><a class="dropdown-item" href="{{ route('notification-preferences') }}"><i
-                                                                class="fas fa-bell mr-2"></i>Notification Preferences</a></li>
                                                     <li><a class="dropdown-item" href="{{ route('feedback.create') }}"><i
                                                                 class="fas fa-star mr-2"></i>Leave Feedback</a></li>
                                                     <div class="dropdown-divider"></div>
@@ -714,12 +712,6 @@
                             </a>
                         </li>
                         <li class="mobile-sidebar-item">
-                            <a href="{{ route('notification-preferences') }}" class="mobile-sidebar-link">
-                                <i class="fas fa-bell"></i>
-                                <span>Notifications</span>
-                            </a>
-                        </li>
-                        <li class="mobile-sidebar-item">
                             <a href="{{ route('feedback.create') }}" class="mobile-sidebar-link">
                                 <i class="fas fa-star"></i>
                                 <span>Feedback</span>
@@ -798,21 +790,6 @@
                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="widget subscribe-widget">
-                            <h4 class="footer-title">{{ setting('footer.subscribe_title', 'Subscribe Now.') }}</h4>
-                            <form action="#">
-                                <input type="email"
-                                    placeholder="{{ setting('footer.subscribe_placeholder', 'Your email here') }}"
-                                    required>
-                                <div class="btn-and-text">
-                                    <button type="submit"><i class="flaticon-right-arrow-1"></i></button>
-                                    <p>{{ setting('footer.subscribe_description', 'Receive weekly tips & tricks on beauty.') }}
-                                    </p>
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </div>

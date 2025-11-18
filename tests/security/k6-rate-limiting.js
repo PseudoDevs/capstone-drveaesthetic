@@ -13,7 +13,7 @@ export let options = {
   },
 };
 
-const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = 'https://drveaestheticclinic.online/api';
 
 export default function() {
   // Test rate limiting on authentication endpoints

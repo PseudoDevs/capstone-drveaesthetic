@@ -57,8 +57,19 @@ class PrescriptionResource extends Resource
                                 }
                             }),
                         Forms\Components\Hidden::make('client_id'),
-                        Forms\Components\Hidden::make('prescribed_by')
-                            ->default(fn () => auth()->id()),
+                        
+                        Forms\Components\Select::make('prescribed_by')
+                            ->label('Prescribed By')
+                            ->options(function () {
+                                return \App\Models\User::query()
+                                    ->whereIn('role', ['Doctor', 'Staff'])
+                                    ->pluck('name', 'id');
+                            })
+                            ->default(fn () => auth()->id())
+                            ->searchable()
+                            ->required()
+                            ->helperText('Defaults to current user. Change if prescribing on behalf of another doctor.'),
+                        
                         Forms\Components\Hidden::make('prescribed_date')
                             ->default(fn () => now()->format('Y-m-d')),
                     ]),

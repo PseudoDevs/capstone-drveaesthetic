@@ -191,30 +191,41 @@
                                         <div class="payment-number">{{ $payment->payment_number ?? 'N/A' }}</div>
                                     </td>
                                     <td>
-                                        <div class="service-name">{{ $payment->bill->appointment->service->service_name ?? 'Service' }}</div>
+                                        <div class="service-name">
+                                            @if(isset($payment->is_virtual) && $payment->is_virtual)
+                                                {{ $payment->bill->appointment->service->service_name ?? 'Service' }}
+                                            @else
+                                                {{ $payment->bill->appointment->service->service_name ?? 'Service' }}
+                                            @endif
+                                        </div>
                                     </td>
                                     <td>
-                                        <div class="payment-date">{{ $payment->created_at->format('M j, Y') }}</div>
-                                        <div class="payment-time">{{ $payment->created_at->format('h:i A') }}</div>
+                                        @php
+                                            $paymentDate = isset($payment->is_virtual) && $payment->is_virtual 
+                                                ? ($payment->created_at instanceof \Carbon\Carbon ? $payment->created_at : \Carbon\Carbon::parse($payment->created_at))
+                                                : $payment->created_at;
+                                        @endphp
+                                        <div class="payment-date">{{ $paymentDate->format('M j, Y') }}</div>
+                                        <div class="payment-time">{{ $paymentDate->format('h:i A') }}</div>
                                     </td>
                                     <td>
                                         <div class="payment-amount">₱{{ number_format($payment->amount, 2) }}</div>
                                     </td>
                                     <td>
-                                        <span class="payment-method-badge {{ strtolower(str_replace('_', '-', $payment->payment_method)) }}">
-                                            {{ ucfirst(str_replace('_', ' ', $payment->payment_method)) }}
+                                        <span class="payment-method-badge {{ strtolower(str_replace('_', '-', $payment->payment_method ?? 'cash')) }}">
+                                            {{ ucfirst(str_replace('_', ' ', $payment->payment_method ?? 'Cash')) }}
                                         </span>
                                     </td>
                                     <td>
-                                        @if($payment->payment_reference)
+                                        @if(isset($payment->payment_reference) && $payment->payment_reference)
                                             <div class="payment-reference">{{ $payment->payment_reference }}</div>
                                         @else
                                             <span class="text-muted">N/A</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="status-badge {{ $payment->status === 'completed' ? 'completed' : 'pending' }}">
-                                            {{ ucfirst($payment->status) }}
+                                        <span class="status-badge {{ ($payment->status ?? 'completed') === 'completed' ? 'completed' : 'pending' }}">
+                                            {{ ucfirst($payment->status ?? 'Completed') }}
                                         </span>
                                     </td>
                                     <td>

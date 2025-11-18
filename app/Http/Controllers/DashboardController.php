@@ -125,14 +125,45 @@ class DashboardController extends Controller
         // Calculate payment progress
         $paymentProgress = $totalAmount > 0 ? ($paidAmount / $totalAmount) * 100 : 0;
 
-        // Get recent payments
+        // Get recent payments - check through bill client_id
         $recentPayments = Payment::whereHas('bill', function ($query) use ($user) {
-            $query->where('client_id', $user->id);
-        })
-        ->with(['bill.appointment.service'])
-        ->orderBy('created_at', 'desc')
-        ->limit(10)
-        ->get();
+                $query->where('client_id', $user->id);
+            })
+            ->with(['bill.appointment.service'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Include paid bills that don't have payment records
+        // This handles cases where appointments are marked as paid but no Payment record exists
+        $paidBillsWithoutPayments = $bills->filter(function($bill) {
+            return ($bill->status === 'paid' || $bill->remaining_balance <= 0) 
+                && $bill->paid_amount > 0 
+                && $bill->payments()->count() === 0;
+        })->take(10 - $recentPayments->count());
+
+        foreach ($paidBillsWithoutPayments as $bill) {
+            // Create a virtual payment object for display
+            $virtualPayment = new \stdClass();
+            $virtualPayment->payment_number = $bill->bill_number ?? 'N/A';
+            $virtualPayment->bill = $bill;
+            $virtualPayment->amount = $bill->paid_amount;
+            $virtualPayment->payment_method = 'cash'; // Default
+            $virtualPayment->payment_reference = null;
+            $virtualPayment->status = 'completed';
+            $virtualPayment->created_at = $bill->paid_date 
+                ? \Carbon\Carbon::parse($bill->paid_date) 
+                : ($bill->created_at ?? now());
+            $virtualPayment->is_virtual = true;
+            $recentPayments->push($virtualPayment);
+        }
+
+        // Sort by date descending
+        $recentPayments = $recentPayments->sortByDesc(function($payment) {
+            return $payment->created_at instanceof \Carbon\Carbon 
+                ? $payment->created_at 
+                : \Carbon\Carbon::parse($payment->created_at);
+        })->take(10);
 
         // Get staggered bills
         $staggeredBills = $bills->where('payment_type', 'staggered');
