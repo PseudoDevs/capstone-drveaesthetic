@@ -32,9 +32,18 @@ class PrescriptionResource extends Resource
                                     ->with(['client', 'service'])
                                     ->latest()
                                     ->get()
-                                    ->mapWithKeys(fn ($appointment) => [
-                                        $appointment->id => "{$appointment->client->name} - {$appointment->service->service_name} ({$appointment->appointment_date->format('M d, Y')} at {$appointment->appointment_time})"
-                                    ]);
+                                    ->mapWithKeys(function ($appointment) {
+                                        $clientName = $appointment->client->name ?? 'Unknown Client';
+                                        $serviceName = $appointment->service->service_name ?? 'No Service Assigned';
+                                        $date = $appointment->appointment_date
+                                            ? \Illuminate\Support\Carbon::parse($appointment->appointment_date)->format('M d, Y')
+                                            : 'No Date';
+                                        $time = $appointment->appointment_time ?? 'No Time';
+
+                                        return [
+                                            $appointment->id => "{$clientName} - {$serviceName} ({$date} at {$time})",
+                                        ];
+                                    });
                             })
                             ->searchable()
                             ->preload()
