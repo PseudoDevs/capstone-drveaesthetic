@@ -111,7 +111,6 @@
                                     <th>Balance</th>
                                     <th>Status</th>
                                     <th>Due Date</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -141,11 +140,6 @@
                                         </span>
                                     </td>
                                     <td>{{ $bill->due_date ? $bill->due_date->format('M j, Y') : 'N/A' }}</td>
-                                    <td>
-                                        <button class="view-bill-btn">
-                                            <i class="fas fa-eye"></i> View
-                                        </button>
-                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>

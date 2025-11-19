@@ -531,7 +531,7 @@
                                 <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none">
                                     <div class="clinic-logo me-2">
                                         <img src="{{ asset('assets/images/new-logo-bk.png') }}"
-                                             alt="Dr. Ve Aesthetic Clinic Logo"
+                                             alt="Dr. Ve Aesthetic Clinic Logo" 
                                              class="clinic-logo-img">
                                     </div>
                                     <div class="text-logo">
